@@ -744,14 +744,14 @@ def Update_Task(ID, attribute, value):
 
 
 def main():
+    Project_Data_Filename='All Project Data Report Metro West or Mike.xlsx'
+    Schedules_Filename = 'Metro West PETE Schedules (1).xlsx'
     """ Main entry point of the app """
     logger.info("Starting Pete Maintenance Helper")
     Change_Working_Path('./Data')
-    files=filesearch('.xlsx')
-    dataframes = list()
-    for file in files:
-        dataframe=Excel_to_Pandas(file)
-        dataframes.append(dataframe)
+    Project_Data_df=Excel_to_Pandas(Project_Data_Filename)
+    Project_Schedules_df=Excel_to_Pandas(Schedules_Filename)
+
 
     #Set Index for all Dataframes
     myprojectsdf = pd.DataFrame()

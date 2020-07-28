@@ -403,7 +403,7 @@ def Genrate_Physical_Prints_Report(scheduledf):
         P_design['Estimated_In-Service_Date'] = P_design['Estimated_In-Service_Date'].dropna().astype(str)
 
         P_design.loc[P_design['Start_Date_Planned\Actual'] == 'A', 'Physical_Design_Start'] = 'Started'
-        P_design.loc[P_design['Start_Date_Planned\Actual'] == 'A', 'Physical_Design_Finish'] = 'Finished'
+        P_design.loc[P_design['Finish_Date_Planned\Actual'] == 'A', 'Physical_Design_Finish'] = 'Finished'
 
         outputdf = P_design[list(('PETE_ID',
                                   'Project_Name',

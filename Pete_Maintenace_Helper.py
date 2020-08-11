@@ -18,7 +18,8 @@ import datetime as DT
 import xlsxwriter
 from typing import Optional
 from xlsxwriter.worksheet import (
-    Worksheet, cell_number_tuple, cell_string_tuple)
+    Worksheet, cell_number_tuple, cell_string_tuple, xl_rowcol_to_cell
+)
 import multiprocessing
 
 
@@ -90,7 +91,7 @@ def Create_tasks_for_Precon_meetings(myprojects, schedule):
 
     outputdf = precons_df[precons_df.Project_ID.isin(list(myprojects.PETE_ID))]
 
-
+    outputdf.sort_values(by=['Estimated_In_Service_Date'])
     for index, row in outputdf.iterrows():
 
         description = 'Check if I have an invite to ' + row['Grandchild']
@@ -113,21 +114,26 @@ def Create_tasks_for_Precon_meetings(myprojects, schedule):
         #p.start()
     # p.join()
 
-def Create_tasks_for_Waterfalls(myprojects, scheduledf):
+def Create_tasks_for_Waterfalls(scheduledf):
     # This filters Waterfall schedules that are in draft of Released projects
-    Draft_Waterfalls=scheduledf[(scheduledf['Grandchild'] == 'Waterfall Start') &
-                             (scheduledf['Schedule_Status'] == 'Draft') &
-                            (scheduledf['Project_Status'] == 'Released') &
-                                pd.notnull(scheduledf['Planned_Construction_Ready'])]
+    PMO_DF=scheduledf[(scheduledf['Schedule_Function'] == 'PMO') &
+                      (scheduledf['Program_Manager'] == 'Michael Howard')]
 
-    outputdf = Draft_Waterfalls[Draft_Waterfalls.Project_ID.isin(list(myprojects.PETE_ID))]
+    All_projects_DF = scheduledf[(scheduledf['Program_Manager'] == 'Michael Howard')]
+
+    All_projects_DF=All_projects_DF.drop_duplicates(subset=['PETE_ID'])
+    PMO_DF=PMO_DF.drop_duplicates(subset=['PETE_ID'])
 
 
+
+    outputdf = All_projects_DF.loc[~All_projects_DF['PETE_ID'].isin(PMO_DF['PETE_ID'])]
+
+    outputdf.sort_values(by=['Estimated_In_Service_Date'])
     for index, row in outputdf.iterrows():
 
         description = 'Waterfall needs to baselined'
         project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
-        duedate = DT.datetime.today()
+        duedate = DT.datetime.today() + DT.timedelta(hours=1)
 
         if row['Project_Tier'] == 1.0:
             priority = 'H'
@@ -154,12 +160,12 @@ def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf):
                         (scheduledf['Project_Status'] == 'Released')]
 
     outputdf = filterdf[filterdf.Project_ID.isin(list(myprojects.PETE_ID))]
-
+    outputdf.sort_values(by=['Estimated_In_Service_Date'])
     for index, row in outputdf.iterrows():
 
         description = 'Check with Engineering on when a schedule will be finalized'
         project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
-        duedate = DT.datetime.today()
+        duedate = DT.datetime.today() + DT.timedelta(hours=2)
 
         if row['Project_Tier'] == 1.0:
             priority = 'H'
@@ -180,15 +186,17 @@ def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf):
 def Create_task_for_Released_projects_missing_Construnction_Ready_Date(scheduledf):
     # This filters Waterfall schedules that are in draft of Released projects
 
-    filterdf = scheduledf[(scheduledf['Grandchild'] == 'Waterfall Start') &
-                          (pd.isnull(scheduledf['PLANNEDCONSTRUCTIONREADY'])) ]
+    filterdf = scheduledf[(pd.isnull(scheduledf['PLANNEDCONSTRUCTIONREADY'])) &
+                          (scheduledf['Program_Manager'] == 'Michael Howard')]
 
+    filterdf= filterdf.drop_duplicates(subset=['PETE_ID'])
 
+    filterdf.sort_values(by=['Estimated_In_Service_Date'])
     for index, row in filterdf.iterrows():
 
         description = 'Check with Engineering on populating the construction ready date'
         project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
-        duedate = DT.datetime.today()+DT.timedelta(days=5)
+        duedate = DT.datetime.today()+DT.timedelta(hours=3)
 
         if row['Project_Tier'] == 1.0:
             priority = 'H'
@@ -213,12 +221,12 @@ def Create_task_for_ESID_before_Energiztion(scheduledf):
                           (scheduledf['Estimated_In-Service_Date'] < scheduledf['Finish_Date']) &
                           (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
 
-
+    filterdf.sort_values(by=['Estimated_In_Service_Date'])
     for index, row in filterdf.iterrows():
 
         description = 'Project Energization is after Estimated In-Service Date'
         project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
-        duedate = DT.datetime.today() + DT.timedelta(days=5)
+        duedate = DT.datetime.today() + DT.timedelta(hours=4)
 
         if row['Project_Tier'] == 1.0:
             priority = 'H'
@@ -242,11 +250,12 @@ def Create_task_for_Electrical_Prints_Start(scheduledf):
                               (scheduledf['Finish_Date'] >= DT.datetime.today()) &
                               (scheduledf['Program_Manager'] != 'Michael Howard' )]
 
+    filterdf = filterdf.sort_values(by=['Estimated_In_Service_Date'])
     for index, row in filterdf.iterrows():
 
         description = 'Check with Engineering on if Electrical Designs were started'
         project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
-        duedate = DT.datetime.today()
+        duedate = DT.datetime.today() + DT.timedelta(hours=5)
 
         if row['Project_Tier'] == 1.0:
             priority = 'H'
@@ -271,11 +280,12 @@ def Create_task_for_Electrical_Prints(scheduledf):
                           (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5) ) &
                           (scheduledf['Finish_Date_Planned\Actual'] != 'A' )]
     outputdf=filterdf
+    outputdf = outputdf.sort_values(by=['Estimated_In_Service_Date'])
     for index, row in outputdf.iterrows():
 
         description = 'Check with Engineering on when Electrical Designs will be issued'
         project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
-        duedate = DT.datetime.today()
+        duedate = DT.datetime.today() + DT.timedelta(hours=6)
 
         if row['Project_Tier'] == 1.0:
             priority = 'H'
@@ -303,6 +313,7 @@ def Create_task_for_Relay_Settings(scheduledf):
                           (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
                           (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
     outputdf = filterdf
+    outputdf=outputdf.sort_values(by=['Estimated_In_Service_Date'])
     for index, row in outputdf.iterrows():
 
         description = 'Check with Relay Setter on when settings are going to be issued'
@@ -326,7 +337,7 @@ def Create_task_for_Relay_Settings(scheduledf):
         filterdf = scheduledf[(scheduledf['Grandchild'] == 'Create Relay Settings') &
                               (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
                                   'Start_Date']) / 2 <= DT.datetime.today()) &
-                              (scheduledf['Finish_Date_Planned\Actual'] != 'A') &
+                              (scheduledf['Start_Date_Planned\Actual'] != 'A') &
                               (scheduledf['Finish_Date'] >= DT.datetime.today())]
         outputdf = filterdf
         for index, row in outputdf.iterrows():
@@ -531,10 +542,11 @@ def Genrate_Electrical_Prints_Report(scheduledf):
     writer.save()
     writer.close()
 
-def Genrate_Relay_Settings_Report(scheduledf):
+def Genrate_Relay_Settings_Report(scheduledf, Relay_Setters_df):
     writer = pd.ExcelWriter('Metro West Relay Settings Report.xlsx', engine='xlsxwriter')
 
     scheduledf = scheduledf[scheduledf['Region_Name'] == 'METRO WEST']
+    scheduledf = pd.merge(scheduledf, Relay_Setters_df[['PETE_ID', 'Relay_Setter_Engineer']], on='PETE_ID' )
 
     for district in np.sort(scheduledf.Work_Center_Name.dropna().unique()):
 
@@ -552,6 +564,8 @@ def Genrate_Relay_Settings_Report(scheduledf):
                                           # (scheduledf['Schedule_Status'] == 'Active') &
                                           # (scheduledf['Project_Status'] == 'Released') &
                                            (scheduledf['Work_Center_Name'] == district)]
+
+
 
         Protection_Control_df=Protection_Control_df.sort_values(by=['Start_Date'])
         Protection_Control_df.drop_duplicates(subset='PETE_ID', keep='last', inplace=True)
@@ -589,7 +603,7 @@ def Genrate_Relay_Settings_Report(scheduledf):
                                   'Estimated_In-Service_Date',
                                   'Project_Energization',
                                   'Earliest_PC_Delivery',
-                                  'RELAYSETTER',
+                                  'Relay_Setter_Engineer',
                                   ))]
 
         outputdf['Start_Date'] = outputdf['Start_Date'].dropna().astype(str)
@@ -735,6 +749,121 @@ def Update_Task(ID, attribute, value):
 
     logger.info(task)
 
+def Genrate_Resource_Plan(scheduledf, Budget_item_df):
+    writer = pd.ExcelWriter('Metro West Resource Plan.xlsx', engine='xlsxwriter')
+    scheduledf = scheduledf[scheduledf['Region_Name'] == 'METRO WEST']
+    scheduledf.drop_duplicates(subset='PETE_ID', keep='last', inplace=True)
+    scheduledf = scheduledf[scheduledf.PROJECTTYPE != 'ROW']
+    scheduledf.rename(columns={'BUDGETITEMNUMBER': 'Budget_Item_Number'}, inplace=True)
+    new_header=Budget_item_df.iloc[0]
+    Budget_item_df = Budget_item_df[1:]
+    Budget_item_df.columns = new_header
+
+    Budget_item_df.rename(columns={'Budget Item Number': 'Budget_Item_Number'}, inplace=True)
+    Budget_item_df.rename(columns={'Description': 'Budget_Item'}, inplace=True)
+
+    scheduledf = pd.merge(scheduledf, Budget_item_df, on='Budget_Item_Number')
+
+
+    for district in np.sort(scheduledf.Work_Center_Name.dropna().unique()):
+        for type in np.sort(scheduledf.PROJECTTYPE.dropna().unique()):
+            filtereddf = scheduledf[(scheduledf['Estimated_In_Service_Date'] >= pd.to_datetime('2021-01-01')) &
+                                     (scheduledf['Estimated_In_Service_Date'] <= pd.to_datetime('2021-06-30')) &
+                                     (scheduledf['PROJECTTYPE'] == type) &
+                                     (scheduledf['Work_Center_Name'] == district)]
+
+
+            outputdf = filtereddf[list(('PETE_ID',
+                                      'WA',
+                                      'Project_Name_x',
+                                      'Description',
+                                      'PLANNEDCONSTRUCTIONREADY',
+                                      'Estimated_In-Service_Date',
+                                      'Budget_Item',
+                                      ))]
+
+            if type == 'Station':
+                Work= [ 'P&C Work',
+                        'Set Steel',
+                        'Weld Bus',
+                        'Set Switches',
+                        'Install Jumpers',
+                        'Dress Transformer',
+                        'Above Grade Demo',
+                        'Set Breakers',
+                        'Remove Old Breakers'
+                      ]
+            else:
+                Work = ['Build Lattice',
+                        'FCC',
+                        'Install Insulators',
+                        'Set Switches'
+                        ]
+
+            Work.sort()
+
+            for item in Work:
+                outputdf[item] = np.nan
+
+            outputdf['Comments'] = np.nan
+
+            outputdf['PLANNEDCONSTRUCTIONREADY'] = outputdf['PLANNEDCONSTRUCTIONREADY'].dt.date
+            outputdf['Estimated_In-Service_Date'] = outputdf['Estimated_In-Service_Date'].dt.date
+
+            outputdf['PLANNEDCONSTRUCTIONREADY'] = outputdf['PLANNEDCONSTRUCTIONREADY'].dropna().astype(str)
+            outputdf['Estimated_In-Service_Date'] = outputdf['Estimated_In-Service_Date'].dropna().astype(str)
+            outputdf['WA'] = outputdf['WA'].dropna().astype(str)
+            #outputdf['Earliest_PC_Delivery'] = outputdf['Earliest_PC_Delivery'].dropna().astype(str)
+            #outputdf['Estimated_In-Service_Date'] = outputdf['Estimated_In-Service_Date'].dropna().astype(str)
+
+            # Create a Pandas Excel writer using XlsxWriter as the engine.
+            # Save the unformatted results
+
+            if len(outputdf) >= 1:
+                outputdf.to_excel(writer, index=False, sheet_name=district + ' ' + type)
+
+                # Get workbook
+                workbook = writer.book
+                worksheet = writer.sheets[district + ' ' + type]
+
+                # There is a better way to so this but I am ready to move on
+                # note that PETE ID is diffrent from the ID used to take you to a website page
+                x = 0
+                for row in filtereddf.iterrows():
+                    worksheet.write_url('A' + str(2 + x),
+                                        'https://pete.corp.oncor.com/pete.web/project-details/' + str(
+                                            filtereddf['PROJECTID'].values[x]),
+                                        string=str('%05.0f' % filtereddf['PETE_ID'].values[x]))  # Implicit format
+                    x = x + 1
+
+
+
+
+
+
+                cell_format = workbook.add_format()
+                cell_format.set_align('center')
+                worksheet.set_column('A:'+ chr(ord('@')+len(outputdf.columns)), None, cell_format)
+
+                for x in range(len(outputdf.columns)):
+                    set_column_autowidth(worksheet, x)
+
+                for column in outputdf.columns:
+                    index = outputdf.columns.get_loc(column)
+                    if column == 'P&C Work':
+                        worksheet.data_validation(xl_rowcol_to_cell(1,index)+':'+xl_rowcol_to_cell(outputdf.shape[0],index),
+                                          {'validate': 'list', 'source': [
+                                              'Commissioning Group',
+                                              'District',
+                                              'N/A',
+                                              'Outside District'
+                                             ],})
+
+                    #elif column == 'P&C Work':
+    writer.save()
+    writer.close()
+
+
 
 #def Complete_Task():
 
@@ -742,6 +871,8 @@ def Update_Task(ID, attribute, value):
 def main():
     Project_Data_Filename='All Project Data Report Metro West or Mike.xlsx'
     Schedules_Filename = 'Metro West PETE Schedules.xlsx'
+    Budget_Item_Filename = 'Budget Item.xlsx'
+    Relay_Setters_Filename = 'Relay Setter Report.xlsx'
     """ Main entry point of the app """
     logger.info("Starting Pete Maintenance Helper")
     Change_Working_Path('./Data')
@@ -757,6 +888,17 @@ def main():
         logger.error('Can not find Schedule Data file')
         raise
 
+    try:
+        budget_item_df=Excel_to_Pandas(Budget_Item_Filename)
+    except:
+        logger.error('Can not find Budget Item Data file')
+
+    try:
+        Relay_Setters_df=Excel_to_Pandas(Relay_Setters_Filename)
+    except:
+        logger.error('Can not find Relay Setters Data file')
+
+
     Project_Schedules_All_Data_df = pd.merge(Project_Schedules_df, Project_Data_df, on='PETE_ID', sort= False)
 
     #myprojectsdf.to_csv('myprojects.csv')
@@ -764,21 +906,24 @@ def main():
 
 
 
-    #Create_tasks_for_Precon_meetings(Project_Schedules_All_Data_df)
-  #  Create_tasks_for_Waterfalls(myprojectsdf, scheduledf)
-  #  Create_task_for_Final_Engineering_with_draft_schedules(myprojectsdf, scheduledf)
-    Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
-    Create_task_for_ESID_before_Energiztion(Project_Schedules_All_Data_df)
-    Create_task_for_Electrical_Prints_Start(Project_Schedules_All_Data_df)
+    if DT.date.today().weekday() == 0:
+        #Create_tasks_for_Precon_meetings(Project_Schedules_All_Data_df)
+        Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df)
+        # Create_task_for_Final_Engineering_with_draft_schedules(myprojectsdf, scheduledf)
+        Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
+        Create_task_for_ESID_before_Energiztion(Project_Schedules_All_Data_df)
+        Create_task_for_Electrical_Prints_Start(Project_Schedules_All_Data_df)
+        Create_task_for_Electrical_Prints(Project_Schedules_All_Data_df)
+        Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
 
-    Create_task_for_Electrical_Prints(Project_Schedules_All_Data_df)
-    Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
+    if DT.date.today().weekday() == 4:
+        Genrate_Relay_Settings_Report(Project_Schedules_All_Data_df, Relay_Setters_df)
+        Genrate_Electrical_Prints_Report(Project_Schedules_All_Data_df)
+        Genrate_Physical_Prints_Report(Project_Schedules_All_Data_df)
 
-    Genrate_Relay_Settings_Report(Project_Schedules_All_Data_df)
-    Genrate_Electrical_Prints_Report(Project_Schedules_All_Data_df)
-    Genrate_Physical_Prints_Report(Project_Schedules_All_Data_df)
+    Genrate_Resource_Plan(Project_Schedules_All_Data_df, budget_item_df)
 
-#
+
 
 if __name__ == "__main__":
     """ This is executed when run from the command line """

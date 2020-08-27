@@ -893,6 +893,36 @@ def Genrate_Resource_Plan(scheduledf, Budget_item_df):
         writer.close()
 
 
+def Genrate_Matrial_Report(Material_df, scheduledf):
+    for district in np.sort(scheduledf.Work_Center_Name.dropna().unique()):
+        writer = pd.ExcelWriter(' '.join([district,'Material Report.xlsx']), engine='xlsxwriter')
+        filtereddf = scheduledf[(scheduledf['Work_Center_Name'] == district)]
+        for project in np.sort(filtereddf.WA_Number.dropna().unique()):
+            project_material_df = Material_df[Material_df['PROJECT'] == project]
+            if len(project_material_df) >= 1:
+                project_material_df.to_excel(writer, index=False, sheet_name=project)
+                # Get workbook
+                workbook = writer.book
+                worksheet = writer.sheets[project]
+
+                cell_format = workbook.add_format()
+                cell_format.set_align('center')
+                cell_format.set_align('vcenter')
+                worksheet.set_column('A:' + chr(ord('@') + len(project_material_df.columns)), None, cell_format)
+
+                for x in range(len(project_material_df.columns)):
+                    set_column_autowidth(worksheet, x)
+
+                wrap_format = workbook.add_format()
+                wrap_format.set_text_wrap()
+                wrap_format.set_align('vcenter')
+                worksheet.set_column('C:C', None, wrap_format)
+                worksheet.set_column('C:C', 100)
+
+
+        writer.save()
+        writer.close()
+
 
 #def Complete_Task():
 
@@ -958,7 +988,7 @@ def main():
         Genrate_Physical_Prints_Report(Project_Schedules_All_Data_df)
 
     Genrate_Resource_Plan(Project_Schedules_All_Data_df, budget_item_df)
-
+    Genrate_Matrial_Report(Material_Data_df, Project_Schedules_All_Data_df)
 
 
 if __name__ == "__main__":

@@ -61,7 +61,8 @@ def Excel_to_Pandas(filename):
     logger.info('importing file ' + filename)
     df=[]
     try:
-        df = pd.read_excel(filename)
+        df = pd.read_excel(filename, sheet_name=None)
+        df = pd.concat(df, axis=0, ignore_index=True)
     except:
         logger.error("Error importing file " + filename, exc_info=True)
 
@@ -750,7 +751,7 @@ def Update_Task(ID, attribute, value):
     logger.info(task)
 
 def Genrate_Resource_Plan(scheduledf, Budget_item_df):
-    writer = pd.ExcelWriter('Metro West Resource Plan.xlsx', engine='xlsxwriter')
+
     scheduledf = scheduledf[scheduledf['Region_Name'] == 'METRO WEST']
     scheduledf.drop_duplicates(subset='PETE_ID', keep='last', inplace=True)
     scheduledf = scheduledf[scheduledf.PROJECTTYPE != 'ROW']
@@ -766,13 +767,14 @@ def Genrate_Resource_Plan(scheduledf, Budget_item_df):
 
 
     for district in np.sort(scheduledf.Work_Center_Name.dropna().unique()):
+        writer = pd.ExcelWriter(district + ' Spring District Resource Plan.xlsx', engine='xlsxwriter')
         for type in np.sort(scheduledf.PROJECTTYPE.dropna().unique()):
             filtereddf = scheduledf[(scheduledf['Estimated_In_Service_Date'] >= pd.to_datetime('2021-01-01')) &
                                      (scheduledf['Estimated_In_Service_Date'] <= pd.to_datetime('2021-06-30')) &
                                      (scheduledf['PROJECTTYPE'] == type) &
                                      (scheduledf['Work_Center_Name'] == district)]
 
-
+            outputdf = filtereddf.sort_values(by=['PLANNEDCONSTRUCTIONREADY'], ascending=True)
             outputdf = filtereddf[list(('PETE_ID',
                                       'WA',
                                       'Project_Name_x',
@@ -797,7 +799,8 @@ def Genrate_Resource_Plan(scheduledf, Budget_item_df):
                 Work = ['Build Lattice',
                         'FCC',
                         'Install Insulators',
-                        'Set Switches'
+                        'Set Switches',
+                        'Replace Arms'
                         ]
 
             Work.sort()
@@ -815,6 +818,10 @@ def Genrate_Resource_Plan(scheduledf, Budget_item_df):
             outputdf['WA'] = outputdf['WA'].dropna().astype(str)
             #outputdf['Earliest_PC_Delivery'] = outputdf['Earliest_PC_Delivery'].dropna().astype(str)
             #outputdf['Estimated_In-Service_Date'] = outputdf['Estimated_In-Service_Date'].dropna().astype(str)
+
+            outputdf.rename(columns={'PLANNEDCONSTRUCTIONREADY': 'Construction Ready'}, inplace= True)
+            outputdf.rename(columns={'Project_Name_x': 'Project Name'}, inplace= True)
+
 
             # Create a Pandas Excel writer using XlsxWriter as the engine.
             # Save the unformatted results
@@ -839,19 +846,11 @@ def Genrate_Resource_Plan(scheduledf, Budget_item_df):
 
 
 
-
-
-                cell_format = workbook.add_format()
-                cell_format.set_align('center')
-                worksheet.set_column('A:'+ chr(ord('@')+len(outputdf.columns)), None, cell_format)
-
-                for x in range(len(outputdf.columns)):
-                    set_column_autowidth(worksheet, x)
-
                 for column in outputdf.columns:
                     index = outputdf.columns.get_loc(column)
                     if column == 'P&C Work':
-                        worksheet.data_validation(xl_rowcol_to_cell(1,index)+':'+xl_rowcol_to_cell(outputdf.shape[0],index),
+                        worksheet.data_validation(
+                            xl_rowcol_to_cell(1,index)+':'+xl_rowcol_to_cell(outputdf.shape[0], index),
                                           {'validate': 'list', 'source': [
                                               'Commissioning Group',
                                               'District',
@@ -859,9 +858,39 @@ def Genrate_Resource_Plan(scheduledf, Budget_item_df):
                                               'Outside District'
                                              ],})
 
-                    #elif column == 'P&C Work':
-    writer.save()
-    writer.close()
+                    elif column in Work:
+                        worksheet.data_validation(
+                            xl_rowcol_to_cell(1, index) + ':' + xl_rowcol_to_cell(outputdf.shape[0], index),
+                            {'validate': 'list', 'source': [
+                                'District will do all',
+                                'District will do some, see comments',
+                                'N/A',
+                                'Outside District'
+
+                            ], })
+            cell_format = workbook.add_format()
+
+
+
+
+
+            cell_format = workbook.add_format()
+            cell_format.set_align('center')
+            cell_format.set_align('vcenter')
+            worksheet.set_column('A:' + chr(ord('@') + len(outputdf.columns)), None, cell_format)
+
+            for x in range(len(outputdf.columns)):
+                set_column_autowidth(worksheet, x)
+
+            wrap_format = workbook.add_format()
+            wrap_format.set_text_wrap()
+            wrap_format.set_align('vcenter')
+            worksheet.set_column('C:D', None, wrap_format)
+            worksheet.set_column('C:D', 100)
+
+
+        writer.save()
+        writer.close()
 
 
 
@@ -873,11 +902,18 @@ def main():
     Schedules_Filename = 'Metro West PETE Schedules.xlsx'
     Budget_Item_Filename = 'Budget Item.xlsx'
     Relay_Setters_Filename = 'Relay Setter Report.xlsx'
+    Material_Data_Filename = 'Material Status Report All Metro West.xlsx'
     """ Main entry point of the app """
     logger.info("Starting Pete Maintenance Helper")
     Change_Working_Path('./Data')
     try:
         Project_Data_df=Excel_to_Pandas(Project_Data_Filename)
+    except:
+        logger.error('Can not find Project Data file')
+        raise
+
+    try:
+        Material_Data_df=Excel_to_Pandas(Material_Data_Filename)
     except:
         logger.error('Can not find Project Data file')
         raise

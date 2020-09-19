@@ -21,6 +21,9 @@ from xlsxwriter.worksheet import (
     Worksheet, cell_number_tuple, cell_string_tuple, xl_rowcol_to_cell
 )
 import multiprocessing
+from pathlib import Path
+import tkinter as tk
+from tkinter import filedialog
 
 
 
@@ -57,9 +60,16 @@ def Change_Working_Path(path):
         print("Can't change the Current Working Directory because this path doesn't exits")
 
 #Pandas Functions
-def Excel_to_Pandas(filename):
+def Excel_to_Pandas(filename,check_update=False):
     logger.info('importing file ' + filename)
     df=[]
+    if check_update == True:
+        timestamp = DT.datetime.fromtimestamp(Path(filename).stat().st_mtime)
+        if DT.datetime.today().date() != timestamp.date():
+            root = tk.Tk()
+            root.withdraw()
+            filename = filedialog.askopenfilename(title =' '.join(['Select file for', filename]))
+
     try:
         df = pd.read_excel(filename, sheet_name=None)
         df = pd.concat(df, axis=0, ignore_index=True)
@@ -149,9 +159,75 @@ def Create_tasks_for_Waterfalls(scheduledf):
             priority = None
 
         Add_Task(description, project, duedate, priority, 'PMH')
-        #p.start()
-    #p.join()
-    
+
+    Waterfall_Start_DF = scheduledf[(scheduledf['Schedule_Function'] == 'PMO') &
+                        (scheduledf['Program_Manager'] == 'Michael Howard') &
+                        (scheduledf['Grandchild'] == 'Waterfall Start')]
+
+    Waterfall_Finish_DF = scheduledf[(scheduledf['Schedule_Function'] == 'PMO') &
+                                    (scheduledf['Program_Manager'] == 'Michael Howard') &
+                                    (scheduledf['Grandchild'] == 'Waterfall Finish')]
+
+    Waterfall_Start_DF.reset_index(drop=True)
+    Waterfall_Finish_DF.reset_index(drop=True)
+    outputdf = Waterfall_Start_DF.loc[Waterfall_Start_DF['Start_Date'].values > Waterfall_Finish_DF['Start_Date'].values]
+
+    outputdf.sort_values(by=['Estimated_In_Service_Date'])
+    for index, row in outputdf.iterrows():
+
+        description = 'Waterfall Finish is before Waterfall Start'
+        project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
+        duedate = DT.datetime.today() + DT.timedelta(hours=1)
+
+        if row['Project_Tier'] == 1.0:
+            priority = 'H'
+
+        elif row['Project_Tier'] == 2.0:
+            priority = 'M'
+
+        elif row['Project_Tier'] == 3.0:
+            priority = 'L'
+
+        else:
+            priority = None
+
+        Add_Task(description, project, duedate, priority, 'PMH')
+
+    outputdf=Waterfall_Finish_DF
+    outputdf['ESID_SEASON']=outputdf.loc[pd.to_datetime(outputdf['Estimated_In-Service_Date']).dt.quarter < 3, 'ESID_SEASON'] = pd.to_numeric(pd.to_datetime(outputdf['Estimated_In-Service_Date']).dt.year)+.5
+    outputdf['ESID_SEASON'] = outputdf.loc[pd.to_datetime(outputdf['Estimated_In-Service_Date']).dt.quarter >= 3, 'ESID_SEASON'] = pd.to_numeric(pd.to_datetime(outputdf['Estimated_In-Service_Date']).dt.year)
+
+    outputdf['WaterFall_SEASON'] = outputdf.loc[pd.to_datetime(outputdf['Start_Date']).dt.quarter < 3, 'WaterFall_SEASON'] = pd.to_numeric(pd.to_datetime(outputdf['Start_Date']).dt.year)+.5
+    outputdf['WaterFall_SEASON'] = outputdf.loc[pd.to_datetime(outputdf['Start_Date']).dt.quarter >= 3, 'WaterFall_SEASON'] = pd.to_numeric(pd.to_datetime(outputdf['Start_Date']).dt.year)
+
+    outputdf = outputdf.loc[(
+        outputdf['WaterFall_SEASON'] != outputdf['ESID_SEASON'])]
+
+    outputdf.sort_values(by=['Estimated_In_Service_Date'])
+    for index, row in outputdf.iterrows():
+
+        description = 'Waterfall Finish not in same season as EISD'
+        project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
+        duedate = DT.datetime.today() + DT.timedelta(hours=1)
+
+        if row['Project_Tier'] == 1.0:
+            priority = 'H'
+
+        elif row['Project_Tier'] == 2.0:
+            priority = 'M'
+
+        elif row['Project_Tier'] == 3.0:
+            priority = 'L'
+
+        else:
+            priority = None
+
+        Add_Task(description, project, duedate, priority, 'PMH')
+
+
+
+
+
 
 def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf):
     # This filters Waterfall schedules that are in draft of Released projects
@@ -219,6 +295,7 @@ def Create_task_for_ESID_before_Energiztion(scheduledf):
     #
 
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Project Energization') &
+                          (scheduledf['Program_Manager'] == 'Michael Howard') &
                           (scheduledf['Estimated_In-Service_Date'] < scheduledf['Finish_Date']) &
                           (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
 
@@ -769,8 +846,8 @@ def Genrate_Resource_Plan(scheduledf, Budget_item_df):
     for district in np.sort(scheduledf.Work_Center_Name.dropna().unique()):
         writer = pd.ExcelWriter(district + ' Spring District Resource Plan.xlsx', engine='xlsxwriter')
         for type in np.sort(scheduledf.PROJECTTYPE.dropna().unique()):
-            filtereddf = scheduledf[(scheduledf['Estimated_In_Service_Date'] >= pd.to_datetime('2021-01-01')) &
-                                     (scheduledf['Estimated_In_Service_Date'] <= pd.to_datetime('2021-06-30')) &
+            filtereddf = scheduledf[(scheduledf['Estimated_In_Service_Date'] >= pd.to_datetime('2020-01-01')) &
+                                     (scheduledf['Estimated_In_Service_Date'] <= pd.to_datetime('2020-12-31')) &
                                      (scheduledf['PROJECTTYPE'] == type) &
                                      (scheduledf['Work_Center_Name'] == district)]
 
@@ -896,13 +973,21 @@ def Genrate_Resource_Plan(scheduledf, Budget_item_df):
 def Genrate_Matrial_Report(Material_df, scheduledf):
     for district in np.sort(scheduledf.Work_Center_Name.dropna().unique()):
         writer = pd.ExcelWriter(' '.join([district,'Material Report.xlsx']), engine='xlsxwriter')
+        workbook = writer.book
+        summarysheet = workbook.add_worksheet('Summary')
         filtereddf = scheduledf[(scheduledf['Work_Center_Name'] == district)]
+        row=0
         for project in np.sort(filtereddf.WA_Number.dropna().unique()):
+
             project_material_df = Material_df[Material_df['PROJECT'] == project]
             if len(project_material_df) >= 1:
+
+                summarysheet.write_url(row, 0, f"internal:'{project}'!A1", string=project)
+                summarysheet.write(row, 1, str(scheduledf[(scheduledf['WA_Number']==project)]['Project_Name_x'].values[0]))
+                row = row + 1
                 project_material_df.to_excel(writer, index=False, sheet_name=project)
                 # Get workbook
-                workbook = writer.book
+
                 worksheet = writer.sheets[project]
 
                 cell_format = workbook.add_format()
@@ -923,9 +1008,61 @@ def Genrate_Matrial_Report(Material_df, scheduledf):
         writer.save()
         writer.close()
 
+def Create_task_for_add_WA_to_schedule(scheduledf, myprojectbudgetitmes):
+    # This filters Prints with finished dates past 5 days past today without an actual finish
+
+    filterdf = scheduledf[(pd.isnull(scheduledf['Schedule_Function'])) &
+                          (scheduledf['PROJECTSTATUS'] == 'Released') &
+                          (scheduledf['BUDGETITEMNUMBER'].isin(myprojectbudgetitmes))]
+    outputdf = filterdf
+    outputdf = outputdf.sort_values(by=['Estimated_In_Service_Date'])
+    for index, row in outputdf.iterrows():
+
+        description = 'Add PETE ID to query for Schedules'
+        project = str(row['PETE_ID']) + ':' + row['Project_Name_y']
+        duedate = DT.datetime.today() + DT.timedelta(hours=6)
+
+        if row['Project_Tier'] == 1.0:
+            priority = 'H'
+
+        elif row['Project_Tier'] == 2.0:
+            priority = 'M'
+
+        elif row['Project_Tier'] == 3.0:
+            priority = 'L'
+
+        else:
+            priority = None
+
+        Add_Task(description, project, duedate, priority, 'PMH')
 
 #def Complete_Task():
 
+def Create_task_for_missing_tiers(df):
+    filterdf = df[(pd.isnull(df['Project_Tier'])) &
+                          (df['Program_Manager'] == 'Michael Howard')]
+
+    outputdf = filterdf.drop_duplicates(subset=['PETE_ID'])
+    outputdf = outputdf.sort_values(by=['Estimated_In_Service_Date'])
+    for index, row in outputdf.iterrows():
+
+        description = 'Project Tier Missing'
+        project = str(row['PETE_ID']) + ':' + row['Project_Name_y']
+        duedate = DT.datetime.today() + DT.timedelta(hours=6)
+
+        if row['Project_Tier'] == 1.0:
+            priority = 'H'
+
+        elif row['Project_Tier'] == 2.0:
+            priority = 'M'
+
+        elif row['Project_Tier'] == 3.0:
+            priority = 'L'
+
+        else:
+            priority = None
+
+        Add_Task(description, project, duedate, priority, 'PMH')
 
 def main():
     Project_Data_Filename='All Project Data Report Metro West or Mike.xlsx'
@@ -933,23 +1070,22 @@ def main():
     Budget_Item_Filename = 'Budget Item.xlsx'
     Relay_Setters_Filename = 'Relay Setter Report.xlsx'
     Material_Data_Filename = 'Material Status Report All Metro West.xlsx'
+
+    myprojectbudgetitmes=['00003212', '00003201', '00003203', '00003206', '00003226']
+
     """ Main entry point of the app """
     logger.info("Starting Pete Maintenance Helper")
     Change_Working_Path('./Data')
     try:
-        Project_Data_df=Excel_to_Pandas(Project_Data_Filename)
+        Project_Data_df=Excel_to_Pandas(Project_Data_Filename, True)
     except:
         logger.error('Can not find Project Data file')
         raise
 
-    try:
-        Material_Data_df=Excel_to_Pandas(Material_Data_Filename)
-    except:
-        logger.error('Can not find Project Data file')
-        raise
+
 
     try:
-        Project_Schedules_df=Excel_to_Pandas(Schedules_Filename)
+        Project_Schedules_df=Excel_to_Pandas(Schedules_Filename, True)
     except:
         logger.error('Can not find Schedule Data file')
         raise
@@ -965,7 +1101,7 @@ def main():
         logger.error('Can not find Relay Setters Data file')
 
 
-    Project_Schedules_All_Data_df = pd.merge(Project_Schedules_df, Project_Data_df, on='PETE_ID', sort= False)
+    Project_Schedules_All_Data_df = pd.merge(Project_Schedules_df, Project_Data_df, on='PETE_ID', sort= False, how='outer')
 
     #myprojectsdf.to_csv('myprojects.csv')
     Project_Schedules_All_Data_df.to_csv('scheduledf.csv')
@@ -974,21 +1110,32 @@ def main():
 
     if DT.date.today().weekday() == 0:
         #Create_tasks_for_Precon_meetings(Project_Schedules_All_Data_df)
-        Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df)
+
         # Create_task_for_Final_Engineering_with_draft_schedules(myprojectsdf, scheduledf)
-        Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
+        #Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
         Create_task_for_ESID_before_Energiztion(Project_Schedules_All_Data_df)
         Create_task_for_Electrical_Prints_Start(Project_Schedules_All_Data_df)
         Create_task_for_Electrical_Prints(Project_Schedules_All_Data_df)
         Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
+        Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes)
+        Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df)
+        Create_task_for_missing_tiers(Project_Schedules_All_Data_df)
+
 
     if DT.date.today().weekday() == 4:
         Genrate_Relay_Settings_Report(Project_Schedules_All_Data_df, Relay_Setters_df)
         Genrate_Electrical_Prints_Report(Project_Schedules_All_Data_df)
         Genrate_Physical_Prints_Report(Project_Schedules_All_Data_df)
 
+    if DT.date.today().weekday() == 2:
+        try:
+            Material_Data_df = Excel_to_Pandas(Material_Data_Filename)
+        except:
+            logger.error('Can not find Project Data file')
+            raise
+        Genrate_Matrial_Report(Material_Data_df, Project_Schedules_All_Data_df)
     Genrate_Resource_Plan(Project_Schedules_All_Data_df, budget_item_df)
-    Genrate_Matrial_Report(Material_Data_df, Project_Schedules_All_Data_df)
+
 
 
 if __name__ == "__main__":

@@ -321,19 +321,125 @@ def Create_task_for_ESID_before_Energiztion(scheduledf):
         Add_Task(description, project, duedate, priority, 'PMH')
 
 
-def Create_task_for_Electrical_Prints_Start(scheduledf):
-    filterdf = scheduledf[(scheduledf['Grandchild'] == 'Electrical Design') &
-                              (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf['Start_Date'])/2 <= DT.datetime.today() )  &
-                              (scheduledf['Start_Date_Planned\Actual'] != 'A' ) &
-                              (scheduledf['Finish_Date'] >= DT.datetime.today()) &
-                              (scheduledf['Program_Manager'] != 'Michael Howard' )]
+def Create_task_for_Engineering_Activities(scheduledf):
 
-    filterdf = filterdf.sort_values(by=['Estimated_In_Service_Date'])
-    for index, row in filterdf.iterrows():
+    #This code filters out the start dates for TE activities and creates tasks
+    EDdf = scheduledf[(scheduledf['Grandchild'] == 'Electrical Design') &
+                      (scheduledf['Start_Date'] + (
+                                  scheduledf['Finish_Date'] - scheduledf['Start_Date']) / 2 <= DT.datetime.today()) &
+                      (scheduledf['Start_Date_Planned\Actual'] != 'A') &
+                      (scheduledf['Finish_Date'] >= DT.datetime.today()) &
+                      (scheduledf['Program_Manager'] != 'Michael Howard')]
 
-        description = 'Check with Engineering on if Electrical Designs were started'
+    PDdf = scheduledf[(scheduledf['Grandchild'] == 'Physical Design') &
+                          (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
+                              'Start_Date']) / 2 <= DT.datetime.today()) &
+                          (scheduledf['Start_Date_Planned\Actual'] != 'A') &
+                          (scheduledf['Finish_Date'] >= DT.datetime.today()) &
+                          (scheduledf['Program_Manager'] != 'Michael Howard')]
+
+    FDdf = scheduledf[(scheduledf['Grandchild'] == 'Foundation Design') &
+                            (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
+                                'Start_Date']) / 2 <= DT.datetime.today()) &
+                            (scheduledf['Start_Date_Planned\Actual'] != 'A') &
+                            (scheduledf['Finish_Date'] >= DT.datetime.today()) &
+                            (scheduledf['Program_Manager'] != 'Michael Howard')]
+
+    filterdf=EDdf[~EDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
+    filterdf=filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
+
+    description = 'Check with Engineering on if Electrical Designs were started'
+    duedate = DT.datetime.today() + DT.timedelta(hours=5)
+    create_tasks(filterdf, description, duedate)
+
+
+    filterdf = PDdf[~PDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
+    filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
+
+    description = 'Check with Engineering on if Physical Designs were started'
+    duedate = DT.datetime.today() + DT.timedelta(hours=5)
+    create_tasks(filterdf, description, duedate)
+
+    filterdf = FDdf[~FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
+    filterdf = filterdf[~filterdf['PETE_ID'].isin(PDdf['PETE_ID'])]
+
+    description = 'Check with Engineering on if Foundation Designs were started'
+    duedate = DT.datetime.today() + DT.timedelta(hours=5)
+    create_tasks(filterdf, description, duedate)
+
+    filterdf = FDdf[FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
+    filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
+
+    description = 'Ask Engineering to update the TE schedule'
+    duedate = DT.datetime.today() + DT.timedelta(hours=5)
+    create_tasks(filterdf, description, duedate)
+
+    # This code filters out the finish dates for TE activities and creates tasks
+
+    EDdf = scheduledf[(scheduledf['Grandchild'] == 'Electrical Design') &
+                      (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
+                          (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
+
+    PDdf = scheduledf[(scheduledf['Grandchild'] == 'Physical Design') &
+                      (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
+                          (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
+
+    FDdf = scheduledf[(scheduledf['Grandchild'] == 'Foundation Design') &
+                      (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
+                      (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
+
+    filterdf = EDdf[~EDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
+    filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
+
+    description = 'Check with Engineering on if Electrical Designs were issued'
+    duedate = DT.datetime.today() + DT.timedelta(hours=5)
+    create_tasks(filterdf, description, duedate)
+
+    filterdf = PDdf[~PDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
+    filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
+
+    description = 'Check with Engineering on if Physical Designs were issued'
+    duedate = DT.datetime.today() + DT.timedelta(hours=5)
+    create_tasks(filterdf, description, duedate)
+
+    filterdf = FDdf[~FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
+    filterdf = filterdf[~filterdf['PETE_ID'].isin(PDdf['PETE_ID'])]
+
+    description = 'Check with Engineering on if Foundation Designs were issued'
+    duedate = DT.datetime.today() + DT.timedelta(hours=5)
+    create_tasks(filterdf, description, duedate)
+
+    filterdf = FDdf[FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
+    filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
+
+    description = 'Ask Engineering to update the TE schedule'
+    duedate = DT.datetime.today() + DT.timedelta(hours=5)
+    create_tasks(filterdf, description, duedate)
+
+    filterdf = scheduledf[(scheduledf['Grandchild'] == 'Construction Task Request Approval') &
+                      (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
+                      (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
+
+    description = 'Ask Engineering for update on Construction Task Request Approval'
+    duedate = DT.datetime.today() + DT.timedelta(hours=5)
+    create_tasks(filterdf, description, duedate)
+
+    filterdf = scheduledf[(scheduledf['Grandchild'] == 'Complete Design Book Issued') &
+                          (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
+                          (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
+
+    description = 'Ask Engineering for update on Design Book Issued'
+    duedate = DT.datetime.today() + DT.timedelta(hours=5)
+    create_tasks(filterdf, description, duedate)
+
+
+def create_tasks(df, description, duedate, tag='PMH'):
+    df = df.sort_values(by=['Estimated_In_Service_Date'])
+    for index, row in df.iterrows():
+
+
         project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
-        duedate = DT.datetime.today() + DT.timedelta(hours=5)
+
 
         if row['Project_Tier'] == 1.0:
             priority = 'H'
@@ -347,42 +453,8 @@ def Create_task_for_Electrical_Prints_Start(scheduledf):
         else:
             priority = None
 
-        Add_Task(description, project, duedate, priority, 'PMH')
+        Add_Task(description, project, duedate, priority, tag)
 
-
-def Create_task_for_Electrical_Prints(scheduledf):
-
-    # This filters Prints with finished dates past 5 days past today without an actual finish
-
-    filterdf = scheduledf[(scheduledf['Grandchild'] == 'Electrical Design') &
-                          (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5) ) &
-                          (scheduledf['Finish_Date_Planned\Actual'] != 'A' )]
-    outputdf=filterdf
-    outputdf = outputdf.sort_values(by=['Estimated_In_Service_Date'])
-    for index, row in outputdf.iterrows():
-
-        description = 'Check with Engineering on when Electrical Designs will be issued'
-        project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
-        duedate = DT.datetime.today() + DT.timedelta(hours=6)
-
-        if row['Project_Tier'] == 1.0:
-            priority = 'H'
-
-        elif row['Project_Tier'] == 2.0:
-            priority = 'M'
-
-        elif row['Project_Tier'] == 3.0:
-            priority = 'L'
-
-        else:
-            priority = None
-
-        Add_Task(description, project, duedate, priority, 'PMH')
-
-
-
-        #p.start()
-    #p.join()
 
 def Create_task_for_Relay_Settings(scheduledf):
     # This filters Prints with finished dates past 5 days past today without an actual finish
@@ -1114,8 +1186,7 @@ def main():
         # Create_task_for_Final_Engineering_with_draft_schedules(myprojectsdf, scheduledf)
         #Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
         Create_task_for_ESID_before_Energiztion(Project_Schedules_All_Data_df)
-        Create_task_for_Electrical_Prints_Start(Project_Schedules_All_Data_df)
-        Create_task_for_Electrical_Prints(Project_Schedules_All_Data_df)
+        Create_task_for_Electrical_Activities(Project_Schedules_All_Data_df)
         Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
         Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes)
         Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df)

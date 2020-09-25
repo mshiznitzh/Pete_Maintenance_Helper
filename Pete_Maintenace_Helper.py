@@ -24,6 +24,7 @@ import multiprocessing
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog
+from subprocess import Popen, PIPE
 
 
 
@@ -223,9 +224,6 @@ def Create_tasks_for_Waterfalls(scheduledf):
             priority = None
 
         Add_Task(description, project, duedate, priority, 'PMH')
-
-
-
 
 
 
@@ -432,13 +430,23 @@ def Create_tasks_for_Engineering_Activities(scheduledf):
     duedate = DT.datetime.today() + DT.timedelta(hours=5)
     create_tasks(filterdf, description, duedate)
 
+    filterdf = scheduledf[(pd.isnull(scheduledf['FIMSTATUS'])) &
+                          (scheduledf['PLANNEDCONSTRUCTIONREADY'] <= DT.datetime.today() - DT.timedelta(days=5)) &
+                         (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
+
+    description = 'Ask Engineering about the WA'
+    duedate = DT.datetime.today() + DT.timedelta(hours=5)
+    create_tasks(filterdf, description, duedate)
+
 
 def create_tasks(df, description, duedate, tag='PMH'):
     df = df.sort_values(by=['Estimated_In_Service_Date'])
     for index, row in df.iterrows():
 
+        logger.info("Starting Function")
+        logger.info(str(row['PETE_ID']))
 
-        project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
+        project = str(row['PETE_ID']) + ':' + row['Project_Name_y']
 
 
         if row['Project_Tier'] == 1.0:
@@ -918,8 +926,8 @@ def Genrate_Resource_Plan(scheduledf, Budget_item_df):
     for district in np.sort(scheduledf.Work_Center_Name.dropna().unique()):
         writer = pd.ExcelWriter(district + ' Spring District Resource Plan.xlsx', engine='xlsxwriter')
         for type in np.sort(scheduledf.PROJECTTYPE.dropna().unique()):
-            filtereddf = scheduledf[(scheduledf['Estimated_In_Service_Date'] >= pd.to_datetime('2020-01-01')) &
-                                     (scheduledf['Estimated_In_Service_Date'] <= pd.to_datetime('2020-12-31')) &
+            filtereddf = scheduledf[(scheduledf['Estimated_In_Service_Date'] >= pd.to_datetime('2021-01-01')) &
+                                     (scheduledf['Estimated_In_Service_Date'] <= pd.to_datetime('2021-12-31')) &
                                      (scheduledf['PROJECTTYPE'] == type) &
                                      (scheduledf['Work_Center_Name'] == district)]
 
@@ -1180,18 +1188,28 @@ def main():
 
 
 
-    if DT.date.today().weekday() == 0:
-        #Create_tasks_for_Precon_meetings(Project_Schedules_All_Data_df)
+    if DT.date.today().weekday() == 4:
 
-        # Create_task_for_Final_Engineering_with_draft_schedules(myprojectsdf, scheduledf)
+        res = Popen('tasks=$(task tag=PMH _ids) && task delete $tasks', shell=True, stdin=PIPE)
+        res.stdin.write(b'a\n')
+        res.stdin.flush()
+        res.stdin.close()
+        res = Popen('task sync', shell=True, stdin=PIPE)
+        res.stdin.close()
+
+
+        #Create_tasks_for_Precon_meetings(Project_Schedules_All_Data_df)
+        #Create_task_for_Final_Engineering_with_draft_schedules(myprojectsdf, scheduledf)
         #Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
         Create_task_for_ESID_before_Energiztion(Project_Schedules_All_Data_df)
-        Create_tasks_for_Engineering_Activities
+        Create_tasks_for_Engineering_Activities(Project_Schedules_All_Data_df)
         Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
         Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes)
         Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df)
         Create_task_for_missing_tiers(Project_Schedules_All_Data_df)
 
+        res = Popen('task sync', shell=True, stdin=PIPE)
+        res.stdin.close()
 
     if DT.date.today().weekday() == 4:
         Genrate_Relay_Settings_Report(Project_Schedules_All_Data_df, Relay_Setters_df)

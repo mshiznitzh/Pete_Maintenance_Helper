@@ -1187,8 +1187,8 @@ def main():
     Project_Schedules_All_Data_df.to_csv('scheduledf.csv')
 
 
-
-    if DT.date.today().weekday() == 4:
+#Return the day of the week as an integer, where Monday is 0 and Sunday is 6
+    if DT.date.today().weekday() == 0:
 
         res = Popen('tasks=$(task tag=PMH _ids) && task delete $tasks', shell=True, stdin=PIPE)
         res.stdin.write(b'a\n')

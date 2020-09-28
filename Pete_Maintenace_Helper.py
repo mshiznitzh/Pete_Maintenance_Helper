@@ -431,8 +431,9 @@ def Create_tasks_for_Engineering_Activities(scheduledf):
     create_tasks(filterdf, description, duedate)
 
     filterdf = scheduledf[(pd.isnull(scheduledf['FIMSTATUS'])) &
-                          (scheduledf['PLANNEDCONSTRUCTIONREADY'] <= DT.datetime.today() - DT.timedelta(days=5)) &
-                         (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
+                         (scheduledf['PLANNEDCONSTRUCTIONREADY'] <= DT.datetime.today() - DT.timedelta(days=5)) &
+                         (scheduledf['Finish_Date_Planned\Actual'] != 'A') &
+                         (scheduledf['Program_Manager'] != 'Michael Howard')]
 
     description = 'Ask Engineering about the WA'
     duedate = DT.datetime.today() + DT.timedelta(hours=5)

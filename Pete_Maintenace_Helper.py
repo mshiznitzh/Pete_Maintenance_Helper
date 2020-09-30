@@ -489,7 +489,7 @@ def Create_task_for_Relay_Settings(scheduledf):
     filterdf = filterdf.sort_values(by=['Estimated_In_Service_Date'])
 
     if len(filterdf) >= 1:
-        description = 'Check with Relay Setter on when settings are going to be issued'
+        description = 'Check with Relay Setter on when settings are going to be started'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         create_tasks(filterdf, description, duedate)
 

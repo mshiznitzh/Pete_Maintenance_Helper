@@ -349,7 +349,7 @@ def Create_tasks_for_Engineering_Activities(scheduledf):
     description = 'Check with Engineering on if Electrical Designs were started'
     duedate = DT.datetime.today() + DT.timedelta(hours=5)
     create_tasks(filterdf, description, duedate)
-
+    return filterdf, description, duedate
 
     filterdf = PDdf[~PDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
@@ -416,7 +416,8 @@ def Create_tasks_for_Engineering_Activities(scheduledf):
 
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Construction Task Request Approval') &
                       (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
-                      (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
+                      (scheduledf['Finish_Date_Planned\Actual'] != 'A') &
+                      (scheduledf['Program_Manager'] == 'Michael Howard')]
 
     description = 'Ask Engineering for update on Construction Task Request Approval'
     duedate = DT.datetime.today() + DT.timedelta(hours=5)
@@ -467,58 +468,32 @@ def create_tasks(df, description, duedate, tag='PMH'):
 
 def Create_task_for_Relay_Settings(scheduledf):
     # This filters Prints with finished dates past 5 days past today without an actual finish
+    description=None
 
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Create Relay Settings') &
                           (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
                           (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
-    outputdf = filterdf
-    outputdf=outputdf.sort_values(by=['Estimated_In_Service_Date'])
-    for index, row in outputdf.iterrows():
 
+    filterdf=filterdf.sort_values(by=['Estimated_In_Service_Date'])
+
+    if len(filterdf) >= 1:
         description = 'Check with Relay Setter on when settings are going to be issued'
-        project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        create_tasks(filterdf, description, duedate)
 
-        if row['Project_Tier'] == 1.0:
-            priority = 'H'
-
-        elif row['Project_Tier'] == 2.0:
-            priority = 'M'
-
-        elif row['Project_Tier'] == 3.0:
-            priority = 'L'
-
-        else:
-            priority = None
-
-        Add_Task(description, project, duedate, priority, 'PMH')
-
-        filterdf = scheduledf[(scheduledf['Grandchild'] == 'Create Relay Settings') &
+    filterdf = scheduledf[(scheduledf['Grandchild'] == 'Create Relay Settings') &
                               (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
                                   'Start_Date']) / 2 <= DT.datetime.today()) &
                               (scheduledf['Start_Date_Planned\Actual'] != 'A') &
                               (scheduledf['Finish_Date'] >= DT.datetime.today())]
-        outputdf = filterdf
-        for index, row in outputdf.iterrows():
+    filterdf = filterdf.sort_values(by=['Estimated_In_Service_Date'])
 
-            description = 'Check with with Relay Setter on when settings are going to be started'
-            project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
-            duedate = DT.datetime.today() + DT.timedelta(hours=8)
+    if len(filterdf) >= 1:
+        description = 'Check with Relay Setter on when settings are going to be issued'
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        create_tasks(filterdf, description, duedate)
 
-            if row['Project_Tier'] == 1.0:
-                priority = 'H'
-
-            elif row['Project_Tier'] == 2.0:
-                priority = 'M'
-
-            elif row['Project_Tier'] == 3.0:
-                priority = 'L'
-
-            else:
-                priority = None
-
-            Add_Task(description, project, duedate, priority, 'PMH')
-
+    return description
 
 #def Project_Start_60_Days_Out_No_Outages
 #def Check_Estimated_In_Service_Date():
@@ -910,7 +885,7 @@ def Update_Task(ID, attribute, value):
 
 def Genrate_Resource_Plan(scheduledf, Budget_item_df):
 
-    scheduledf = scheduledf[scheduledf['Region_Name'] == 'METRO WEST']
+    #scheduledf = scheduledf[scheduledf['Region_Name'] == 'METRO WEST']
     scheduledf.drop_duplicates(subset='PETE_ID', keep='last', inplace=True)
     scheduledf = scheduledf[scheduledf.PROJECTTYPE != 'ROW']
     scheduledf.rename(columns={'BUDGETITEMNUMBER': 'Budget_Item_Number'}, inplace=True)
@@ -1202,6 +1177,7 @@ def main():
         #Create_tasks_for_Precon_meetings(Project_Schedules_All_Data_df)
         #Create_task_for_Final_Engineering_with_draft_schedules(myprojectsdf, scheduledf)
         #Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
+        Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
         Create_task_for_ESID_before_Energiztion(Project_Schedules_All_Data_df)
         Create_tasks_for_Engineering_Activities(Project_Schedules_All_Data_df)
         Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)

@@ -319,7 +319,7 @@ def Create_task_for_ESID_before_Energiztion(scheduledf):
         Add_Task(description, project, duedate, priority, 'PMH')
 
 
-def Create_tasks_for_Engineering_Activities(scheduledf):
+def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks=True):
 
     #This code filters out the start dates for TE activities and creates tasks
     EDdf = scheduledf[(scheduledf['Grandchild'] == 'Electrical Design') &
@@ -346,32 +346,41 @@ def Create_tasks_for_Engineering_Activities(scheduledf):
     filterdf=EDdf[~EDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
     filterdf=filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
 
-    description = 'Check with Engineering on if Electrical Designs were started'
-    duedate = DT.datetime.today() + DT.timedelta(hours=5)
-    create_tasks(filterdf, description, duedate)
-    return filterdf, description, duedate
+    if len(filterdf) >= 1:
+        description = 'Check with Engineering on if Electrical Designs were started'
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks
+            create_tasks(filterdf, description, duedate)
 
     filterdf = PDdf[~PDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
 
-    description = 'Check with Engineering on if Physical Designs were started'
-    duedate = DT.datetime.today() + DT.timedelta(hours=5)
-    create_tasks(filterdf, description, duedate)
+    if len(filterdf) >= 1:
+        description = 'Check with Engineering on if Physical Designs were started'
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks
+            create_tasks(filterdf, description, duedate)
 
     filterdf = FDdf[~FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(PDdf['PETE_ID'])]
 
-    description = 'Check with Engineering on if Foundation Designs were started'
-    duedate = DT.datetime.today() + DT.timedelta(hours=5)
-    create_tasks(filterdf, description, duedate)
+    if len(filterdf) >= 1:
+        description = 'Check with Engineering on if Foundation Designs were started'
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks
+            create_tasks(filterdf, description, duedate)
 
     filterdf = FDdf[FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
 
-    description = 'Ask Engineering to update the TE schedule'
-    duedate = DT.datetime.today() + DT.timedelta(hours=5)
-    create_tasks(filterdf, description, duedate)
+    if len(filterdf) >= 1:
+        description = 'Ask Engineering to update the TE schedule'
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks
+            create_tasks(filterdf, description, duedate)
+    return description
 
+def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Tasks=True):
     # This code filters out the finish dates for TE activities and creates tasks
 
     EDdf = scheduledf[(scheduledf['Grandchild'] == 'Electrical Design') &
@@ -389,31 +398,44 @@ def Create_tasks_for_Engineering_Activities(scheduledf):
     filterdf = EDdf[~EDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
 
-    description = 'Check with Engineering on if Electrical Designs were issued'
-    duedate = DT.datetime.today() + DT.timedelta(hours=5)
-    create_tasks(filterdf, description, duedate)
+    if len(filterdf) >= 1:
+        description = 'Check with Engineering on if Electrical Designs were issued'
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+         if Create_Tasks
+            create_tasks(filterdf, description, duedate)
 
     filterdf = PDdf[~PDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
 
-    description = 'Check with Engineering on if Physical Designs were issued'
-    duedate = DT.datetime.today() + DT.timedelta(hours=5)
-    create_tasks(filterdf, description, duedate)
+    if len(filterdf) >= 1:
+        description = 'Check with Engineering on if Physical Designs were issued'
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks
+            create_tasks(filterdf, description, duedate)
+
 
     filterdf = FDdf[~FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(PDdf['PETE_ID'])]
 
-    description = 'Check with Engineering on if Foundation Designs were issued'
-    duedate = DT.datetime.today() + DT.timedelta(hours=5)
-    create_tasks(filterdf, description, duedate)
+    if len(filterdf) >= 1:
+        description = 'Check with Engineering on if Foundation Designs were issued'
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks
+            create_tasks(filterdf, description, duedate)
 
     filterdf = FDdf[FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
 
-    description = 'Ask Engineering to update the TE schedule'
     duedate = DT.datetime.today() + DT.timedelta(hours=5)
-    create_tasks(filterdf, description, duedate)
+    if len(filterdf) >= 1:
+        description = 'Ask Engineering to update the TE schedule'
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks
+            create_tasks(filterdf, description, duedate)
 
+    return description
+
+def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf):
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Construction Task Request Approval') &
                       (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
                       (scheduledf['Finish_Date_Planned\Actual'] != 'A') &
@@ -423,6 +445,7 @@ def Create_tasks_for_Engineering_Activities(scheduledf):
     duedate = DT.datetime.today() + DT.timedelta(hours=5)
     create_tasks(filterdf, description, duedate)
 
+def Create_tasks_for_Design_Book_Issued(scheduledf):
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Complete Design Book Issued') &
                           (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
                           (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
@@ -431,6 +454,7 @@ def Create_tasks_for_Engineering_Activities(scheduledf):
     duedate = DT.datetime.today() + DT.timedelta(hours=5)
     create_tasks(filterdf, description, duedate)
 
+def Create_tasks_for_WA(scheduledf):
     filterdf = scheduledf[(pd.isnull(scheduledf['FIMSTATUS'])) &
                          (scheduledf['PLANNEDCONSTRUCTIONREADY'] <= DT.datetime.today() - DT.timedelta(days=5)) &
                          (scheduledf['Finish_Date_Planned\Actual'] != 'A') &
@@ -439,7 +463,7 @@ def Create_tasks_for_Engineering_Activities(scheduledf):
     description = 'Ask Engineering about the WA'
     duedate = DT.datetime.today() + DT.timedelta(hours=5)
     create_tasks(filterdf, description, duedate)
-
+    return description
 
 def create_tasks(df, description, duedate, tag='PMH'):
     df = df.sort_values(by=['Estimated_In_Service_Date'])

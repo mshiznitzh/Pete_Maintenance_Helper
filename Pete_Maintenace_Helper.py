@@ -434,6 +434,7 @@ def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Task
     return description
 
 def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf, Create_Tasks=True):
+    description = None
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Construction Task Request Approval') &
                       (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
                       (scheduledf['Finish_Date_Planned\Actual'] != 'A') &
@@ -444,6 +445,7 @@ def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf, Create_Tas
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         if Create_Tasks:
             create_tasks(filterdf, description, duedate)
+    return description
 
 def Create_tasks_for_Design_Book_Issued(scheduledf):
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Complete Design Book Issued') &

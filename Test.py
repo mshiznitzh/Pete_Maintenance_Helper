@@ -234,5 +234,16 @@ class TaskCreationTest(unittest.TestCase):
             self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Start_Dates(df, False),
                              description)
 
+    def test_Create_tasks_for_Construncction_Task_Request_Approval(self):
+
+        description = 'Ask Engineering for update on Construction Task Request Approval'
+        df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+        df.at[0, 'Grandchild'] = 'Construction Task Request Approval'
+        df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+        df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+        df.at[0, 'Program_Manager'] = 'Michael Howard'
+
+        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Construncction_Task_Request_Approval(df, False), description)
+
 if __name__ == '__main__':
     unittest.main()

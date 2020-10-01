@@ -255,8 +255,6 @@ def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf):
             priority = None
 
         Add_Task(description, project, duedate, priority, 'PMH')
-        #p.start()
-    #p.join()
 
 def Create_task_for_Released_projects_missing_Construnction_Ready_Date(scheduledf):
     # This filters Waterfall schedules that are in draft of Released projects
@@ -435,15 +433,17 @@ def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Task
 
     return description
 
-def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf):
+def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf, Create_Tasks=True):
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Construction Task Request Approval') &
                       (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
                       (scheduledf['Finish_Date_Planned\Actual'] != 'A') &
                       (scheduledf['Program_Manager'] == 'Michael Howard')]
 
-    description = 'Ask Engineering for update on Construction Task Request Approval'
-    duedate = DT.datetime.today() + DT.timedelta(hours=5)
-    create_tasks(filterdf, description, duedate)
+    if len(filterdf) >= 1:
+        description = 'Ask Engineering for update on Construction Task Request Approval'
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks:
+            create_tasks(filterdf, description, duedate)
 
 def Create_tasks_for_Design_Book_Issued(scheduledf):
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Complete Design Book Issued') &

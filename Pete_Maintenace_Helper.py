@@ -128,6 +128,7 @@ def Create_tasks_for_Precon_meetings(myprojects, schedule):
 
 def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=False):
     # This filters Waterfall schedules that are in draft of Released projects
+    description = None
     PMO_DF=scheduledf[(scheduledf['Schedule_Function'] == 'PMO') &
                       (scheduledf['Program_Manager'] == 'Michael Howard')]
 

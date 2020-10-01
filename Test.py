@@ -254,5 +254,37 @@ class TaskCreationTest(unittest.TestCase):
 
         self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Waterfalls(df, False), description)
 
+    def test_Create_tasks_for_Waterfalls_Baseline(self):
+
+        description = 'Waterfall Finish is before Waterfall Start'
+        df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+        df = pd.concat([df] * 2, ignore_index=True)
+
+        df.at[0, 'Schedule_Function'] = 'PMO'
+        df.at[0, 'Grandchild'] = 'Waterfall Start'
+        df.at[0, 'Program_Manager'] = 'Michael Howard'
+        df.at[0, 'Start_Date'] = pd.to_datetime("today").date()
+        df.at[0, 'Estimated_In-Service_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=1)
+
+        df.at[1, 'Schedule_Function'] = 'PMO'
+        df.at[1, 'Grandchild'] = 'Waterfall Finish'
+        df.at[1, 'Program_Manager'] = 'Michael Howard'
+        df.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=1)
+        df.at[1, 'Estimated_In-Service_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=1)
+
+        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Waterfalls(df, False), description)
+
+    def test_Create_tasks_for_Waterfalls_EISD(self):
+        description = 'Waterfall Finish not in same season as EISD'
+        df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+
+        df.at[0, 'Schedule_Function'] = 'PMO'
+        df.at[0, 'Grandchild'] = 'Waterfall Finish'
+        df.at[0, 'Program_Manager'] = 'Michael Howard'
+        df.at[0, 'Start_Date'] = pd.to_datetime("today").date()
+        df.at[0, 'Estimated_In-Service_Date'] = pd.to_datetime("today").date() + pd.DateOffset(months=6)
+
+        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Waterfalls(df, False), description)
+
 if __name__ == '__main__':
     unittest.main()

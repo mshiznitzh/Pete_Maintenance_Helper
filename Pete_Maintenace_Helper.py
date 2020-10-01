@@ -428,7 +428,7 @@ def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Task
 
     duedate = DT.datetime.today() + DT.timedelta(hours=5)
     if len(filterdf) >= 1:
-        description = 'Ask Engineering to update the TE schedule'
+        description = 'Ask Engineering to update the TE schedule (Finish Date)'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         if Create_Tasks:
             create_tasks(filterdf, description, duedate)
@@ -1203,7 +1203,8 @@ def main():
         #Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
         Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
         Create_task_for_ESID_before_Energiztion(Project_Schedules_All_Data_df)
-        Create_tasks_for_Engineering_Activities(Project_Schedules_All_Data_df)
+        Create_tasks_for_Engineering_Activities_Start_Dates(Project_Schedules_All_Data_df)
+        Create_tasks_for_Engineering_Activities_Finish_Dates(Project_Schedules_All_Data_df)
         Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
         Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes)
         Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df)

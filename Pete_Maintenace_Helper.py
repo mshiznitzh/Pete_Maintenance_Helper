@@ -490,7 +490,7 @@ def create_tasks(df, description, duedate, tag='PMH'):
         Add_Task(description, project, duedate, priority, tag)
 
 
-def Create_task_for_Relay_Settings(scheduledf):
+def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True):
     # This filters Prints with finished dates past 5 days past today without an actual finish
     description=None
 
@@ -503,7 +503,8 @@ def Create_task_for_Relay_Settings(scheduledf):
     if len(filterdf) >= 1:
         description = 'Check with Relay Setter on when settings are going to be issued'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
-        create_tasks(filterdf, description, duedate)
+        if Create_Tasks:
+            create_tasks(filterdf, description, duedate)
 
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Create Relay Settings') &
                               (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
@@ -515,7 +516,8 @@ def Create_task_for_Relay_Settings(scheduledf):
     if len(filterdf) >= 1:
         description = 'Check with Relay Setter on when settings are going to be started'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
-        create_tasks(filterdf, description, duedate)
+        if Create_Tasks:
+            create_tasks(filterdf, description, duedate)
 
     return description
 

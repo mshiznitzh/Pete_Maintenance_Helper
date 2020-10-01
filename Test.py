@@ -15,7 +15,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_task_for_Relay_Settings(df), description)
+        self.assertEqual(Pete_Maintenace_Helper.Create_task_for_Relay_Settings(df, False), description)
 
     def test_Create_task_for_Relay_Settings_start_date(self):
 
@@ -26,7 +26,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_task_for_Relay_Settings(df), description)
+        self.assertEqual(Pete_Maintenace_Helper.Create_task_for_Relay_Settings(df, False), description)
 
     def test_Create_tasks_for_Engineering_Activities_Start_Dates_ED(self):
 

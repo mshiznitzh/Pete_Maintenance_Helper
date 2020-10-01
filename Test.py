@@ -245,5 +245,14 @@ class TaskCreationTest(unittest.TestCase):
 
         self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Construncction_Task_Request_Approval(df, False), description)
 
+    def test_Create_tasks_for_Waterfalls_Baseline(self):
+
+        description = 'Waterfall needs to baselined'
+        df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+        df.at[0, 'Schedule_Function'] = 'TEST'
+        df.at[0, 'Program_Manager'] = 'Michael Howard'
+
+        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Waterfalls(df, False), description)
+
 if __name__ == '__main__':
     unittest.main()

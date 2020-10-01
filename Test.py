@@ -1,8 +1,7 @@
 import unittest
 import pandas as pd
 import os
-from Pete_Maintenace_Helper import Create_task_for_Relay_Settings
-import sys
+import Pete_Maintenace_Helper
 
 class TaskCreationTest(unittest.TestCase):
     def test_Create_task_for_Relay_Settings_Finish_date(self):
@@ -16,7 +15,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
 
-        self.assertEqual(Create_task_for_Relay_Settings(df), description)
+        self.assertEqual(Pete_Maintenace_Helper.Create_task_for_Relay_Settings(df), description)
 
     def test_Create_task_for_Relay_Settings_start_date(self):
 
@@ -27,9 +26,110 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
 
-        self.assertEqual(Create_task_for_Relay_Settings(df), description)
+        self.assertEqual(Pete_Maintenace_Helper.Create_task_for_Relay_Settings(df), description)
+
+    def test_Create_tasks_for_Engineering_Activities_Start_Dates_ED(self):
+
+        description = 'Check with Engineering on if Electrical Designs were started'
+
+        df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+        df.at[0, 'Grandchild'] = 'Electrical Design'
+        df.at[0,'Start_Date'] = pd.to_datetime("today").date() -  pd.DateOffset(days=5)
+        df.at[0, 'Start_Date_Planned\Actual'] = 'P'
+        df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+        df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+
+        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
+
+    def test_Create_tasks_for_Engineering_Activities_Start_Dates_PD(self):
+
+        description = 'Check with Engineering on if Physical Designs were started'
+
+        df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+        df.at[0, 'Grandchild'] = 'Physical Design'
+        df.at[0,'Start_Date'] = pd.to_datetime("today").date() -  pd.DateOffset(days=5)
+        df.at[0, 'Start_Date_Planned\Actual'] = 'P'
+        df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+        df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+
+        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
+
+    def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD(self):
+
+        description = 'Check with Engineering on if Foundation Designs were started'
+
+        df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+        df.at[0, 'Grandchild'] = 'Foundation Design'
+        df.at[0,'Start_Date'] = pd.to_datetime("today").date() -  pd.DateOffset(days=5)
+        df.at[0, 'Start_Date_Planned\Actual'] = 'P'
+        df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+        df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+
+        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
+
+    def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD_ED(self):
+
+        description = 'Ask Engineering to update the TE schedule'
+
+        df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+        df= pd.concat([df]*2, ignore_index=True)
+
+        df.at[0, 'Grandchild'] = 'Foundation Design'
+        df.at[0,'Start_Date'] = pd.to_datetime("today").date() -  pd.DateOffset(days=5)
+        df.at[0, 'Start_Date_Planned\Actual'] = 'P'
+        df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+        df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+
+        df.at[1, 'Grandchild'] = 'Electrical Design'
+        df.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+        df.at[1, 'Start_Date_Planned\Actual'] = 'P'
+        df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+        df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
 
 
+        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
+
+        def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD_PD(self):
+            description = 'Ask Engineering to update the TE schedule'
+
+            df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+            df = pd.concat([df] * 2, ignore_index=True)
+
+            df.at[0, 'Grandchild'] = 'Foundation Design'
+            df.at[0, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+            df.at[0, 'Start_Date_Planned\Actual'] = 'P'
+            df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+            df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+
+            df.at[1, 'Grandchild'] = 'Physical Design'
+            df.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+            df.at[1, 'Start_Date_Planned\Actual'] = 'P'
+            df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+            df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
+
+            self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Start_Dates(df, False),
+                             description)
+
+        def test_Create_tasks_for_Engineering_Activities_Start_Dates_ED_PD(self):
+            description = 'Ask Engineering to update the TE schedule'
+
+            df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+            df = pd.concat([df] * 2, ignore_index=True)
+
+            df.at[0, 'Grandchild'] = 'Electrical Design'
+            df.at[0, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+            df.at[0, 'Start_Date_Planned\Actual'] = 'P'
+            df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+            df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+
+            df.at[1, 'Grandchild'] = 'Physical Design'
+            df.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+            df.at[1, 'Start_Date_Planned\Actual'] = 'P'
+            df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+            df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
+
+            self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Start_Dates(df, False),
+                             description)
 
 
 if __name__ == '__main__':

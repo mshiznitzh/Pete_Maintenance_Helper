@@ -243,35 +243,23 @@ def Create_task_for_Released_projects_missing_Construnction_Ready_Date(scheduled
         #p.start()
     #p.join()
 
-def Create_task_for_ESID_before_Energiztion(scheduledf):
+def Create_task_for_ESID_before_Energiztion(scheduledf, Create_Tasks=True):
     #
-
+    description = None
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Project Energization') &
                           (scheduledf['Program_Manager'] == 'Michael Howard') &
                           (scheduledf['Estimated_In-Service_Date'] < scheduledf['Finish_Date']) &
                           (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
 
     filterdf.sort_values(by=['Estimated_In_Service_Date'])
-    for index, row in filterdf.iterrows():
 
-        description = 'Project Energization is after Estimated In-Service Date'
-        project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
-        duedate = DT.datetime.today() + DT.timedelta(hours=4)
-
-        if row['Project_Tier'] == 1.0:
-            priority = 'H'
-
-        elif row['Project_Tier'] == 2.0:
-            priority = 'M'
-
-        elif row['Project_Tier'] == 3.0:
-            priority = 'L'
-
-        else:
-            priority = None
-
-        Add_Task(description, project, duedate, priority, 'PMH')
-
+        
+        if len(filterdf) >= 1:
+            description = 'Project Energization is after Estimated In-Service Date'
+            duedate = DT.datetime.today() + DT.timedelta(hours=8)
+            if Create_Tasks:
+                create_tasks(filterdf, description, duedate)
+    return description
 
 def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks=True):
     description=None

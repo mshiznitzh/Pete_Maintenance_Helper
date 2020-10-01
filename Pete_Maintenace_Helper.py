@@ -126,7 +126,7 @@ def Create_tasks_for_Precon_meetings(myprojects, schedule):
         #p.start()
     # p.join()
 
-def Create_tasks_for_Waterfalls(scheduledf):
+def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=False):
     # This filters Waterfall schedules that are in draft of Released projects
     PMO_DF=scheduledf[(scheduledf['Schedule_Function'] == 'PMO') &
                       (scheduledf['Program_Manager'] == 'Michael Howard')]
@@ -136,30 +136,15 @@ def Create_tasks_for_Waterfalls(scheduledf):
     All_projects_DF=All_projects_DF.drop_duplicates(subset=['PETE_ID'])
     PMO_DF=PMO_DF.drop_duplicates(subset=['PETE_ID'])
 
-
-
     outputdf = All_projects_DF.loc[~All_projects_DF['PETE_ID'].isin(PMO_DF['PETE_ID'])]
 
     outputdf.sort_values(by=['Estimated_In_Service_Date'])
-    for index, row in outputdf.iterrows():
 
+    if len(outputdf) >= 1:
         description = 'Waterfall needs to baselined'
-        project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
-        duedate = DT.datetime.today() + DT.timedelta(hours=1)
-
-        if row['Project_Tier'] == 1.0:
-            priority = 'H'
-
-        elif row['Project_Tier'] == 2.0:
-            priority = 'M'
-
-        elif row['Project_Tier'] == 3.0:
-            priority = 'L'
-
-        else:
-            priority = None
-
-        Add_Task(description, project, duedate, priority, 'PMH')
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks:
+            create_tasks(outputdf, description, duedate)
 
     Waterfall_Start_DF = scheduledf[(scheduledf['Schedule_Function'] == 'PMO') &
                         (scheduledf['Program_Manager'] == 'Michael Howard') &
@@ -173,26 +158,11 @@ def Create_tasks_for_Waterfalls(scheduledf):
     Waterfall_Finish_DF.reset_index(drop=True)
     outputdf = Waterfall_Start_DF.loc[Waterfall_Start_DF['Start_Date'].values > Waterfall_Finish_DF['Start_Date'].values]
 
-    outputdf.sort_values(by=['Estimated_In_Service_Date'])
-    for index, row in outputdf.iterrows():
-
+    if len(outputdf) >= 1:
         description = 'Waterfall Finish is before Waterfall Start'
-        project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
-        duedate = DT.datetime.today() + DT.timedelta(hours=1)
-
-        if row['Project_Tier'] == 1.0:
-            priority = 'H'
-
-        elif row['Project_Tier'] == 2.0:
-            priority = 'M'
-
-        elif row['Project_Tier'] == 3.0:
-            priority = 'L'
-
-        else:
-            priority = None
-
-        Add_Task(description, project, duedate, priority, 'PMH')
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks:
+            create_tasks(outputdf, description, duedate)
 
     outputdf=Waterfall_Finish_DF
     outputdf['ESID_SEASON']=outputdf.loc[pd.to_datetime(outputdf['Estimated_In-Service_Date']).dt.quarter < 3, 'ESID_SEASON'] = pd.to_numeric(pd.to_datetime(outputdf['Estimated_In-Service_Date']).dt.year)+.5
@@ -204,27 +174,12 @@ def Create_tasks_for_Waterfalls(scheduledf):
     outputdf = outputdf.loc[(
         outputdf['WaterFall_SEASON'] != outputdf['ESID_SEASON'])]
 
-    outputdf.sort_values(by=['Estimated_In_Service_Date'])
-    for index, row in outputdf.iterrows():
-
+    if len(outputdf) >= 1:
         description = 'Waterfall Finish not in same season as EISD'
-        project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
-        duedate = DT.datetime.today() + DT.timedelta(hours=1)
-
-        if row['Project_Tier'] == 1.0:
-            priority = 'H'
-
-        elif row['Project_Tier'] == 2.0:
-            priority = 'M'
-
-        elif row['Project_Tier'] == 3.0:
-            priority = 'L'
-
-        else:
-            priority = None
-
-        Add_Task(description, project, duedate, priority, 'PMH')
-
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks:
+            create_tasks(outputdf, description, duedate)
+    return description
 
 
 def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf):

@@ -292,7 +292,7 @@ def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks
         description = 'Check with Engineering on if Electrical Designs were started'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         if Create_Tasks:
-            create_tasks(filterdf, description, duedate)
+            create_tasks(filterdf, description, duedate, 'PMH_E')
 
     filterdf = PDdf[~PDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
@@ -301,7 +301,7 @@ def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks
         description = 'Check with Engineering on if Physical Designs were started'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         if Create_Tasks:
-            create_tasks(filterdf, description, duedate)
+            create_tasks(filterdf, description, duedate, 'PMH_E')
 
     filterdf = FDdf[~FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(PDdf['PETE_ID'])]
@@ -310,7 +310,7 @@ def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks
         description = 'Check with Engineering on if Foundation Designs were started'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         if Create_Tasks:
-            create_tasks(filterdf, description, duedate)
+            create_tasks(filterdf, description, duedate, 'PMH_E')
 
     filterdf = FDdf[FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
@@ -319,7 +319,7 @@ def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks
         description = 'Ask Engineering to update the TE schedule'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         if Create_Tasks:
-            create_tasks(filterdf, description, duedate)
+            create_tasks(filterdf, description, duedate, 'PMH_E')
     return description
 
 def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Tasks=True):
@@ -344,7 +344,7 @@ def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Task
         description = 'Check with Engineering on if Electrical Designs were issued'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         if Create_Tasks:
-            create_tasks(filterdf, description, duedate)
+            create_tasks(filterdf, description, duedate, 'PMH_E')
 
     filterdf = PDdf[~PDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
@@ -353,7 +353,7 @@ def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Task
         description = 'Check with Engineering on if Physical Designs were issued'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         if Create_Tasks:
-            create_tasks(filterdf, description, duedate)
+            create_tasks(filterdf, description, duedate, 'PMH_E')
 
 
     filterdf = FDdf[~FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
@@ -363,7 +363,7 @@ def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Task
         description = 'Check with Engineering on if Foundation Designs were issued'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         if Create_Tasks:
-            create_tasks(filterdf, description, duedate)
+            create_tasks(filterdf, description, duedate, 'PMH_E')
 
     filterdf = FDdf[FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
@@ -373,7 +373,7 @@ def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Task
         description = 'Ask Engineering to update the TE schedule (Finish Date)'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         if Create_Tasks:
-            create_tasks(filterdf, description, duedate)
+            create_tasks(filterdf, description, duedate, 'PMH_E')
 
     return description
 
@@ -388,7 +388,7 @@ def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf, Create_Tas
         description = 'Ask Engineering for update on Construction Task Request Approval'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         if Create_Tasks:
-            create_tasks(filterdf, description, duedate)
+            create_tasks(filterdf, description, duedate, 'PMH_E')
     return description
 
 def Create_tasks_for_Design_Book_Issued(scheduledf):
@@ -398,7 +398,7 @@ def Create_tasks_for_Design_Book_Issued(scheduledf):
 
     description = 'Ask Engineering for update on Design Book Issued'
     duedate = DT.datetime.today() + DT.timedelta(hours=5)
-    create_tasks(filterdf, description, duedate)
+    create_tasks(filterdf, description, duedate, 'PMH_E')
 
 def Create_tasks_for_WA(scheduledf):
     filterdf = scheduledf[(pd.isnull(scheduledf['FIMSTATUS'])) &
@@ -408,7 +408,7 @@ def Create_tasks_for_WA(scheduledf):
 
     description = 'Ask Engineering about the WA'
     duedate = DT.datetime.today() + DT.timedelta(hours=5)
-    create_tasks(filterdf, description, duedate)
+    create_tasks(filterdf, description, duedate, 'PMH_E')
     return description
 
 def create_tasks(df, description, duedate, tag='PMH'):
@@ -450,7 +450,7 @@ def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True):
         description = 'Check with Relay Setter on when settings are going to be issued'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         if Create_Tasks:
-            create_tasks(filterdf, description, duedate)
+            create_tasks(filterdf, description, duedate, 'PMH_E')
 
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Create Relay Settings') &
                               (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
@@ -463,7 +463,7 @@ def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True):
         description = 'Check with Relay Setter on when settings are going to be started'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         if Create_Tasks:
-            create_tasks(filterdf, description, duedate)
+            create_tasks(filterdf, description, duedate, 'PMH_E')
 
     return description
 
@@ -1135,17 +1135,24 @@ def main():
     Project_Schedules_All_Data_df.to_csv('scheduledf.csv')
 
 
-#Return the day of the week as an integer, where Monday is 0 and Sunday is 6
-    if DT.date.today().weekday() == 0:
 
-        res = Popen('tasks=$(task tag=PMH _ids) && task delete $tasks', shell=True, stdin=PIPE)
+
+    res = Popen('tasks=$(task tag=PMH _ids) && task delete $tasks', shell=True, stdin=PIPE)
+    res.stdin.write(b'a\n')
+    res.stdin.flush()
+    res.stdin.close()
+    res = Popen('task sync', shell=True, stdin=PIPE)
+    res.stdin.close()
+
+
+    # Return the day of the week as an integer, where Monday is 0 and Sunday is 6
+    if DT.date.today().weekday() == 0:
+        res = Popen('tasks=$(task tag=PMH_E _ids) && task delete $tasks', shell=True, stdin=PIPE)
         res.stdin.write(b'a\n')
         res.stdin.flush()
         res.stdin.close()
         res = Popen('task sync', shell=True, stdin=PIPE)
         res.stdin.close()
-
-
         #Create_tasks_for_Precon_meetings(Project_Schedules_All_Data_df)
         #Create_task_for_Final_Engineering_with_draft_schedules(myprojectsdf, scheduledf)
         #Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
@@ -1154,12 +1161,13 @@ def main():
         Create_tasks_for_Engineering_Activities_Start_Dates(Project_Schedules_All_Data_df)
         Create_tasks_for_Engineering_Activities_Finish_Dates(Project_Schedules_All_Data_df)
         Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
-        Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes)
-        Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df)
-        Create_task_for_missing_tiers(Project_Schedules_All_Data_df)
 
-        res = Popen('task sync', shell=True, stdin=PIPE)
-        res.stdin.close()
+    Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes)
+    Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df)
+    Create_task_for_missing_tiers(Project_Schedules_All_Data_df)
+
+    res = Popen('task sync', shell=True, stdin=PIPE)
+    res.stdin.close()
 
     if DT.date.today().weekday() == 4:
         Genrate_Relay_Settings_Report(Project_Schedules_All_Data_df, Relay_Setters_df)

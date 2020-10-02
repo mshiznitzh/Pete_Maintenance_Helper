@@ -1156,15 +1156,16 @@ def main():
         res.stdin.flush()
         res.wait()
         res.stdin.close()
+
         #Create_tasks_for_Precon_meetings(Project_Schedules_All_Data_df)
         #Create_task_for_Final_Engineering_with_draft_schedules(myprojectsdf, scheduledf)
         #Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
         Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
-        Create_task_for_ESID_before_Energiztion(Project_Schedules_All_Data_df)
         Create_tasks_for_Engineering_Activities_Start_Dates(Project_Schedules_All_Data_df)
         Create_tasks_for_Engineering_Activities_Finish_Dates(Project_Schedules_All_Data_df)
         Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
 
+    Create_task_for_ESID_before_Energiztion(Project_Schedules_All_Data_df)
     Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes)
     Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df)
     Create_task_for_missing_tiers(Project_Schedules_All_Data_df)

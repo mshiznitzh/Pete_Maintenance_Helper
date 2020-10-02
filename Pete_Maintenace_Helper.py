@@ -1142,6 +1142,7 @@ def main():
     res.stdin.flush()
     res.stdin.close()
     res = Popen('task sync', shell=True, stdin=PIPE)
+    res.wait()
     res.stdin.close()
 
 
@@ -1152,6 +1153,8 @@ def main():
         res.stdin.flush()
         res.stdin.close()
         res = Popen('task sync', shell=True, stdin=PIPE)
+        res.stdin.flush()
+        res.wait()
         res.stdin.close()
         #Create_tasks_for_Precon_meetings(Project_Schedules_All_Data_df)
         #Create_task_for_Final_Engineering_with_draft_schedules(myprojectsdf, scheduledf)
@@ -1167,6 +1170,7 @@ def main():
     Create_task_for_missing_tiers(Project_Schedules_All_Data_df)
 
     res = Popen('task sync', shell=True, stdin=PIPE)
+    res.wait()
     res.stdin.close()
 
     if DT.date.today().weekday() == 4:

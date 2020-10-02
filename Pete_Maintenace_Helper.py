@@ -1173,7 +1173,7 @@ def main():
             logger.error('Can not find Project Data file')
             raise
         Genrate_Matrial_Report(Material_Data_df, Project_Schedules_All_Data_df)
-    Genrate_Resource_Plan(Project_Schedules_All_Data_df, budget_item_df)
+    #Genrate_Resource_Plan(Project_Schedules_All_Data_df, budget_item_df)
 
 
 

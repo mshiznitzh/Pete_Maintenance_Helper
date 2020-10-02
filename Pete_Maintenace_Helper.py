@@ -254,11 +254,11 @@ def Create_task_for_ESID_before_Energiztion(scheduledf, Create_Tasks=True):
     filterdf.sort_values(by=['Estimated_In_Service_Date'])
 
         
-        if len(filterdf) >= 1:
-            description = 'Project Energization is after Estimated In-Service Date'
-            duedate = DT.datetime.today() + DT.timedelta(hours=8)
-            if Create_Tasks:
-                create_tasks(filterdf, description, duedate)
+    if len(filterdf) >= 1:
+        description = 'Project Energization is after Estimated In-Service Date'
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks:
+            create_tasks(filterdf, description, duedate)
     return description
 
 def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks=True):

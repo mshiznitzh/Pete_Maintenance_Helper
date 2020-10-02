@@ -1096,7 +1096,7 @@ def main():
     Project_Data_Filename='All Project Data Report Metro West or Mike.xlsx'
     Schedules_Filename = 'Metro West PETE Schedules.xlsx'
     Budget_Item_Filename = 'Budget Item.xlsx'
-    Relay_Setters_Filename = 'Relay Setters Report.xlsx'
+    Relay_Setters_Filename = 'Relay Setter Report.xlsx'
     Material_Data_Filename = 'Material Status Report All Metro West.xlsx'
 
     myprojectbudgetitmes=['00003212', '00003201', '00003203', '00003206', '00003226']

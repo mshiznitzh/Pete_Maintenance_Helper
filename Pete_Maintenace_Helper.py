@@ -660,10 +660,10 @@ def Genrate_Relay_Settings_Report(scheduledf, Relay_Setters_df):
                               #(pd.notnull(scheduledf['Start_Date'])) &
                                (scheduledf['Work_Center_Name'] == district)]
 
-        Protection_Control_df = scheduledf[(scheduledf['Grandchild'].str.contains('Relay')) &
-                                (scheduledf['Grandchild'].str.contains('Complete Prewired Switching Station Control Center')) &
-                             # (scheduledf['Schedule_Status'] == 'Active') &
-                             # (scheduledf['Project_Status'] == 'Released') &
+        Protection_Control_df = scheduledf[((scheduledf['Schedule_Function'].str.match('Material Delivery')) &
+                                            (scheduledf['Grandchild'].str.contains('Relay'))) |
+                                           ((scheduledf['PARENT'].str.match('Protection and Control')) &
+                                    (scheduledf['Grandchild'].str.contains('CONTROL CENTER'))) &
                               (scheduledf['Work_Center_Name'] == district)]
 
         Energization_df = scheduledf[(scheduledf['Grandchild'] == 'Project Energization') &

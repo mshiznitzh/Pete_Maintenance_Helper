@@ -2,6 +2,7 @@ import unittest
 import pandas as pd
 import os
 import Pete_Maintenace_Helper
+import Create_Task.Create_Task
 
 class TaskCreationTest(unittest.TestCase):
     def test_Create_task_for_Relay_Settings_Finish_date(self):
@@ -15,7 +16,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_task_for_Relay_Settings(df, False), description)
+        self.assertEqual(Create_Task.Create_Task.Create_task_for_Relay_Settings(df, False), description)
 
     def test_Create_task_for_Relay_Settings_start_date(self):
 
@@ -26,7 +27,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_task_for_Relay_Settings(df, False), description)
+        self.assertEqual(Create_Task.Create_Task.Create_task_for_Relay_Settings(df, False), description)
 
     def test_Create_tasks_for_Engineering_Activities_Start_Dates_ED(self):
 
@@ -39,7 +40,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
 
     def test_Create_tasks_for_Engineering_Activities_Start_Dates_PD(self):
 
@@ -52,7 +53,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
 
     def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD(self):
 
@@ -65,7 +66,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
 
     def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD_ED(self):
 
@@ -87,7 +88,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
 
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
 
     def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD_PD(self):
         description = 'Ask Engineering to update the TE schedule'
@@ -107,7 +108,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Start_Dates(df, False),
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df, False),
                          description)
 
     def test_Create_tasks_for_Engineering_Activities_Start_Dates_ED_PD(self):
@@ -128,7 +129,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Start_Dates(df, False),
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df, False),
                          description)
 
     def test_Create_tasks_for_Engineering_Activities_Finish_Dates_ED(self):
@@ -142,7 +143,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Finish_Dates(df,False), description)
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(df,False), description)
 
     def test_Create_tasks_for_Engineering_Activities_Finish_Dates_PD(self):
 
@@ -155,7 +156,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Finish_Dates(df,False), description)
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(df,False), description)
 
     def test_Create_tasks_for_Engineering_Activities_Finish_Dates_FD(self):
 
@@ -168,7 +169,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Finish_Dates(df,False), description)
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(df,False), description)
 
     def test_Create_tasks_for_Engineering_Activities_Finish_Dates_FD_ED(self):
 
@@ -190,7 +191,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
 
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Finish_Dates(df,False), description)
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(df,False), description)
 
         def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD_PD(self):
             description = 'Ask Engineering to update the TE schedule (Finish Date)'
@@ -210,7 +211,7 @@ class TaskCreationTest(unittest.TestCase):
             df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
             df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
 
-            self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Start_Dates(df, False),
+            self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df, False),
                              description)
 
         def test_Create_tasks_for_Engineering_Activities_Start_Dates_ED_PD(self):
@@ -231,7 +232,7 @@ class TaskCreationTest(unittest.TestCase):
             df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
             df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
 
-            self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Engineering_Activities_Start_Dates(df, False),
+            self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df, False),
                              description)
 
     def test_Create_tasks_for_Construncction_Task_Request_Approval(self):
@@ -243,7 +244,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
         df.at[0, 'Program_Manager'] = 'Michael Howard'
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Construncction_Task_Request_Approval(df, False), description)
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Construncction_Task_Request_Approval(df, False), description)
 
     def test_Create_tasks_for_Waterfalls_Baseline(self):
 
@@ -252,7 +253,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Schedule_Function'] = 'TEST'
         df.at[0, 'Program_Manager'] = 'Michael Howard'
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Waterfalls(df, False), description)
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Waterfalls(df, False), description)
 
     def test_Create_tasks_for_Waterfalls_Baseline(self):
 
@@ -272,7 +273,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=1)
         df.at[1, 'Estimated_In-Service_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=1)
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Waterfalls(df, False), description)
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Waterfalls(df, False), description)
 
     def test_Create_tasks_for_Waterfalls_EISD(self):
         description = 'Waterfall Finish not in same season as EISD'
@@ -284,7 +285,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Start_Date'] = pd.to_datetime("today").date()
         df.at[0, 'Estimated_In-Service_Date'] = pd.to_datetime("today").date() + pd.DateOffset(months=6)
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_tasks_for_Waterfalls(df, False), description)
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Waterfalls(df, False), description)
 
     def test_Create_tasks_for_Waterfalls_EISD(self):
         description = 'Project Energization is after Estimated In-Service Date'
@@ -295,7 +296,25 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date()
         df.at[0, 'Estimated_In-Service_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=1)
 
-        self.assertEqual(Pete_Maintenace_Helper.Create_task_for_ESID_before_Energiztion(df, False), description)
+        self.assertEqual(Create_Task.Create_Task.Create_task_for_ESID_before_Energiztion(df, False), description)
+
+    def test_Create_tasks_no_TOA_inside_Construnction_Summary(self):
+        description = 'Outages in Construction Summary'
+        df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+
+        df.at[0, 'Schedule_Function'] = 'TOA'
+        df.at[0, 'COMMENTS'] = 'Oncor Status: SUBMITTED ERCOT Status:   Requested By: MENDOZA,ADRIAN ALBERT Date Submitted: 2020-09-21 15:45:16.0 ERCOT Received Date:   Emergency Restore Time: 6 HOURS Line Device: EULESS BKR 4225, SWT 4224, SWT 4226 Associated Projects: 16T62055'
+        df.at[0, 'Program_Manager'] = 'Michael Howard'
+        df.at[0, 'Start_Date'] = pd.to_datetime("today").date()
+        df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=7)
+
+        df.at[1, 'Schedule_Function'] = 'Construction'
+        df.at[1, 'PARENT'] = 'Construction Summary'
+        df.at[1, 'Program_Manager'] = 'Michael Howard'
+        df.at[1, 'Start_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=1)
+        df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=6)
+
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_no_TOA_inside_Construnction_Summary(df, False), description)
 
 if __name__ == '__main__':
     unittest.main()

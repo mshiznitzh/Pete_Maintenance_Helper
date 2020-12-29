@@ -500,6 +500,7 @@ def main():
     Create_Task.Create_Task.Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes)
     Create_Task.Create_Task.Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df)
     Create_Task.Create_Task.Create_task_for_missing_tiers(Project_Schedules_All_Data_df)
+    Create_Task.Create_tasks_no_TOA_inside_Construnction_Summary(Project_Schedules_All_Data_df)
 
     res = Popen('task sync', shell=True, stdin=PIPE)
     res.wait()

@@ -19,40 +19,41 @@ from subprocess import Popen, PIPE
 import Reports.Reports
 import Pete_Maintenace_Helper
 
-def Create_tasks_no_TOA_inside_Construnction_Summary(schedule):
+def Create_tasks_no_TOA_active(schedule):
     description = None
 
     toadf = schedule.query('Schedule_Function' == 'TOA' and
                            'COMMENTS.str.contains("SUBMITTED")' and
                            'Program_Manager' == "Michael Howard")
 
-    CSdf = schedule.query('Schedule_Function' == 'Construction' and
-                           'PARENT' == 'Construction Summary' and
-                           'Program_Manager' == "Michael Howard")
+    #CSdf = schedule.query('Schedule_Function' == 'Construction' and
+     #                      'PARENT' == 'Construction Summary' and
+      #                     'Program_Manager' == "Michael Howard")
 
     toasdf = toadf.sort_vaulues('Start_Date', axis = 0, ascending = True, na_position = 'last')
     toasdf = toasdf.drop_duplicates(PETE_ID)
     toasdf = toasdf.rename(columns={"Start_Date": "TOA_Start_Date"})
 
-    toafdf = toadf.sort_vaulues('Finish_Date', axis = 0, ascending = True, na_position = 'last')
-    toafdf = toafdf.drop_duplicates(PETE_ID)
-    toafdf = toafdf.rename(columns={"Finish_Date": "TOA_Finish_Date"})
 
-    CSsdf = CSdf.sort_vaulues('Start_Date', axis=0, ascending=True, na_position='last')
-    CSsdf = CSsdf.drop_duplicates(PETE_ID)
-    CSsdf = CSsdf.rename(columns={"Start_Date": "CS_Start_Date"})
 
-    CSfdf = CSdf.sort_vaulues('Finish_Date', axis=0, ascending=True, na_position='last')
-    CSfdf = CSfdf.drop_duplicates(PETE_ID)
-    CSfdf = CSfdf.rename(columns={"Finish_Date": "CS_Finish_Date"})
+    #toafdf = toadf.sort_vaulues('Finish_Date', axis = 0, ascending = True, na_position = 'last')
+    #toafdf = toafdf.drop_duplicates(PETE_ID)
+    #toafdf = toafdf.rename(columns={"Finish_Date": "TOA_Finish_Date"})
 
-    toadf = pd.merge(toasdf,toafdf[['PETE_ID', 'TOA_Finish_Date']], how='inner' , on = 'PETE_ID')
-    toadf = pd.merge(toadf, CSsdf[['PETE_ID', 'CS_Start_Date']], how='inner', on='PETE_ID')
-    toadf = pd.merge(toadf, CSfdf[['PETE_ID', 'CS_Finish_Date']], how='inner', on='PETE_ID')
+    #CSsdf = CSdf.sort_vaulues('Start_Date', axis=0, ascending=True, na_position='last')
+    #CSsdf = CSsdf.drop_duplicates(PETE_ID)
+    #CSsdf = CSsdf.rename(columns={"Start_Date": "CS_Start_Date"})
 
-    toadf = toadf.query(TOA_Start_Date <''
+    #CSfdf = CSdf.sort_vaulues('Finish_Date', axis=0, ascending=True, na_position='last')
+    #CSfdf = CSfdf.drop_duplicates(PETE_ID)
+    #CSfdf = CSfdf.rename(columns={"Finish_Date": "CS_Finish_Date"})
 
-                        )
+    #toadf = pd.merge(toasdf,toafdf[['PETE_ID', 'TOA_Finish_Date']], how='inner' , on = 'PETE_ID')
+    #toadf = pd.merge(toadf, CSsdf[['PETE_ID', 'CS_Start_Date']], how='inner', on='PETE_ID')
+    #toadf = pd.merge(toadf, CSfdf[['PETE_ID', 'CS_Finish_Date']], how='inner', on='PETE_ID')
+
+    #toadf = toadf.query(TOA_Start_Date <
+
 
     return description
 
@@ -159,15 +160,18 @@ def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=False):
 def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf):
     # This filters Waterfall schedules that are in draft of Released projects
 
-    Releaseddf = scheduledf[(scheduledf['PROJECTSTATUS'] == 'Released')]
+    Releaseddf = scheduledf[(scheduledf['PROJECTSTATUS'] == 'Released') &
+                            (scheduledf['REGIONNAME'] == 'METRO WEST') |
+                            (scheduledf['BUDGETITEMNUMBER'].isin(['3201','3202','3203','3206', '3212', '3226']))]
     Engscheduledf = scheduledf[(scheduledf['Schedule_Function'] == 'Transmission Engineering')]
 
     outputdf = Releaseddf[~Releaseddf['PETE_ID'].isin(Engscheduledf['PETE_ID'])]
+    outputdf = outputdf.drop_duplicates(subset='PETE_ID', keep="first")
     outputdf.sort_values(by=['Estimated_In_Service_Date'])
     for index, row in outputdf.iterrows():
 
         description = 'Check with Engineering on when a schedule will be finalized'
-        project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
+        project = str(row['PETE_ID']) + ':' + str(row['Project_Name_x'])
         duedate = DT.datetime.today() + DT.timedelta(hours=2)
 
         if row['Project_Tier'] == 1.0:

@@ -3,6 +3,8 @@
 Module Docstring
 """
 
+# TODO: update Docstring
+
 __author__ = "MiKe Howard"
 __version__ = "0.1.0"
 __license__ = "MIT"
@@ -478,7 +480,7 @@ def main():
 
 
     # Return the day of the week as an integer, where Monday is 0 and Sunday is 6
-    if DT.date.today().weekday() == 1:
+    if DT.date.today().weekday() == 2:
         res = Popen('tasks=$(task tag=PMH_E _ids) && task delete $tasks', shell=True, stdin=PIPE)
         res.stdin.write(b'a\n')
         res.stdin.flush()
@@ -489,7 +491,7 @@ def main():
         res.stdin.close()
 
         #Create_tasks_for_Precon_meetings(Project_Schedules_All_Data_df)
-        Create_task_for_Final_Engineering_with_draft_schedules(Project_Schedules_All_Data_df)
+        Create_Task.Create_Task.Create_task_for_Final_Engineering_with_draft_schedules(Project_Schedules_All_Data_df)
         Create_Task.Create_Task.Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
         Create_Task.Create_Task.Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
         Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(Project_Schedules_All_Data_df)
@@ -500,7 +502,7 @@ def main():
     Create_Task.Create_Task.Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes)
     Create_Task.Create_Task.Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df)
     Create_Task.Create_Task.Create_task_for_missing_tiers(Project_Schedules_All_Data_df)
-    Create_Task.Create_tasks_no_TOA_inside_Construnction_Summary(Project_Schedules_All_Data_df)
+#    Create_Task.Create_tasks_no_TOA_inside_Construnction_Summary(Project_Schedules_All_Data_df)
 
     res = Popen('task sync', shell=True, stdin=PIPE)
     res.wait()
@@ -511,7 +513,7 @@ def main():
         Reports.Reports.Genrate_Electrical_Prints_Report(Project_Schedules_All_Data_df)
         Reports.Reports.Genrate_Physical_Prints_Report(Project_Schedules_All_Data_df)
 
-    if DT.date.today().weekday() == 2:
+    if DT.date.today().weekday() == 4:
         try:
             Material_Data_df = Excel_to_Pandas(Material_Data_Filename)
         except:

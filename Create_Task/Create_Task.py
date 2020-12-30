@@ -189,7 +189,8 @@ def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf):
 def Create_task_for_Released_projects_missing_Construnction_Ready_Date(scheduledf):
     # This filters Waterfall schedules that are in draft of Released projects
 
-    filterdf = scheduledf[(pd.isnull(scheduledf['PLANNEDCONSTRUCTIONREADY'])) &
+    filterdf = scheduledf[(scheduledf['Schedule_Function'] == 'Transmission Engineering') &
+                          (pd.isnull(scheduledf['PLANNEDCONSTRUCTIONREADY'])) &
                           (scheduledf['Program_Manager'] == 'Michael Howard')]
 
     filterdf = filterdf.drop_duplicates(subset=['PETE_ID'])

@@ -159,11 +159,10 @@ def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=False):
 def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf):
     # This filters Waterfall schedules that are in draft of Released projects
 
-    filterdf = scheduledf[(scheduledf['Grandchild'] == 'Final Engineering') &
-                          (scheduledf['Schedule_Status'] == 'Draft') &
-                          (scheduledf['Project_Status'] == 'Released')]
+    Releaseddf = scheduledf[(scheduledf['PROJECTSTATUS'] == 'Released')]
+    Engscheduledf = scheduledf[(scheduledf['Schedule_Function'] == 'Transmission Engineering')]
 
-    outputdf = filterdf[filterdf.Project_ID.isin(list(myprojects.PETE_ID))]
+    outputdf = Releaseddf[~Releaseddf['PETE_ID'].isin(Engscheduledf['PETE_ID'])]
     outputdf.sort_values(by=['Estimated_In_Service_Date'])
     for index, row in outputdf.iterrows():
 

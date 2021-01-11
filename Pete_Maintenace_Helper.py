@@ -346,43 +346,7 @@ def Genrate_Resource_Plan(scheduledf, Budget_item_df):
         writer.close()
 
 
-def Genrate_Matrial_Report(Material_df, scheduledf):
-    for district in np.sort(scheduledf.Work_Center_Name.dropna().unique()):
-        writer = pd.ExcelWriter(' '.join([district,'Material Report.xlsx']), engine='xlsxwriter')
-        workbook = writer.book
-        summarysheet = workbook.add_worksheet('Summary')
-        filtereddf = scheduledf[(scheduledf['Work_Center_Name'] == district)]
-        row=0
-        for project in np.sort(filtereddf.WA_Number.dropna().unique()):
 
-            project_material_df = Material_df[Material_df['PROJECT'] == project]
-            if len(project_material_df) >= 1:
-
-                summarysheet.write_url(row, 0, f"internal:'{project}'!A1", string=project)
-                summarysheet.write(row, 1, str(scheduledf[(scheduledf['WA_Number']==project)]['Project_Name_x'].values[0]))
-                row = row + 1
-                project_material_df.to_excel(writer, index=False, sheet_name=project)
-                # Get workbook
-
-                worksheet = writer.sheets[project]
-
-                cell_format = workbook.add_format()
-                cell_format.set_align('center')
-                cell_format.set_align('vcenter')
-                worksheet.set_column('A:' + chr(ord('@') + len(project_material_df.columns)), None, cell_format)
-
-                for x in range(len(project_material_df.columns)):
-                    set_column_autowidth(worksheet, x)
-
-                wrap_format = workbook.add_format()
-                wrap_format.set_text_wrap()
-                wrap_format.set_align('vcenter')
-                worksheet.set_column('C:C', None, wrap_format)
-                worksheet.set_column('C:C', 100)
-
-
-        writer.save()
-        writer.close()
 
 
 
@@ -480,7 +444,7 @@ def main():
         except:
             logger.error('Can not find Project Data file')
             raise
-        Genrate_Matrial_Report(Material_Data_df, Project_Schedules_All_Data_df)
+        Reports.Genrate_Matrial_Report(Material_Data_df, Project_Schedules_All_Data_df)
     #Genrate_Resource_Plan(Project_Schedules_All_Data_df, budget_item_df)
 
 

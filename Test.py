@@ -299,7 +299,25 @@ class TaskCreationTest(unittest.TestCase):
         self.assertEqual(Create_Task.Create_Task.Create_task_for_ESID_before_Energiztion(df, False), description)
 
     def test_Create_tasks_no_TOA_inside_Construnction_Summary(self):
-        description = 'Outages in Construction Summary'
+        description = 'Outages in Construction Summary Window'
+        df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+
+        df.at[0, 'Schedule_Function'] = 'TOA'
+        df.at[0, 'COMMENTS'] = 'Oncor Status: SUBMITTED ERCOT Status:   Requested By: MENDOZA,ADRIAN ALBERT Date Submitted: 2020-09-21 15:45:16.0 ERCOT Received Date:   Emergency Restore Time: 6 HOURS Line Device: EULESS BKR 4225, SWT 4224, SWT 4226 Associated Projects: 16T62055'
+        df.at[0, 'Program_Manager'] = 'Michael Howard'
+        df.at[0, 'Start_Date'] = pd.to_datetime("today").date()
+        df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=7)
+
+        df.at[1, 'Schedule_Function'] = 'Construction'
+        df.at[1, 'PARENT'] = 'Construction Summary'
+        df.at[1, 'Program_Manager'] = 'Michael Howard'
+        df.at[1, 'Start_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=1)
+        df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=6)
+
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_no_TOA_inside_Construnction_Summary(df, False), description)
+
+    def test_Create_tasks_Worng_Tier_Level(self):
+        description = 'Tier Level is wrong for estimate'
         df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
 
         df.at[0, 'Schedule_Function'] = 'TOA'

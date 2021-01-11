@@ -4,6 +4,7 @@ from taskw import TaskWarrior
 import pandas as pd
 import glob
 import os
+from dateutil.relativedelta import relativedelta
 import datetime as DT
 import xlsxwriter
 from typing import Optional
@@ -161,8 +162,11 @@ def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf):
     # This filters Waterfall schedules that are in draft of Released projects
 
     Releaseddf = scheduledf[(scheduledf['PROJECTSTATUS'] == 'Released') &
-                            (scheduledf['REGIONNAME'] == 'METRO WEST') |
+                            (scheduledf['Estimated_In_Service_Date'] <= DT.datetime.today() + relativedelta(months=+9)) &
+                            ~(scheduledf['Project_Category'].isin(['ROW', 'RELO'])) &
+                            (scheduledf['Region_Name'] == 'METRO WEST') |
                             (scheduledf['BUDGETITEMNUMBER'].isin(['3201','3202','3203','3206', '3212', '3226']))]
+
     Engscheduledf = scheduledf[(scheduledf['Schedule_Function'] == 'Transmission Engineering')]
 
     outputdf = Releaseddf[~Releaseddf['PETE_ID'].isin(Engscheduledf['PETE_ID'])]

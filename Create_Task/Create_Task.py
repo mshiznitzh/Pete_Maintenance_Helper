@@ -252,21 +252,21 @@ def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks
                               scheduledf['Finish_Date'] - scheduledf['Start_Date']) / 2 <= DT.datetime.today()) &
                       (scheduledf['Start_Date_Planned\Actual'] != 'A') &
                       (scheduledf['Finish_Date'] >= DT.datetime.today()) &
-                      (scheduledf['Program_Manager'] != 'Michael Howard')]
+                      (scheduledf['Program_Manager'] == 'Michael Howard')]
 
     PDdf = scheduledf[(scheduledf['Grandchild'] == 'Physical Design') &
                       (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
                           'Start_Date']) / 2 <= DT.datetime.today()) &
                       (scheduledf['Start_Date_Planned\Actual'] != 'A') &
                       (scheduledf['Finish_Date'] >= DT.datetime.today()) &
-                      (scheduledf['Program_Manager'] != 'Michael Howard')]
+                      (scheduledf['Program_Manager'] == 'Michael Howard')]
 
     FDdf = scheduledf[(scheduledf['Grandchild'] == 'Foundation Design') &
                       (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
                           'Start_Date']) / 2 <= DT.datetime.today()) &
                       (scheduledf['Start_Date_Planned\Actual'] != 'A') &
                       (scheduledf['Finish_Date'] >= DT.datetime.today()) &
-                      (scheduledf['Program_Manager'] != 'Michael Howard')]
+                      (scheduledf['Program_Manager'] == 'Michael Howard')]
 
     filterdf = EDdf[~EDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]

@@ -20,12 +20,15 @@ from subprocess import Popen, PIPE
 import Reports.Reports
 import Pete_Maintenace_Helper
 
+list_my_BUDGETITEMS = ['3201','3202','3203','3206', '3212', '3226']
+
 def Create_tasks_no_TOA_active(schedule):
     description = None
 
     toadf = schedule.query('Schedule_Function' == 'TOA' and
                            'COMMENTS.str.contains("SUBMITTED")' and
-                           'Program_Manager' == "Michael Howard")
+                           'Program_Manager' == "Michael Howard" or
+                            'BUDGETITEMNUMBER'.isin(list_my_BUDGETITEMS))
 
     #CSdf = schedule.query('Schedule_Function' == 'Construction' and
      #                      'PARENT' == 'Construction Summary' and
@@ -92,13 +95,15 @@ def Create_tasks_for_Precon_meetings(myprojects, schedule):
     # p.join()
 
 
-def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=False):
+def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=True):
     # This filters Waterfall schedules that are in draft of Released projects
     description = None
-    PMO_DF = scheduledf[(scheduledf['Schedule_Function'] == 'PMO') &
-                        (scheduledf['Program_Manager'] == 'Michael Howard')]
+    PMO_DF = scheduledf[(scheduledf['Grandchild'] == 'Waterfall Start') &
+                        (scheduledf['Program_Manager'] == 'Michael Howard') |
+                            (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
 
-    All_projects_DF = scheduledf[(scheduledf['Program_Manager'] == 'Michael Howard')]
+    All_projects_DF = scheduledf[(scheduledf['Program_Manager'] == 'Michael Howard')  |
+                            (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
 
     All_projects_DF = All_projects_DF.drop_duplicates(subset=['PETE_ID'])
     PMO_DF = PMO_DF.drop_duplicates(subset=['PETE_ID'])
@@ -108,7 +113,7 @@ def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=False):
     outputdf.sort_values(by=['Estimated_In_Service_Date'])
 
     if len(outputdf) >= 1:
-        description = 'Waterfall needs to baselined'
+        description = 'Waterfall needs to be baselined'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         if Create_Tasks:
             Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate)
@@ -162,10 +167,10 @@ def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf):
     # This filters Waterfall schedules that are in draft of Released projects
 
     Releaseddf = scheduledf[(scheduledf['PROJECTSTATUS'] == 'Released') &
-                            (scheduledf['Estimated_In_Service_Date'] <= DT.datetime.today() + relativedelta(months=+9)) &
+                            (scheduledf['Estimated_In_Service_Date'] <= DT.datetime.today() + relativedelta(months=+6)) &
                             ~(scheduledf['Project_Category'].isin(['ROW', 'RELO'])) &
                             (scheduledf['Region_Name'] == 'METRO WEST') |
-                            (scheduledf['BUDGETITEMNUMBER'].isin(['3201','3202','3203','3206', '3212', '3226']))]
+                            (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS ))]
 
     Engscheduledf = scheduledf[(scheduledf['Schedule_Function'] == 'Transmission Engineering')]
 
@@ -198,7 +203,8 @@ def Create_task_for_Released_projects_missing_Construnction_Ready_Date(scheduled
 
     filterdf = scheduledf[(scheduledf['Schedule_Function'] == 'Transmission Engineering') &
                           (pd.isnull(scheduledf['PLANNEDCONSTRUCTIONREADY'])) &
-                          (scheduledf['Program_Manager'] == 'Michael Howard')]
+                          (scheduledf['Program_Manager'] == 'Michael Howard') |
+                            (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
 
     filterdf = filterdf.drop_duplicates(subset=['PETE_ID'])
 
@@ -252,21 +258,24 @@ def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks
                               scheduledf['Finish_Date'] - scheduledf['Start_Date']) / 2 <= DT.datetime.today()) &
                       (scheduledf['Start_Date_Planned\Actual'] != 'A') &
                       (scheduledf['Finish_Date'] >= DT.datetime.today()) &
-                      (scheduledf['Program_Manager'] == 'Michael Howard')]
+                      (scheduledf['Program_Manager'] == 'Michael Howard') |
+                            (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
 
     PDdf = scheduledf[(scheduledf['Grandchild'] == 'Physical Design') &
                       (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
                           'Start_Date']) / 2 <= DT.datetime.today()) &
                       (scheduledf['Start_Date_Planned\Actual'] != 'A') &
                       (scheduledf['Finish_Date'] >= DT.datetime.today()) &
-                      (scheduledf['Program_Manager'] == 'Michael Howard')]
+                      (scheduledf['Program_Manager'] == 'Michael Howard') |
+                            (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
 
     FDdf = scheduledf[(scheduledf['Grandchild'] == 'Foundation Design') &
                       (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
                           'Start_Date']) / 2 <= DT.datetime.today()) &
                       (scheduledf['Start_Date_Planned\Actual'] != 'A') &
                       (scheduledf['Finish_Date'] >= DT.datetime.today()) &
-                      (scheduledf['Program_Manager'] == 'Michael Howard')]
+                      (scheduledf['Program_Manager'] == 'Michael Howard') |
+                            (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
 
     filterdf = EDdf[~EDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
@@ -296,19 +305,38 @@ def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks
             Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
 
     filterdf = FDdf[FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
-    filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
+    #filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
 
     if len(filterdf) >= 1:
         description = 'Ask Engineering to update the TE schedule'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
         if Create_Tasks:
             Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+
+    filterdf = EDdf[EDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
+    #filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
+
+    if len(filterdf) >= 1:
+        description = 'Ask Engineering to update the TE schedule'
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks:
+            Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+
+    filterdf = FDdf[FDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
+    #filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
+
+    if len(filterdf) >= 1:
+        description = 'Ask Engineering to update the TE schedule'
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks:
+            Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+
     return description
 
 
 def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Tasks=True):
     # This code filters out the finish dates for TE activities and creates tasks
-
+    description = None
     EDdf = scheduledf[(scheduledf['Grandchild'] == 'Electrical Design') &
                       (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
                       (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
@@ -349,9 +377,28 @@ def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Task
             Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
 
     filterdf = FDdf[FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
-    filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
+    #filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
 
-    duedate = DT.datetime.today() + DT.timedelta(hours=5)
+    if len(filterdf) >= 1:
+        description = 'Ask Engineering to update the TE schedule (Finish Date)'
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks:
+            Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+
+    filterdf = FDdf[FDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
+    #filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
+
+
+    if len(filterdf) >= 1:
+        description = 'Ask Engineering to update the TE schedule (Finish Date)'
+        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        if Create_Tasks:
+            Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+
+    filterdf = EDdf[EDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
+    #filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
+
+
     if len(filterdf) >= 1:
         description = 'Ask Engineering to update the TE schedule (Finish Date)'
         duedate = DT.datetime.today() + DT.timedelta(hours=8)
@@ -390,7 +437,8 @@ def Create_tasks_for_WA(scheduledf):
     filterdf = scheduledf[(pd.isnull(scheduledf['FIMSTATUS'])) &
                           (scheduledf['PLANNEDCONSTRUCTIONREADY'] <= DT.datetime.today() - DT.timedelta(days=5)) &
                           (scheduledf['Finish_Date_Planned\Actual'] != 'A') &
-                          (scheduledf['Program_Manager'] == 'Michael Howard')]
+                          (scheduledf['Program_Manager'] == 'Michael Howard') |
+                            (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
 
     description = 'Ask Engineering about the WA'
     duedate = DT.datetime.today() + DT.timedelta(hours=5)
@@ -400,6 +448,7 @@ def Create_tasks_for_WA(scheduledf):
 
 def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True):
     # This filters Prints with finished dates past 5 days past today without an actual finish
+    # TODO Convert Filter to Query
     description=None
 
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Create Relay Settings') &
@@ -431,7 +480,7 @@ def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True):
 
 def Create_task_for_add_WA_to_schedule(scheduledf, myprojectbudgetitmes):
     # This filters Prints with finished dates past 5 days past today without an actual finish
-
+    # TODO Convert Filter to Query
     filterdf = scheduledf[(pd.isnull(scheduledf['Schedule_Function'])) &
                           (scheduledf['PROJECTSTATUS'] == 'Released') &
                           (scheduledf['BUDGETITEMNUMBER'].isin(myprojectbudgetitmes))]
@@ -460,6 +509,7 @@ def Create_task_for_add_WA_to_schedule(scheduledf, myprojectbudgetitmes):
 #def Complete_Task():
 
 def Create_task_for_missing_tiers(df):
+    # TODO Convert Filter to Query
     filterdf = df[(pd.isnull(df['Project_Tier'])) &
                           (df['Program_Manager'] == 'Michael Howard')]
 
@@ -484,3 +534,84 @@ def Create_task_for_missing_tiers(df):
             priority = None
 
         Pete_Maintenace_Helper.Add_Task(description, project, duedate, priority, 'PMH')
+
+def Create_tasks_TOA_outside_Waterfalls(df, Create_Tasks=True):
+    description = None
+#TODO Convert Filter to Query
+    active_outage_df = df[(df['Schedule_Function'] == 'TOA') &
+                  (df['Program_Manager'] == 'Michael Howard') &
+                  (df['COMMENTS'].str.contains('Oncor Status: SUBMITTED')) |
+                  (df['COMMENTS'].str.contains('Oncor Status: APPROVED')) |
+                  (df['COMMENTS'].str.contains('Oncor Status: ACTIVE')) |
+                  (df['COMMENTS'].str.contains('Oncor Status: COMPLETED'))]
+
+    Water_Start_DF = df[(df['Grandchild'] == 'Waterfall Start') &
+                        (df['Program_Manager'] == 'Michael Howard') |
+                        (df['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
+
+    Water_Finish_DF = df[(df['Grandchild'] == 'Waterfall Finish') &
+                        (df['Program_Manager'] == 'Michael Howard') |
+                        (df['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
+
+    Water_Start_DF = Water_Start_DF.rename(columns={"Finish_Date": "WaterFall_Start"})
+    Water_Finish_DF = Water_Finish_DF.rename(columns={"Finish_Date": "WaterFall_Finish"})
+
+    active_outage_df = active_outage_df.sort_values(by=['Start_Date'])
+
+    filterdf = pd.merge(active_outage_df, Water_Start_DF[['PETE_ID', 'WaterFall_Start']], on='PETE_ID', how='left')
+    filterdf = pd.merge(filterdf, Water_Finish_DF[['PETE_ID', 'WaterFall_Finish']], on='PETE_ID', how='left')
+
+    filterdfs = filterdf[filterdf['Start_Date'].lt(filterdf['WaterFall_Start'])]
+    filterdff = filterdf[filterdf['Finish_Date'].gt(filterdf['WaterFall_Finish'])]
+
+
+    filterdf = pd.concat([filterdfs, filterdff], ignore_index=True)
+    filterdf = filterdf.drop_duplicates(subset=['PETE_ID'], keep='first')
+
+    if len(filterdf) >= 1:
+        description = 'TOA request outside Waterfall dates'
+    duedate = DT.datetime.today() + DT.timedelta(hours=8)
+    if Create_Tasks:
+        Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+    return description
+
+def Create_tasks_TOA_no_active(df, Create_Tasks=True):
+    description = None
+    # TODO Convert Filter to Query
+    active_outage_df = df[(df['Schedule_Function'] == 'TOA') &
+                          (df['Program_Manager'] == 'Michael Howard') |
+                          (df['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS)) &
+                          (df['COMMENTS'].str.contains('Oncor Status: SUBMITTED')) |
+                          (df['COMMENTS'].str.contains('Oncor Status: APPROVED')) |
+                          (df['COMMENTS'].str.contains('Oncor Status: ACTIVE')) |
+                          (df['COMMENTS'].str.contains('Oncor Status: COMPLETED'))]
+
+    my_projects_df = df[(df['Grandchild'] == 'Waterfall Start') &
+                        (df['Finish_Date'].le(pd.to_datetime(pd.to_datetime("today").date() + pd.DateOffset(days=120)))) &
+                        (df['Program_Manager'] == 'Michael Howard') |
+                        (df['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))
+                        ]
+    filterdf = my_projects_df[~my_projects_df['PETE_ID'].isin(active_outage_df['PETE_ID'])]
+
+    if len(filterdf) >= 1:
+        description = 'No Active TOA for project'
+    duedate = DT.datetime.today() + DT.timedelta(hours=8)
+    if Create_Tasks:
+        Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+    return description
+
+def Create_tasks_Construnction_Summary_before_Construnction_Ready(df, Create_Tasks=True):
+    description = None
+#TODO Convert Filter to Query
+    CS_df = df[(df['Parent'] == 'Construction Summary') &
+                  (df['Region_Name'] == 'METRO WEST') &
+                  (df['Start_Date'].le(pd.to_datetime(df['PLANNEDCONSTRUCTIONREADY'])))]
+
+    filterdf = CS_df.drop_duplicates(subset=['PETE_ID'], keep='first')
+
+    if len(filterdf) >= 1:
+        description = 'Construction Summary before Construction Ready'
+    duedate = DT.datetime.today() + DT.timedelta(hours=8)
+    if Create_Tasks:
+        Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+    return description

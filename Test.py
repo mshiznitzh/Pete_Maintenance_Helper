@@ -7,7 +7,6 @@ import Create_Task.Create_Task
 class TaskCreationTest(unittest.TestCase):
     def test_Create_task_for_Relay_Settings_Finish_date(self):
 
-
         description = 'Check with Relay Setter on when settings are going to be issued'
         os.chdir("./Test_Data/")
         df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
@@ -39,6 +38,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Start_Date_Planned\Actual'] = 'P'
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+        df.at[0, 'Program_Manager'] = 'Michael Howard'
 
         self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
 
@@ -52,6 +52,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Start_Date_Planned\Actual'] = 'P'
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+        df.at[0, 'Program_Manager'] = 'Michael Howard'
 
         self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
 
@@ -65,6 +66,7 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Start_Date_Planned\Actual'] = 'P'
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+        df.at[0, 'Program_Manager'] = 'Michael Howard'
 
         self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
 
@@ -80,12 +82,14 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Start_Date_Planned\Actual'] = 'P'
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+        df.at[0, 'Program_Manager'] = 'Michael Howard'
 
         df.at[1, 'Grandchild'] = 'Electrical Design'
         df.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
         df.at[1, 'Start_Date_Planned\Actual'] = 'P'
         df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
+        df.at[1, 'Program_Manager'] = 'Michael Howard'
 
 
         self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df,False), description)
@@ -101,12 +105,14 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Start_Date_Planned\Actual'] = 'P'
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+        df.at[0, 'Program_Manager'] = 'Michael Howard'
 
         df.at[1, 'Grandchild'] = 'Physical Design'
         df.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
         df.at[1, 'Start_Date_Planned\Actual'] = 'P'
         df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
+        df.at[1, 'Program_Manager'] = 'Michael Howard'
 
         self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df, False),
                          description)
@@ -122,12 +128,14 @@ class TaskCreationTest(unittest.TestCase):
         df.at[0, 'Start_Date_Planned\Actual'] = 'P'
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+        df.at[0, 'Program_Manager'] = 'Michael Howard'
 
         df.at[1, 'Grandchild'] = 'Physical Design'
         df.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
         df.at[1, 'Start_Date_Planned\Actual'] = 'P'
         df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
         df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
+        df.at[1, 'Program_Manager'] = 'Michael Howard'
 
         self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df, False),
                          description)
@@ -190,50 +198,28 @@ class TaskCreationTest(unittest.TestCase):
         df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
         df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
 
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(df, False),
+                     description)
+
+    def test_Create_tasks_for_Engineering_Activities_Finish_Dates_FD_PD(self):
+        description = 'Ask Engineering to update the TE schedule (Finish Date)'
+
+        df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+        df = pd.concat([df] * 2, ignore_index=True)
+
+        df.at[0, 'Grandchild'] = 'Foundation Design'
+        df.at[0, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=10)
+        df.at[0, 'Start_Date_Planned\Actual'] = 'A'
+        df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+        df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+
+        df.at[1, 'Grandchild'] = 'Physical Design'
+        df.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=10)
+        df.at[1, 'Start_Date_Planned\Actual'] = 'A'
+        df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+        df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
 
         self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(df,False), description)
-
-        def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD_PD(self):
-            description = 'Ask Engineering to update the TE schedule (Finish Date)'
-
-            df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
-            df = pd.concat([df] * 2, ignore_index=True)
-
-            df.at[0, 'Grandchild'] = 'Foundation Design'
-            df.at[0, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
-            df.at[0, 'Start_Date_Planned\Actual'] = 'P'
-            df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
-            df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
-
-            df.at[1, 'Grandchild'] = 'Physical Design'
-            df.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
-            df.at[1, 'Start_Date_Planned\Actual'] = 'P'
-            df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
-            df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
-
-            self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df, False),
-                             description)
-
-        def test_Create_tasks_for_Engineering_Activities_Start_Dates_ED_PD(self):
-            description = 'Ask Engineering to update the TE schedule (Finish Date)'
-
-            df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
-            df = pd.concat([df] * 2, ignore_index=True)
-
-            df.at[0, 'Grandchild'] = 'Electrical Design'
-            df.at[0, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
-            df.at[0, 'Start_Date_Planned\Actual'] = 'P'
-            df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
-            df.at[0, 'Finish_Date_Planned\Actual'] = 'P'
-
-            df.at[1, 'Grandchild'] = 'Physical Design'
-            df.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
-            df.at[1, 'Start_Date_Planned\Actual'] = 'P'
-            df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
-            df.at[1, 'Finish_Date_Planned\Actual'] = 'P'
-
-            self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(df, False),
-                             description)
 
     def test_Create_tasks_for_Construncction_Task_Request_Approval(self):
 
@@ -248,32 +234,34 @@ class TaskCreationTest(unittest.TestCase):
 
     def test_Create_tasks_for_Waterfalls_Baseline(self):
 
-        description = 'Waterfall needs to baselined'
+        description = 'Waterfall needs to be baselined'
         df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
-        df.at[0, 'Schedule_Function'] = 'TEST'
+        df.at[0, 'Grandchild'] = 'TEST'
         df.at[0, 'Program_Manager'] = 'Michael Howard'
 
         self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Waterfalls(df, False), description)
 
-    def test_Create_tasks_for_Waterfalls_Baseline(self):
 
-        description = 'Waterfall Finish is before Waterfall Start'
-        df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
-        df = pd.concat([df] * 2, ignore_index=True)
 
-        df.at[0, 'Schedule_Function'] = 'PMO'
-        df.at[0, 'Grandchild'] = 'Waterfall Start'
-        df.at[0, 'Program_Manager'] = 'Michael Howard'
-        df.at[0, 'Start_Date'] = pd.to_datetime("today").date()
-        df.at[0, 'Estimated_In-Service_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=1)
-
-        df.at[1, 'Schedule_Function'] = 'PMO'
-        df.at[1, 'Grandchild'] = 'Waterfall Finish'
-        df.at[1, 'Program_Manager'] = 'Michael Howard'
-        df.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=1)
-        df.at[1, 'Estimated_In-Service_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=1)
-
-        self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Waterfalls(df, False), description)
+    # def test_Create_tasks_for_Waterfalls_Baseline(self):
+    #
+    #     description = 'Waterfall Finish is before Waterfall Start'
+    #     df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+    #     df = pd.concat([df] * 2, ignore_index=True)
+    #
+    #     df.at[0, 'Schedule_Function'] = 'PMO'
+    #     df.at[0, 'Grandchild'] = 'Waterfall Start'
+    #     df.at[0, 'Program_Manager'] = 'Michael Howard'
+    #     df.at[0, 'Start_Date'] = pd.to_datetime("today").date()
+    #     df.at[0, 'Estimated_In-Service_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=1)
+    #
+    #     df.at[1, 'Schedule_Function'] = 'PMO'
+    #     df.at[1, 'Grandchild'] = 'Waterfall Finish'
+    #     df.at[1, 'Program_Manager'] = 'Michael Howard'
+    #     df.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=1)
+    #     df.at[1, 'Estimated_In-Service_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=1)
+    #
+    #     self.assertEqual(Create_Task.Create_Task.Create_tasks_for_Waterfalls_not_published(df, False), description)
 
     def test_Create_tasks_for_Waterfalls_EISD(self):
         description = 'Waterfall Finish not in same season as EISD'
@@ -298,41 +286,43 @@ class TaskCreationTest(unittest.TestCase):
 
         self.assertEqual(Create_Task.Create_Task.Create_task_for_ESID_before_Energiztion(df, False), description)
 
-    def test_Create_tasks_no_TOA_inside_Construnction_Summary(self):
-        description = 'Outages in Construction Summary Window'
+    def test_Create_tasks_no_TOA_outside_Waterfall(self):
+        description = 'TOA request outside Waterfall dates'
         df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
-
+       # df['COMMENTS'] = df['COMMENTS'].astype(str)
         df.at[0, 'Schedule_Function'] = 'TOA'
-        df.at[0, 'COMMENTS'] = 'Oncor Status: SUBMITTED ERCOT Status:   Requested By: MENDOZA,ADRIAN ALBERT Date Submitted: 2020-09-21 15:45:16.0 ERCOT Received Date:   Emergency Restore Time: 6 HOURS Line Device: EULESS BKR 4225, SWT 4224, SWT 4226 Associated Projects: 16T62055'
+        df.at[0, 'COMMENTS'] = str('Oncor Status: SUBMITTED ERCOT Status:')
         df.at[0, 'Program_Manager'] = 'Michael Howard'
         df.at[0, 'Start_Date'] = pd.to_datetime("today").date()
         df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=7)
 
-        df.at[1, 'Schedule_Function'] = 'Construction'
-        df.at[1, 'PARENT'] = 'Construction Summary'
+        df.at[1, 'Grandchild'] = 'Waterfall Start'
         df.at[1, 'Program_Manager'] = 'Michael Howard'
-        df.at[1, 'Start_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=1)
-        df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=6)
+        df.at[1, 'Finish_Date'] = pd.to_datetime("today").date()
 
-        self.assertEqual(Create_Task.Create_Task.Create_tasks_no_TOA_inside_Construnction_Summary(df, False), description)
+        df.at[2, 'Grandchild'] = 'Waterfall Finish'
+        df.at[2, 'Program_Manager'] = 'Michael Howard'
+        df.at[2, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=6)
 
-    def test_Create_tasks_Worng_Tier_Level(self):
-        description = 'Tier Level is wrong for estimate'
-        df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+        self.assertEqual(Create_Task.Create_Task.Create_tasks_TOA_outside_Waterfalls(df, False), description)
 
-        df.at[0, 'Schedule_Function'] = 'TOA'
-        df.at[0, 'COMMENTS'] = 'Oncor Status: SUBMITTED ERCOT Status:   Requested By: MENDOZA,ADRIAN ALBERT Date Submitted: 2020-09-21 15:45:16.0 ERCOT Received Date:   Emergency Restore Time: 6 HOURS Line Device: EULESS BKR 4225, SWT 4224, SWT 4226 Associated Projects: 16T62055'
-        df.at[0, 'Program_Manager'] = 'Michael Howard'
-        df.at[0, 'Start_Date'] = pd.to_datetime("today").date()
-        df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=7)
-
-        df.at[1, 'Schedule_Function'] = 'Construction'
-        df.at[1, 'PARENT'] = 'Construction Summary'
-        df.at[1, 'Program_Manager'] = 'Michael Howard'
-        df.at[1, 'Start_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=1)
-        df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=6)
-
-        self.assertEqual(Create_Task.Create_Task.Create_tasks_no_TOA_inside_Construnction_Summary(df, False), description)
+    # def test_Create_tasks_Worng_Tier_Level(self):
+    #     description = 'Tier Level is wrong for estimate'
+    #     df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+    #
+    #     df.at[0, 'Schedule_Function'] = 'TOA'
+    #     df.at[0, 'COMMENTS'] = 'Oncor Status: SUBMITTED ERCOT Status:   Requested By: MENDOZA,ADRIAN ALBERT Date Submitted: 2020-09-21 15:45:16.0 ERCOT Received Date:   Emergency Restore Time: 6 HOURS Line Device: EULESS BKR 4225, SWT 4224, SWT 4226 Associated Projects: 16T62055'
+    #     df.at[0, 'Program_Manager'] = 'Michael Howard'
+    #     df.at[0, 'Start_Date'] = pd.to_datetime("today").date()
+    #     df.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=7)
+    #
+    #     df.at[1, 'Schedule_Function'] = 'Construction'
+    #     df.at[1, 'PARENT'] = 'Construction Summary'
+    #     df.at[1, 'Program_Manager'] = 'Michael Howard'
+    #     df.at[1, 'Start_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=1)
+    #     df.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=6)
+    #
+    #     self.assertEqual(Create_Task.Create_Task.Create_tasks_no_TOA_inside_Construnction_Summary(df, False), description)
 
 if __name__ == '__main__':
     unittest.main()

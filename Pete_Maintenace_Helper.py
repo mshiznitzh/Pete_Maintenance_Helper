@@ -106,7 +106,7 @@ def create_tasks(df, description, duedate, tag='PMH'):
         logger.info("Starting Function")
         logger.info(str(row['PETE_ID']))
 
-        project = str(row['PETE_ID']) + ':' + row['Project_Name_y']
+        project = str(row['PETE_ID']) + ':' + str(row['Project_Name_y'])
 
 
         if row['Project_Tier'] == 1.0:
@@ -427,14 +427,16 @@ def main():
     Create_Task.Create_Task.Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes)
     Create_Task.Create_Task.Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df)
     Create_Task.Create_Task.Create_task_for_missing_tiers(Project_Schedules_All_Data_df)
-#    Create_Task.Create_tasks_no_TOA_inside_Construnction_Summary(Project_Schedules_All_Data_df)
+    Create_Task.Create_Task.Create_tasks_TOA_outside_Waterfalls(Project_Schedules_All_Data_df)
+    Create_Task.Create_Task.Create_tasks_TOA_no_active(Project_Schedules_All_Data_df)
+    Create_Task.Create_Task.Create_tasks_Construnction_Summary_before_Construnction_Ready(Project_Schedules_All_Data_df)
 
     res = Popen('task sync', shell=True, stdin=PIPE)
     res.wait()
     res.stdin.close()
 
     if DT.date.today().weekday() == 4:
-        Reports.Reports.Genrate_Relay_Settings_Report(Project_Schedules_All_Data_df, Relay_Setters_df)
+        Reports.Reports.Genrate_Relay_Settings_Report(Project_FcheckSchedules_All_Data_df, Relay_Setters_df)
         Reports.Reports.Genrate_Electrical_Prints_Report(Project_Schedules_All_Data_df)
         Reports.Reports.Genrate_Physical_Prints_Report(Project_Schedules_All_Data_df)
 

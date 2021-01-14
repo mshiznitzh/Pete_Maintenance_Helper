@@ -28,6 +28,89 @@ def test_Create_task_for_Relay_Settings_Finish_date(setup_and_teardown):
 
     assert Create_Task.Create_Task.Create_task_for_Relay_Settings(setup_and_teardown, False) == description
 
+def test_Create_tasks_for_Engineering_Activities_Start_Dates_ED(setup_and_teardown):
+
+    description = 'Check with Engineering on if Electrical Designs were started'
+
+    setup_and_teardown.at[0, 'Grandchild'] = 'Electrical Design'
+    setup_and_teardown.at[0,'Start_Date'] = pd.to_datetime("today").date() -  pd.DateOffset(days=5)
+    setup_and_teardown.at[0, r'Start_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+    setup_and_teardown.at[0, r'Finish_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+    assert Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown,False) == description
+
+def test_Create_tasks_for_Engineering_Activities_Start_Dates_PD(setup_and_teardown):
+    description = 'Check with Engineering on if Physical Designs were started'
+
+    setup_and_teardown.at[0, 'Grandchild'] = 'Physical Design'
+    setup_and_teardown.at[0,'Start_Date'] = pd.to_datetime("today").date() -  pd.DateOffset(days=5)
+    setup_and_teardown.at[0, r'Start_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+    setup_and_teardown.at[0, r'Finish_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+
+    assert Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown,False) == description
+
+def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD(setup_and_teardown):
+
+    description = 'Check with Engineering on if Foundation Designs were started'
+
+
+    setup_and_teardown.at[0, 'Grandchild'] = 'Foundation Design'
+    setup_and_teardown.at[0,'Start_Date'] = pd.to_datetime("today").date() -  pd.DateOffset(days=5)
+    setup_and_teardown.at[0, r'Start_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+    setup_and_teardown.at[0, r'Finish_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+
+    assert Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown,False) == description
+
+def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD_ED(setup_and_teardown):
+
+    description = 'Ask Engineering to update the TE schedule'
+
+    setup_and_teardown= pd.concat([setup_and_teardown]*2, ignore_index=True)
+
+    setup_and_teardown.at[0, 'Grandchild'] = 'Foundation Design'
+    setup_and_teardown.at[0,'Start_Date'] = pd.to_datetime("today").date() -  pd.DateOffset(days=5)
+    setup_and_teardown.at[0, r'Start_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+    setup_and_teardown.at[0, r'Finish_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+
+    setup_and_teardown.at[1, 'Grandchild'] = 'Electrical Design'
+    setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+    setup_and_teardown.at[1, r'Start_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+    setup_and_teardown.at[1, r'Finish_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[1, 'Program_Manager'] = 'Michael Howard'
+
+
+    assert Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown,False) ==  description
+
+def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD_PD(setup_and_teardown):
+    description = 'Ask Engineering to update the TE schedule'
+
+
+    setup_and_teardown = pd.concat([setup_and_teardown] * 2, ignore_index=True)
+
+    setup_and_teardown.at[0, 'Grandchild'] = 'Foundation Design'
+    setup_and_teardown.at[0, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+    setup_and_teardown.at[0, r'Start_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+    setup_and_teardown.at[0, r'Finish_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+
+    setup_and_teardown.at[1, 'Grandchild'] = 'Physical Design'
+    setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+    setup_and_teardown.at[1, r'Start_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+    setup_and_teardown.at[1, r'Finish_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[1, 'Program_Manager'] = 'Michael Howard'
+
+    assert Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown, False) == description
+
 def test_Create_task_for_Relay_Settings_start_date(setup_and_teardown):
 
     description = 'Check with Relay Setter on when settings are going to be started'
@@ -238,3 +321,125 @@ def test_Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(setup_and
     setup_and_teardown.at[1, 'PLANNEDCONSTRUCTIONREADY'] = pd.to_datetime(pd.to_datetime("today").date())
 
     assert Create_Task.Create_Task.Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(setup_and_teardown, False) == description
+def test_Create_tasks_for_Engineering_Activities_Start_Dates_ED_PD(setup_and_teardown):
+    description = 'Ask Engineering to update the TE schedule'
+
+    
+    setup_and_teardown = pd.concat([setup_and_teardown] * 2, ignore_index=True)
+
+    setup_and_teardown.at[0, 'Grandchild'] = 'Electrical Design'
+    setup_and_teardown.at[0, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+    setup_and_teardown.at[0, r'Start_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+    setup_and_teardown.at[0,  r'Finish_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+
+    setup_and_teardown.at[1, 'Grandchild'] = 'Physical Design'
+    setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+    setup_and_teardown.at[1, r'Start_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[1, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
+    setup_and_teardown.at[1,  r'Finish_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[1, 'Program_Manager'] = 'Michael Howard'
+
+    assert Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown, False) == description
+
+def test_Create_tasks_for_Engineering_Activities_Finish_Dates_ED(setup_and_teardown):
+
+    description = 'Check with Engineering on if Electrical Designs were issued'
+
+    
+    setup_and_teardown.at[0, 'Grandchild'] = 'Electrical Design'
+    setup_and_teardown.at[0,'Start_Date'] = pd.to_datetime("today").date() -  pd.DateOffset(days=10)
+    setup_and_teardown.at[0,  r'Start_Date_Planned\Actual'] = 'A'
+    setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+    setup_and_teardown.at[0,  r'Finish_Date_Planned\Actual'] = 'P'
+
+    assert Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(setup_and_teardown,False) == description
+
+def test_Create_tasks_for_Engineering_Activities_Finish_Dates_PD(setup_and_teardown):
+
+    description = 'Check with Engineering on if Physical Designs were issued'
+
+    
+    setup_and_teardown.at[0, 'Grandchild'] = 'Physical Design'
+    setup_and_teardown.at[0,'Start_Date'] = pd.to_datetime("today").date() -  pd.DateOffset(days=10)
+    setup_and_teardown.at[0,  r'Start_Date_Planned\Actual'] = 'A'
+    setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+    setup_and_teardown.at[0,  r'Finish_Date_Planned\Actual'] = 'P'
+
+    assert Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(setup_and_teardown,False) == description
+
+def test_Create_tasks_for_Engineering_Activities_Finish_Dates_FD(setup_and_teardown):
+
+    description = 'Check with Engineering on if Foundation Designs were issued'
+
+    
+    setup_and_teardown.at[0, 'Grandchild'] = 'Foundation Design'
+    setup_and_teardown.at[0,'Start_Date'] = pd.to_datetime("today").date() -  pd.DateOffset(days=10)
+    setup_and_teardown.at[0,  r'Start_Date_Planned\Actual'] = 'A'
+    setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+    setup_and_teardown.at[0,  r'Finish_Date_Planned\Actual'] = 'P'
+
+    assert Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(setup_and_teardown,False) == description
+
+def test_Create_tasks_for_Engineering_Activities_Finish_Dates_FD_ED(setup_and_teardown):
+
+    description = 'Ask Engineering to update the TE schedule (Finish Date)'
+
+    
+    setup_and_teardown= pd.concat([setup_and_teardown]*2, ignore_index=True)
+
+    setup_and_teardown.at[0, 'Grandchild'] = 'Foundation Design'
+    setup_and_teardown.at[0,'Start_Date'] = pd.to_datetime("today").date() -  pd.DateOffset(days=10)
+    setup_and_teardown.at[0,  r'Start_Date_Planned\Actual'] = 'A'
+    setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+    setup_and_teardown.at[0,  r'Finish_Date_Planned\Actual'] = 'P'
+
+    setup_and_teardown.at[1, 'Grandchild'] = 'Electrical Design'
+    setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=10)
+    setup_and_teardown.at[1,  r'Start_Date_Planned\Actual'] = 'A'
+    setup_and_teardown.at[1, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+    setup_and_teardown.at[1,  r'Finish_Date_Planned\Actual'] = 'P'
+
+    assert Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(setup_and_teardown, False) == description
+
+def test_Create_tasks_for_Engineering_Activities_Finish_Dates_FD_PD(setup_and_teardown):
+    description = 'Ask Engineering to update the TE schedule (Finish Date)'
+
+    
+    setup_and_teardown = pd.concat([setup_and_teardown] * 2, ignore_index=True)
+
+    setup_and_teardown.at[0, 'Grandchild'] = 'Foundation Design'
+    setup_and_teardown.at[0, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=10)
+    setup_and_teardown.at[0,  r'Start_Date_Planned\Actual'] = 'A'
+    setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+    setup_and_teardown.at[0,  r'Finish_Date_Planned\Actual'] = 'P'
+
+    setup_and_teardown.at[1, 'Grandchild'] = 'Physical Design'
+    setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=10)
+    setup_and_teardown.at[1,  r'Start_Date_Planned\Actual'] = 'A'
+    setup_and_teardown.at[1, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+    setup_and_teardown.at[1,  r'Finish_Date_Planned\Actual'] = 'P'
+
+    assert Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(setup_and_teardown,False) == description
+
+def test_Create_tasks_for_Construncction_Task_Request_Approval(setup_and_teardown):
+
+    description = 'Ask Engineering for update on Construction Task Request Approval'
+    
+    setup_and_teardown.at[0, 'Grandchild'] = 'Construction Task Request Approval'
+    setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
+    setup_and_teardown.at[0,  r'Finish_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+
+    assert Create_Task.Create_Task.Create_tasks_for_Construncction_Task_Request_Approval(setup_and_teardown, False) == description
+
+def test_Create_tasks_for_Waterfalls_Baseline(setup_and_teardown):
+
+    description = 'Waterfall needs to be baselined'
+    
+    setup_and_teardown.at[0, 'Grandchild'] = 'TEST'
+    setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+
+    assert Create_Task.Create_Task.Create_tasks_for_Waterfalls(setup_and_teardown, False) == description
+

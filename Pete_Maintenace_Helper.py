@@ -16,13 +16,7 @@ from taskw import TaskWarrior
 import pandas as pd
 import glob
 import os
-import datetime as DT
-import xlsxwriter
-from typing import Optional
-from xlsxwriter.worksheet import (
-    Worksheet, cell_number_tuple, cell_string_tuple, xl_rowcol_to_cell
-)
-from multiprocessing import Pool
+import datetime as dt
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog
@@ -31,14 +25,9 @@ from subprocess import Popen, PIPE
 import Reports.Reports
 import Create_Task.Create_Task
 
+# OS Functions
 
 
-#from xlsxwriter.utility import xl_rowcol_to_cell
-from dateutil.tz import tzutc
-import numpy as np
-
-
-#OS Functions
 def filesearch(word=""):
     """Returns a list with all files with the word/extension in it"""
     logger.info('Starting filesearch')
@@ -53,6 +42,7 @@ def filesearch(word=""):
             #return file
     logger.debug(file)
     return file
+
 
 def Change_Working_Path(path):
     # Check if New path exists
@@ -70,8 +60,8 @@ def Excel_to_Pandas(filename,check_update=False):
     logger.info('importing file ' + filename)
     df=[]
     if check_update == True:
-        timestamp = DT.datetime.fromtimestamp(Path(filename).stat().st_mtime)
-        if DT.datetime.today().date() != timestamp.date():
+        timestamp = dt.datetime.fromtimestamp(Path(filename).stat().st_mtime)
+        if dt.datetime.today().date() != timestamp.date():
             root = tk.Tk()
             root.withdraw()
             filename = filedialog.askopenfilename(title =' '.join(['Select file for', filename]))
@@ -264,7 +254,7 @@ def main():
 
 
     # Return the day of the week as an integer, where Monday is 0 and Sunday is 6
-    if DT.date.today().weekday() == 3:
+    if dt.date.today().weekday() == 3:
         res = Popen('tasks=$(task tag=PMH_E _ids) && task delete $tasks', shell=True, stdin=PIPE)
         res.stdin.write(b'a\n')
         res.stdin.flush()
@@ -294,18 +284,18 @@ def main():
     res.wait()
     res.stdin.close()
 
-    if DT.date.today().weekday() == 4:
+    if dt.date.today().weekday() == 4:
         Reports.Reports.Genrate_Relay_Settings_Report(Project_Schedules_All_Data_df, Relay_Setters_df)
         Reports.Reports.Genrate_Electrical_Prints_Report(Project_Schedules_All_Data_df)
         Reports.Reports.Genrate_Physical_Prints_Report(Project_Schedules_All_Data_df)
 
-    if DT.date.today().weekday() == 4:
+    if dt.date.today().weekday() == 4:
         try:
             Material_Data_df = Excel_to_Pandas(Material_Data_Filename)
         except:
             logger.error('Can not find Project Data file')
             raise
-        Reports.Genrate_Matrial_Report(Material_Data_df, Project_Schedules_All_Data_df)
+        Reports.Reports.Genrate_Matrial_Report(Material_Data_df, Project_Schedules_All_Data_df)
     #Reports.Genrate_Resource_Plan(Project_Schedules_All_Data_df, budget_item_df)
 
 

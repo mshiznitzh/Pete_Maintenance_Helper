@@ -21,6 +21,9 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog
 from subprocess import Popen, PIPE
+import scr.create_task.Create_Task as ct
+import scr.Reports.Reports as Reports
+
 
 
 # OS Functions
@@ -44,6 +47,7 @@ def filesearch(word=""):
 
 def Change_Working_Path(path):
     # Check if New path exists
+    logger.info('Current path is ' + str(os.getcwd()))
     if os.path.exists(path):
         # Change the current working Directory
         try:
@@ -208,7 +212,7 @@ def main():
 
     """ Main entry point of the app """
     logger.info("Starting Pete Maintenance Helper")
-    Change_Working_Path('../Data')
+    Change_Working_Path('./Data')
     try:
         Project_Data_df=Excel_to_Pandas(Project_Data_Filename, True)
     except:
@@ -263,29 +267,29 @@ def main():
         res.stdin.close()
 
         #Create_tasks_for_Precon_meetings(Project_Schedules_All_Data_df)
-        scr.Create_Task.Create_Task.Create_task_for_Final_Engineering_with_draft_schedules(Project_Schedules_All_Data_df)
-        scr.Create_Task.Create_Task.Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
-        scr.Create_Task.Create_Task.Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
-        scr.Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(Project_Schedules_All_Data_df)
-        scr.Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(Project_Schedules_All_Data_df)
-        scr.Create_Task.Create_Task.Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
+        ct.Create_task_for_Final_Engineering_with_draft_schedules(Project_Schedules_All_Data_df)
+        ct.Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
+        ct.Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
+        ct.Create_tasks_for_Engineering_Activities_Start_Dates(Project_Schedules_All_Data_df)
+        ct.Create_tasks_for_Engineering_Activities_Finish_Dates(Project_Schedules_All_Data_df)
+        ct.Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
 
-    scr.Create_Task.Create_Task.Create_task_for_ESID_before_Energiztion(Project_Schedules_All_Data_df)
-    scr.Create_Task.Create_Task.Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes)
-    scr.Create_Task.Create_Task.Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df)
-    scr.Create_Task.Create_Task.Create_task_for_missing_tiers(Project_Schedules_All_Data_df)
-    scr.Create_Task.Create_Task.Create_tasks_TOA_outside_Waterfalls(Project_Schedules_All_Data_df)
-    scr.Create_Task.Create_Task.Create_tasks_TOA_no_active(Project_Schedules_All_Data_df)
-    scr.Create_Task.Create_Task.Create_tasks_Construnction_Summary_before_Construnction_Ready(Project_Schedules_All_Data_df)
+    ct.Create_task_for_ESID_before_Energiztion(Project_Schedules_All_Data_df)
+    ct.Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes)
+    ct.Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df)
+    ct.Create_task_for_missing_tiers(Project_Schedules_All_Data_df)
+    ct.Create_tasks_TOA_outside_Waterfalls(Project_Schedules_All_Data_df)
+    ct.Create_tasks_TOA_no_active(Project_Schedules_All_Data_df)
+    ct.Create_tasks_Construnction_Summary_before_Construnction_Ready(Project_Schedules_All_Data_df)
 
     res = Popen('task sync', shell=True, stdin=PIPE)
     res.wait()
     res.stdin.close()
 
     if dt.date.today().weekday() == 4:
-        scr.Reports.Reports.Genrate_Relay_Settings_Report(Project_Schedules_All_Data_df, Relay_Setters_df)
-        scr.Reports.Reports.Genrate_Electrical_Prints_Report(Project_Schedules_All_Data_df)
-        scr.Reports.Reports.Genrate_Physical_Prints_Report(Project_Schedules_All_Data_df)
+        Reports.Genrate_Relay_Settings_Report(Project_Schedules_All_Data_df, Relay_Setters_df)
+        Reports.Genrate_Electrical_Prints_Report(Project_Schedules_All_Data_df)
+        Reports.Genrate_Physical_Prints_Report(Project_Schedules_All_Data_df)
 
     if dt.date.today().weekday() == 4:
         try:
@@ -293,7 +297,7 @@ def main():
         except:
             logger.error('Can not find Project Data file')
             raise
-        scr.Reports.Reports.Genrate_Matrial_Report(Material_Data_df, Project_Schedules_All_Data_df)
+        Reports.Genrate_Matrial_Report(Material_Data_df, Project_Schedules_All_Data_df)
     #Reports.Genrate_Resource_Plan(Project_Schedules_All_Data_df, budget_item_df)
 
 

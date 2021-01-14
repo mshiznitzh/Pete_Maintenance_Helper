@@ -1,6 +1,8 @@
 import pytest
 import os
 import pandas as pd
+import scr.create_task.Create_Task as ct
+
 
 
 @pytest.fixture()
@@ -25,7 +27,7 @@ def test_Create_task_for_Relay_Settings_Finish_date(setup_and_teardown):
     setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
     setup_and_teardown.at[0, r'Finish_Date_Planned\Actual'] = 'P'
 
-    assert scr.Create_Task.Create_Task.Create_task_for_Relay_Settings(setup_and_teardown, False) == description
+    assert ct.Create_task_for_Relay_Settings(setup_and_teardown, False) == description
 
 def test_Create_tasks_for_Engineering_Activities_Start_Dates_ED(setup_and_teardown):
 
@@ -37,7 +39,7 @@ def test_Create_tasks_for_Engineering_Activities_Start_Dates_ED(setup_and_teardo
     setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
     setup_and_teardown.at[0, r'Finish_Date_Planned\Actual'] = 'P'
     setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
-    assert scr.Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown, False) == description
+    assert ct.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown, False) == description
 
 def test_Create_tasks_for_Engineering_Activities_Start_Dates_PD(setup_and_teardown):
     description = 'Check with Engineering on if Physical Designs were started'
@@ -49,7 +51,7 @@ def test_Create_tasks_for_Engineering_Activities_Start_Dates_PD(setup_and_teardo
     setup_and_teardown.at[0, r'Finish_Date_Planned\Actual'] = 'P'
     setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
 
-    assert scr.Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown, False) == description
+    assert ct.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown, False) == description
 
 def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD(setup_and_teardown):
 
@@ -63,7 +65,7 @@ def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD(setup_and_teardo
     setup_and_teardown.at[0, r'Finish_Date_Planned\Actual'] = 'P'
     setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
 
-    assert scr.Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown, False) == description
+    assert ct.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown, False) == description
 
 def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD_ED(setup_and_teardown):
 
@@ -86,7 +88,7 @@ def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD_ED(setup_and_tea
     setup_and_teardown.at[1, 'Program_Manager'] = 'Michael Howard'
 
 
-    assert scr.Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown, False) == description
+    assert ct.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown, False) == description
 
 def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD_PD(setup_and_teardown):
     description = 'Ask Engineering to update the TE schedule'
@@ -108,7 +110,7 @@ def test_Create_tasks_for_Engineering_Activities_Start_Dates_FD_PD(setup_and_tea
     setup_and_teardown.at[1, r'Finish_Date_Planned\Actual'] = 'P'
     setup_and_teardown.at[1, 'Program_Manager'] = 'Michael Howard'
 
-    assert scr.Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown, False) == description
+    assert ct.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown, False) == description
 
 def test_Create_task_for_Relay_Settings_start_date(setup_and_teardown):
 
@@ -119,7 +121,7 @@ def test_Create_task_for_Relay_Settings_start_date(setup_and_teardown):
     setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
     setup_and_teardown.at[0, r'Finish_Date_Planned\Actual'] = 'P'
 
-    assert scr.Create_Task.Create_Task.Create_task_for_Relay_Settings(setup_and_teardown, False) == description
+    assert ct.Create_task_for_Relay_Settings(setup_and_teardown, False) == description
 
 def test_Create_tasks_TOA_after_Waterfall(setup_and_teardown):
     description = 'TOA request outside Waterfall dates'
@@ -141,7 +143,7 @@ def test_Create_tasks_TOA_after_Waterfall(setup_and_teardown):
     setup_and_teardown.at[2, 'Program_Manager'] = 'Michael Howard'
     setup_and_teardown.at[2, 'Finish_Date'] = pd.to_datetime(pd.to_datetime("today").date() + pd.DateOffset(days=6))
 
-    assert scr.Create_Task.Create_Task.Create_tasks_TOA_outside_Waterfalls(setup_and_teardown, False) == description
+    assert ct.Create_tasks_TOA_outside_Waterfalls(setup_and_teardown, False) == description
 
 def test_Create_tasks_TOA_before_Waterfall(setup_and_teardown):
     description = 'TOA request outside Waterfall dates'
@@ -163,7 +165,7 @@ def test_Create_tasks_TOA_before_Waterfall(setup_and_teardown):
     setup_and_teardown.at[2, 'Program_Manager'] = 'Michael Howard'
     setup_and_teardown.at[2, 'Finish_Date'] = pd.to_datetime(pd.to_datetime("today").date() + pd.DateOffset(days=6))
 
-    assert scr.Create_Task.Create_Task.Create_tasks_TOA_outside_Waterfalls(setup_and_teardown, False) == description
+    assert ct.Create_tasks_TOA_outside_Waterfalls(setup_and_teardown, False) == description
 
 def test_Create_tasks_no_active_TOA_inside_Waterfall(setup_and_teardown):
     description = 'No Active TOA for project'
@@ -173,7 +175,7 @@ def test_Create_tasks_no_active_TOA_inside_Waterfall(setup_and_teardown):
     setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
     setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(pd.to_datetime("today").date())
 
-    assert scr.Create_Task.Create_Task.Create_tasks_TOA_no_active(setup_and_teardown, False) == description
+    assert ct.Create_tasks_TOA_no_active(setup_and_teardown, False) == description
 
 def test_Create_tasks_Construnction_Summary_before_Construnction_Ready(setup_and_teardown):
     description = 'Construction Summary before Construction Ready'
@@ -193,7 +195,7 @@ def test_Create_tasks_Construnction_Summary_before_Construnction_Ready(setup_and
     setup_and_teardown.at[1, r'Start_Date_Planned\Actual'] = 'A'
     setup_and_teardown.at[1, 'PLANNEDCONSTRUCTIONREADY'] = pd.to_datetime(pd.to_datetime("today").date())
 
-    assert scr.Create_Task.Create_Task.Create_tasks_Construnction_Summary_before_Construnction_Ready(setup_and_teardown,
+    assert ct.Create_tasks_Construnction_Summary_before_Construnction_Ready(setup_and_teardown,
                                                                                                      False) == None
 
 
@@ -211,7 +213,7 @@ def test_Create_tasks_Construnction_Summary_before_Construnction_Ready(setup_and
     setup_and_teardown.at[1, r'Start_Date_Planned\Actual'] = 'P'
     setup_and_teardown.at[1, 'PLANNEDCONSTRUCTIONREADY'] = pd.to_datetime(pd.to_datetime("today").date())
 
-    assert scr.Create_Task.Create_Task.Create_tasks_Construnction_Summary_before_Construnction_Ready(setup_and_teardown, False) == description
+    assert ct.Create_tasks_Construnction_Summary_before_Construnction_Ready(setup_and_teardown, False) == description
 
 
 def test_Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(setup_and_teardown):
@@ -232,7 +234,7 @@ def test_Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(setup_
     setup_and_teardown.at[1, r'Finish_Date_Planned\Actual'] = 'A'
     setup_and_teardown.at[1, 'PLANNEDCONSTRUCTIONREADY'] = pd.to_datetime(pd.to_datetime("today").date())
 
-    assert scr.Create_Task.Create_Task.Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(setup_and_teardown,
+    assert ct.Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(setup_and_teardown,
                                                                                                         False) == None
 
 
@@ -250,7 +252,7 @@ def test_Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(setup_
     setup_and_teardown.at[1, r'Finish_Date_Planned\Actual'] = 'P'
     setup_and_teardown.at[1, 'PLANNEDCONSTRUCTIONREADY'] = pd.to_datetime(pd.to_datetime("today").date())
 
-    assert scr.Create_Task.Create_Task.Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(setup_and_teardown, False) == description
+    assert ct.Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(setup_and_teardown, False) == description
 
     setup_and_teardown.at[0, 'PETE_ID'] = 1
     setup_and_teardown.at[0, 'Grandchild'] = 'Physical Design'
@@ -266,7 +268,7 @@ def test_Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(setup_
     setup_and_teardown.at[1, r'Finish_Date_Planned\Actual'] = 'P'
     setup_and_teardown.at[1, 'PLANNEDCONSTRUCTIONREADY'] = pd.to_datetime(pd.to_datetime("today").date())
 
-    assert scr.Create_Task.Create_Task.Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(setup_and_teardown, False) == description
+    assert ct.Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(setup_and_teardown, False) == description
 
 def test_Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(setup_and_teardown):
     description = 'Design Finish after Construction Ready Date (Line)'
@@ -285,7 +287,7 @@ def test_Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(setup_and
     setup_and_teardown.at[1, r'Finish_Date_Planned\Actual'] = 'A'
     setup_and_teardown.at[1, 'PLANNEDCONSTRUCTIONREADY'] = pd.to_datetime(pd.to_datetime("today").date())
 
-    assert scr.Create_Task.Create_Task.Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(setup_and_teardown,
+    assert ct.Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(setup_and_teardown,
                                                                                                      False) == None
 
     setup_and_teardown.at[0, 'PETE_ID'] = 1
@@ -302,7 +304,7 @@ def test_Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(setup_and
     setup_and_teardown.at[1, r'Finish_Date_Planned\Actual'] = 'P'
     setup_and_teardown.at[1, 'PLANNEDCONSTRUCTIONREADY'] = pd.to_datetime(pd.to_datetime("today").date())
 
-    assert scr.Create_Task.Create_Task.Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(setup_and_teardown, False) == description
+    assert ct.Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(setup_and_teardown, False) == description
 
     setup_and_teardown.at[0, 'PETE_ID'] = 1
     setup_and_teardown.at[0, 'Grandchild'] = 'Project WA Approved'
@@ -319,7 +321,7 @@ def test_Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(setup_and
     setup_and_teardown.at[1, r'Finish_Date_Planned\Actual'] = 'P'
     setup_and_teardown.at[1, 'PLANNEDCONSTRUCTIONREADY'] = pd.to_datetime(pd.to_datetime("today").date())
 
-    assert scr.Create_Task.Create_Task.Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(setup_and_teardown, False) == description
+    assert ct.Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(setup_and_teardown, False) == description
 def test_Create_tasks_for_Engineering_Activities_Start_Dates_ED_PD(setup_and_teardown):
     description = 'Ask Engineering to update the TE schedule'
 
@@ -340,7 +342,7 @@ def test_Create_tasks_for_Engineering_Activities_Start_Dates_ED_PD(setup_and_tea
     setup_and_teardown.at[1,  r'Finish_Date_Planned\Actual'] = 'P'
     setup_and_teardown.at[1, 'Program_Manager'] = 'Michael Howard'
 
-    assert scr.Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown, False) == description
+    assert ct.Create_tasks_for_Engineering_Activities_Start_Dates(setup_and_teardown, False) == description
 
 def test_Create_tasks_for_Engineering_Activities_Finish_Dates_ED(setup_and_teardown):
 
@@ -353,7 +355,7 @@ def test_Create_tasks_for_Engineering_Activities_Finish_Dates_ED(setup_and_teard
     setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
     setup_and_teardown.at[0,  r'Finish_Date_Planned\Actual'] = 'P'
 
-    assert scr.Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(setup_and_teardown, False) == description
+    assert ct.Create_tasks_for_Engineering_Activities_Finish_Dates(setup_and_teardown, False) == description
 
 def test_Create_tasks_for_Engineering_Activities_Finish_Dates_PD(setup_and_teardown):
 
@@ -366,7 +368,7 @@ def test_Create_tasks_for_Engineering_Activities_Finish_Dates_PD(setup_and_teard
     setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
     setup_and_teardown.at[0,  r'Finish_Date_Planned\Actual'] = 'P'
 
-    assert scr.Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(setup_and_teardown, False) == description
+    assert ct.Create_tasks_for_Engineering_Activities_Finish_Dates(setup_and_teardown, False) == description
 
 def test_Create_tasks_for_Engineering_Activities_Finish_Dates_FD(setup_and_teardown):
 
@@ -379,7 +381,7 @@ def test_Create_tasks_for_Engineering_Activities_Finish_Dates_FD(setup_and_teard
     setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
     setup_and_teardown.at[0,  r'Finish_Date_Planned\Actual'] = 'P'
 
-    assert scr.Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(setup_and_teardown, False) == description
+    assert ct.Create_tasks_for_Engineering_Activities_Finish_Dates(setup_and_teardown, False) == description
 
 def test_Create_tasks_for_Engineering_Activities_Finish_Dates_FD_ED(setup_and_teardown):
 
@@ -400,7 +402,7 @@ def test_Create_tasks_for_Engineering_Activities_Finish_Dates_FD_ED(setup_and_te
     setup_and_teardown.at[1, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
     setup_and_teardown.at[1,  r'Finish_Date_Planned\Actual'] = 'P'
 
-    assert scr.Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(setup_and_teardown, False) == description
+    assert ct.Create_tasks_for_Engineering_Activities_Finish_Dates(setup_and_teardown, False) == description
 
 def test_Create_tasks_for_Engineering_Activities_Finish_Dates_FD_PD(setup_and_teardown):
     description = 'Ask Engineering to update the TE schedule (Finish Date)'
@@ -420,7 +422,7 @@ def test_Create_tasks_for_Engineering_Activities_Finish_Dates_FD_PD(setup_and_te
     setup_and_teardown.at[1, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
     setup_and_teardown.at[1,  r'Finish_Date_Planned\Actual'] = 'P'
 
-    assert scr.Create_Task.Create_Task.Create_tasks_for_Engineering_Activities_Finish_Dates(setup_and_teardown, False) == description
+    assert ct.Create_tasks_for_Engineering_Activities_Finish_Dates(setup_and_teardown, False) == description
 
 def test_Create_tasks_for_Construncction_Task_Request_Approval(setup_and_teardown):
 
@@ -431,7 +433,7 @@ def test_Create_tasks_for_Construncction_Task_Request_Approval(setup_and_teardow
     setup_and_teardown.at[0,  r'Finish_Date_Planned\Actual'] = 'P'
     setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
 
-    assert scr.Create_Task.Create_Task.Create_tasks_for_Construncction_Task_Request_Approval(setup_and_teardown, False) == description
+    assert ct.Create_tasks_for_Construncction_Task_Request_Approval(setup_and_teardown, False) == description
 
 def test_Create_tasks_for_Waterfalls_Baseline(setup_and_teardown):
 
@@ -440,5 +442,5 @@ def test_Create_tasks_for_Waterfalls_Baseline(setup_and_teardown):
     setup_and_teardown.at[0, 'Grandchild'] = 'TEST'
     setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
 
-    assert scr.Create_Task.Create_Task.Create_tasks_for_Waterfalls(setup_and_teardown, False) == description
+    assert ct.Create_tasks_for_Waterfalls(setup_and_teardown, False) == description
 

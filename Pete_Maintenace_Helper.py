@@ -295,7 +295,7 @@ def main():
     res.stdin.close()
 
     if DT.date.today().weekday() == 4:
-        Reports.Reports.Genrate_Relay_Settings_Report(Project_FcheckSchedules_All_Data_df, Relay_Setters_df)
+        Reports.Reports.Genrate_Relay_Settings_Report(Project_Schedules_All_Data_df, Relay_Setters_df)
         Reports.Reports.Genrate_Electrical_Prints_Report(Project_Schedules_All_Data_df)
         Reports.Reports.Genrate_Physical_Prints_Report(Project_Schedules_All_Data_df)
 

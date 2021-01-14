@@ -22,9 +22,9 @@ def test_Create_task_for_Relay_Settings_Finish_date(setup_and_teardown):
     description = 'Check with Relay Setter on when settings are going to be issued'
 
     setup_and_teardown.at[0,'Start_Date'] = pd.to_datetime("today").date() -  pd.DateOffset(days=10)
-    setup_and_teardown.at[0, 'Start_Date_Planned\Actual'] = 'A'
+    setup_and_teardown.at[0, r'Start_Date_Planned\Actual'] = 'A'
     setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() - pd.DateOffset(days=5)
-    setup_and_teardown.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, r'Finish_Date_Planned\Actual'] = 'P'
 
     assert Create_Task.Create_Task.Create_task_for_Relay_Settings(setup_and_teardown, False) == description
 
@@ -33,9 +33,9 @@ def test_Create_task_for_Relay_Settings_start_date(setup_and_teardown):
     description = 'Check with Relay Setter on when settings are going to be started'
 
     setup_and_teardown.at[0,'Start_Date'] = pd.to_datetime("today").date() -  pd.DateOffset(days=5)
-    setup_and_teardown.at[0, 'Start_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, r'Start_Date_Planned\Actual'] = 'P'
     setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime("today").date() + pd.DateOffset(days=5)
-    setup_and_teardown.at[0, 'Finish_Date_Planned\Actual'] = 'P'
+    setup_and_teardown.at[0, r'Finish_Date_Planned\Actual'] = 'P'
 
     assert Create_Task.Create_Task.Create_task_for_Relay_Settings(setup_and_teardown, False) == description
 

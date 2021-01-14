@@ -22,7 +22,7 @@ from typing import Optional
 from xlsxwriter.worksheet import (
     Worksheet, cell_number_tuple, cell_string_tuple, xl_rowcol_to_cell
 )
-import multiprocessing
+from multiprocessing import Pool
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog

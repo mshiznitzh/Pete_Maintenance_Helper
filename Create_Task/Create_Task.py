@@ -200,7 +200,7 @@ def Create_task_for_ESID_before_Energiztion(scheduledf, Create_Tasks=True):
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Project Energization') &
                           (scheduledf['Program_Manager'] == 'Michael Howard') &
                           (scheduledf['Estimated_In-Service_Date'] < scheduledf['Finish_Date']) &
-                          (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
+                          (scheduledf[r'Finish_Date_Planned\Actual'] != 'A')]
 
     filterdf.sort_values(by=['Estimated_In_Service_Date'])
 
@@ -218,7 +218,7 @@ def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks
     EDdf = scheduledf[(scheduledf['Grandchild'] == 'Electrical Design') &
                       (scheduledf['Start_Date'] + (
                               scheduledf['Finish_Date'] - scheduledf['Start_Date']) / 2 <= DT.datetime.today()) &
-                      (scheduledf['Start_Date_Planned\Actual'] != 'A') &
+                      (scheduledf[r'Start_Date_Planned\Actual'] != 'A') &
                       (scheduledf['Finish_Date'] >= DT.datetime.today()) &
                       (scheduledf['Program_Manager'] == 'Michael Howard') |
                             (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
@@ -226,7 +226,7 @@ def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks
     PDdf = scheduledf[(scheduledf['Grandchild'] == 'Physical Design') &
                       (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
                           'Start_Date']) / 2 <= DT.datetime.today()) &
-                      (scheduledf['Start_Date_Planned\Actual'] != 'A') &
+                      (scheduledf[r'Start_Date_Planned\Actual'] != 'A') &
                       (scheduledf['Finish_Date'] >= DT.datetime.today()) &
                       (scheduledf['Program_Manager'] == 'Michael Howard') |
                             (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
@@ -234,7 +234,7 @@ def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks
     FDdf = scheduledf[(scheduledf['Grandchild'] == 'Foundation Design') &
                       (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
                           'Start_Date']) / 2 <= DT.datetime.today()) &
-                      (scheduledf['Start_Date_Planned\Actual'] != 'A') &
+                      (scheduledf[r'Start_Date_Planned\Actual'] != 'A') &
                       (scheduledf['Finish_Date'] >= DT.datetime.today()) &
                       (scheduledf['Program_Manager'] == 'Michael Howard') |
                             (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
@@ -301,15 +301,15 @@ def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Task
     description = None
     EDdf = scheduledf[(scheduledf['Grandchild'] == 'Electrical Design') &
                       (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
-                      (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
+                      (scheduledf[r'Finish_Date_Planned\Actual'] != 'A')]
 
     PDdf = scheduledf[(scheduledf['Grandchild'] == 'Physical Design') &
                       (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
-                      (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
+                      (scheduledf[r'Finish_Date_Planned\Actual'] != 'A')]
 
     FDdf = scheduledf[(scheduledf['Grandchild'] == 'Foundation Design') &
                       (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
-                      (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
+                      (scheduledf[r'Finish_Date_Planned\Actual'] != 'A')]
 
     filterdf = EDdf[~EDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
@@ -374,7 +374,7 @@ def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf, Create_Tas
     description = None
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Construction Task Request Approval') &
                           (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
-                          (scheduledf['Finish_Date_Planned\Actual'] != 'A') &
+                          (scheduledf[r'Finish_Date_Planned\Actual'] != 'A') &
                           (scheduledf['Program_Manager'] == 'Michael Howard')]
 
     if len(filterdf) >= 1:
@@ -388,7 +388,7 @@ def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf, Create_Tas
 def Create_tasks_for_Design_Book_Issued(scheduledf):
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Complete Design Book Issued') &
                           (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
-                          (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
+                          (scheduledf[r'Finish_Date_Planned\Actual'] != 'A')]
 
     description = 'Ask Engineering for update on Design Book Issued'
     duedate = DT.datetime.today() + DT.timedelta(hours=5)
@@ -398,7 +398,7 @@ def Create_tasks_for_Design_Book_Issued(scheduledf):
 def Create_tasks_for_WA(scheduledf):
     filterdf = scheduledf[(pd.isnull(scheduledf['FIMSTATUS'])) &
                           (scheduledf['PLANNEDCONSTRUCTIONREADY'] <= DT.datetime.today() - DT.timedelta(days=5)) &
-                          (scheduledf['Finish_Date_Planned\Actual'] != 'A') &
+                          (scheduledf[r'Finish_Date_Planned\Actual'] != 'A') &
                           (scheduledf['Program_Manager'] == 'Michael Howard') |
                             (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
 
@@ -415,7 +415,7 @@ def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True):
 
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Create Relay Settings') &
                           (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
-                          (scheduledf['Finish_Date_Planned\Actual'] != 'A')]
+                          (scheduledf[r'Finish_Date_Planned\Actual'] != 'A')]
 
     filterdf=filterdf.sort_values(by=['Estimated_In_Service_Date'])
 
@@ -428,7 +428,7 @@ def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True):
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Create Relay Settings') &
                               (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
                                   'Start_Date']) / 2 <= DT.datetime.today()) &
-                              (scheduledf['Start_Date_Planned\Actual'] != 'A') &
+                              (scheduledf[r'Start_Date_Planned\Actual'] != 'A') &
                               (scheduledf['Finish_Date'] >= DT.datetime.today())]
     filterdf = filterdf.sort_values(by=['Estimated_In_Service_Date'])
 
@@ -567,12 +567,68 @@ def Create_tasks_Construnction_Summary_before_Construnction_Ready(df, Create_Tas
 #TODO Convert Filter to Query
     CS_df = df[(df['Parent'] == 'Construction Summary') &
                   (df['Region_Name'] == 'METRO WEST') &
-                  (df['Start_Date'].le(pd.to_datetime(df['PLANNEDCONSTRUCTIONREADY'])))]
+                  (df['Start_Date'].le(pd.to_datetime(df['PLANNEDCONSTRUCTIONREADY'])))&
+                  (df[r'Start_Date_Planned\Actual'] == 'P')]
 
+    CS_df = CS_df.sort_values(by=['Start_Date'], ascending=True)
     filterdf = CS_df.drop_duplicates(subset=['PETE_ID'], keep='first')
 
     if len(filterdf) >= 1:
         description = 'Construction Summary before Construction Ready'
+    duedate = DT.datetime.today() + DT.timedelta(hours=8)
+    if Create_Tasks:
+        Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+    return description
+
+def Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(df, Create_Tasks=True):
+    description = None
+    # TODO Convert Filter to Query
+    CS_df = df[(df['Grandchild'] == 'Electrical Design') &
+               (df['Region_Name'] == 'METRO WEST') &
+               (df['Finish_Date'].lt(pd.to_datetime(df['PLANNEDCONSTRUCTIONREADY']))) &
+                (df[r'Finish_Date_Planned\Actual'] == 'P')]
+
+    CS1_df = df[(df['Grandchild'] == 'Physical Design') &
+               (df['Region_Name'] == 'METRO WEST') &
+               (df['Finish_Date'].lt(pd.to_datetime(df['PLANNEDCONSTRUCTIONREADY']))) &
+                (df[r'Finish_Date_Planned\Actual'] == 'P')
+    ]
+
+    CS_df = pd.concat([CS_df, CS1_df])
+
+    CS_df = CS_df.sort_values(by=['Start_Date'], ascending=True)
+    filterdf = CS_df.drop_duplicates(subset=['PETE_ID'], keep='first')
+
+    if len(filterdf) >= 1:
+        description = 'Design Finish after Construction Ready Date'
+    duedate = DT.datetime.today() + DT.timedelta(hours=8)
+    if Create_Tasks:
+        Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+    return description
+
+def Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(df, Create_Tasks=True):
+    description = None
+    # TODO Convert Filter to Query
+    CS_df = df[(df['Grandchild'] == 'Complete Design Books Issued') &
+               #(df['Grandchild'] == 'Project WA Approved') &
+               (df['Region_Name'] == 'METRO WEST') &
+               (df['Finish_Date'].lt(pd.to_datetime(df['PLANNEDCONSTRUCTIONREADY']))) &
+               (df[r'Finish_Date_Planned\Actual'] == 'P')
+    ]
+
+    CS1_df = df[(df['Grandchild'] == 'Project WA Approved') &
+               (df['Region_Name'] == 'METRO WEST') &
+               (df['Finish_Date'].lt(pd.to_datetime(df['PLANNEDCONSTRUCTIONREADY']))) &
+               (df[r'Finish_Date_Planned\Actual'] == 'P')
+               ]
+
+    CS_df = pd.concat([CS_df,CS1_df ])
+
+    CS_df = CS_df.sort_values(by=['Start_Date'], ascending=True)
+    filterdf = CS_df.drop_duplicates(subset=['PETE_ID'], keep='first')
+
+    if len(filterdf) >= 1:
+        description = 'Design Finish after Construction Ready Date (Line)'
     duedate = DT.datetime.today() + DT.timedelta(hours=8)
     if Create_Tasks:
         Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')

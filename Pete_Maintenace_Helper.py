@@ -405,7 +405,7 @@ def main():
 
 
     # Return the day of the week as an integer, where Monday is 0 and Sunday is 6
-    if DT.date.today().weekday() == 0:
+    if DT.date.today().weekday() == 3:
         res = Popen('tasks=$(task tag=PMH_E _ids) && task delete $tasks', shell=True, stdin=PIPE)
         res.stdin.write(b'a\n')
         res.stdin.flush()

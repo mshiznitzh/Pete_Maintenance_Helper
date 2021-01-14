@@ -22,44 +22,6 @@ import Pete_Maintenace_Helper
 
 list_my_BUDGETITEMS = ['3201','3202','3203','3206', '3212', '3226']
 
-def Create_tasks_no_TOA_active(schedule):
-    description = None
-
-    toadf = schedule.query('Schedule_Function' == 'TOA' and
-                           'COMMENTS.str.contains("SUBMITTED")' and
-                           'Program_Manager' == "Michael Howard" or
-                            'BUDGETITEMNUMBER'.isin(list_my_BUDGETITEMS))
-
-    #CSdf = schedule.query('Schedule_Function' == 'Construction' and
-     #                      'PARENT' == 'Construction Summary' and
-      #                     'Program_Manager' == "Michael Howard")
-
-    toasdf = toadf.sort_vaulues('Start_Date', axis = 0, ascending = True, na_position = 'last')
-    toasdf = toasdf.drop_duplicates(PETE_ID)
-    toasdf = toasdf.rename(columns={"Start_Date": "TOA_Start_Date"})
-
-
-
-    #toafdf = toadf.sort_vaulues('Finish_Date', axis = 0, ascending = True, na_position = 'last')
-    #toafdf = toafdf.drop_duplicates(PETE_ID)
-    #toafdf = toafdf.rename(columns={"Finish_Date": "TOA_Finish_Date"})
-
-    #CSsdf = CSdf.sort_vaulues('Start_Date', axis=0, ascending=True, na_position='last')
-    #CSsdf = CSsdf.drop_duplicates(PETE_ID)
-    #CSsdf = CSsdf.rename(columns={"Start_Date": "CS_Start_Date"})
-
-    #CSfdf = CSdf.sort_vaulues('Finish_Date', axis=0, ascending=True, na_position='last')
-    #CSfdf = CSfdf.drop_duplicates(PETE_ID)
-    #CSfdf = CSfdf.rename(columns={"Finish_Date": "CS_Finish_Date"})
-
-    #toadf = pd.merge(toasdf,toafdf[['PETE_ID', 'TOA_Finish_Date']], how='inner' , on = 'PETE_ID')
-    #toadf = pd.merge(toadf, CSsdf[['PETE_ID', 'CS_Start_Date']], how='inner', on='PETE_ID')
-    #toadf = pd.merge(toadf, CSfdf[['PETE_ID', 'CS_Finish_Date']], how='inner', on='PETE_ID')
-
-    #toadf = toadf.query(TOA_Start_Date <
-
-
-    return description
 
 def Create_tasks_for_Precon_meetings(myprojects, schedule):
     # This filters Pre construnction meeting in the future of Released projects

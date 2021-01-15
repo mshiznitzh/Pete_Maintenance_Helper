@@ -8,7 +8,7 @@ list_my_BUDGETITEMS = ['3201','3202','3203','3206', '3212', '3226']
 
 
 def Create_tasks_for_Precon_meetings(myprojects, schedule):
-    # This filters Pre construnction meeting in the future of Released projects
+    # TODO Create Docstring
     precons_df = schedule[(schedule['Grandchild'] == 'Pre-Construction Meeting') &
                           (schedule['Schedule_Status'] == 'Active') &
                           (schedule['Percent_Complete'] <= 100) &
@@ -42,6 +42,7 @@ def Create_tasks_for_Precon_meetings(myprojects, schedule):
 
 
 def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=True):
+    # TODO Create Docstring
     # This filters Waterfall schedules that are in draft of Released projects
     description = None
     PMO_DF = scheduledf[(scheduledf['Grandchild'] == 'Waterfall Start') &
@@ -110,6 +111,7 @@ def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=True):
 
 
 def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf):
+    # TODO Create Docstring
     # This filters Waterfall schedules that are in draft of Released projects
 
     Releaseddf = scheduledf[(scheduledf['PROJECTSTATUS'] == 'Released') &
@@ -145,6 +147,7 @@ def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf):
 
 
 def Create_task_for_Released_projects_missing_Construnction_Ready_Date(scheduledf):
+    # TODO Create Docstring
     # This filters Waterfall schedules that are in draft of Released projects
 
     filterdf = scheduledf[(scheduledf['Schedule_Function'] == 'Transmission Engineering') &
@@ -179,7 +182,8 @@ def Create_task_for_Released_projects_missing_Construnction_Ready_Date(scheduled
 
 
 def Create_task_for_ESID_before_Energiztion(scheduledf, Create_Tasks=True):
-    #
+    # TODO Create Docstring
+
     description = None
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Project Energization') &
                           (scheduledf['Program_Manager'] == 'Michael Howard') &
@@ -197,6 +201,7 @@ def Create_task_for_ESID_before_Energiztion(scheduledf, Create_Tasks=True):
 
 
 def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks=True):
+    # TODO Create Docstring
     description = None
     # This code filters out the start dates for TE activities and creates tasks
     EDdf = scheduledf[(scheduledf['Grandchild'] == 'Electrical Design') &
@@ -281,6 +286,7 @@ def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks
 
 
 def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Tasks=True):
+    # TODO Create Docstring
     # This code filters out the finish dates for TE activities and creates tasks
     description = None
     EDdf = scheduledf[(scheduledf['Grandchild'] == 'Electrical Design') &
@@ -355,6 +361,7 @@ def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Task
 
 
 def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf, Create_Tasks=True):
+    # TODO Create Docstring
     description = None
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Construction Task Request Approval') &
                           (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
@@ -370,6 +377,7 @@ def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf, Create_Tas
 
 
 def Create_tasks_for_Design_Book_Issued(scheduledf):
+    # TODO Create Docstring
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Complete Design Book Issued') &
                           (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
                           (scheduledf[r'Finish_Date_Planned\Actual'] != 'A')]
@@ -380,6 +388,7 @@ def Create_tasks_for_Design_Book_Issued(scheduledf):
 
 
 def Create_tasks_for_WA(scheduledf):
+    # TODO Create Docstring
     filterdf = scheduledf[(pd.isnull(scheduledf['FIMSTATUS'])) &
                           (scheduledf['PLANNEDCONSTRUCTIONREADY'] <= DT.datetime.today() - DT.timedelta(days=5)) &
                           (scheduledf[r'Finish_Date_Planned\Actual'] != 'A') &
@@ -393,6 +402,7 @@ def Create_tasks_for_WA(scheduledf):
 
 
 def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True):
+    # TODO Create Docstring
     # This filters Prints with finished dates past 5 days past today without an actual finish
     # TODO Convert Filter to Query
     description=None
@@ -425,6 +435,7 @@ def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True):
     return description
 
 def Create_task_for_add_WA_to_schedule(scheduledf, myprojectbudgetitmes):
+    # TODO Create Docstring
     # This filters Prints with finished dates past 5 days past today without an actual finish
     # TODO Convert Filter to Query
     filterdf = scheduledf[(pd.isnull(scheduledf['Schedule_Function'])) &
@@ -455,6 +466,7 @@ def Create_task_for_add_WA_to_schedule(scheduledf, myprojectbudgetitmes):
 #def Complete_Task():
 
 def Create_task_for_missing_tiers(df):
+    # TODO Create Docstring
     # TODO Convert Filter to Query
     filterdf = df[(pd.isnull(df['Project_Tier'])) &
                           (df['Program_Manager'] == 'Michael Howard')]
@@ -482,6 +494,7 @@ def Create_task_for_missing_tiers(df):
         Pete_Maintenace_Helper.Add_Task(description, project, duedate, priority, 'PMH')
 
 def Create_tasks_TOA_outside_Waterfalls(df, Create_Tasks=True):
+    # TODO Create Docstring
     description = None
 #TODO Convert Filter to Query
     active_outage_df = df[(df['Schedule_Function'] == 'TOA') &
@@ -522,6 +535,7 @@ def Create_tasks_TOA_outside_Waterfalls(df, Create_Tasks=True):
     return description
 
 def Create_tasks_TOA_no_active(df, Create_Tasks=True):
+    # TODO Create Docstring
     description = None
     # TODO Convert Filter to Query
     active_outage_df = df[(df['Schedule_Function'] == 'TOA') &
@@ -547,6 +561,7 @@ def Create_tasks_TOA_no_active(df, Create_Tasks=True):
     return description
 
 def Create_tasks_Construnction_Summary_before_Construnction_Ready(df, Create_Tasks=True):
+    # TODO Create Docstring
     description = None
 #TODO Convert Filter to Query
     CS_df = df[(df['Parent'] == 'Construction Summary') &
@@ -565,6 +580,7 @@ def Create_tasks_Construnction_Summary_before_Construnction_Ready(df, Create_Tas
     return description
 
 def Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(df, Create_Tasks=True):
+    # TODO Create Docstring
     description = None
     # TODO Convert Filter to Query
     CS_df = df[(df['Grandchild'] == 'Electrical Design') &
@@ -591,6 +607,7 @@ def Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(df, Create_
     return description
 
 def Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(df, Create_Tasks=True):
+    # TODO Create Docstring
     description = None
     # TODO Convert Filter to Query
     CS_df = df[(df['Grandchild'] == 'Complete Design Books Issued') &

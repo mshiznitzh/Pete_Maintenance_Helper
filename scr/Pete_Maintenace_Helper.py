@@ -171,11 +171,11 @@ def Check_for_Task(description, project):
     project = str(project)
     logger.info(description)
     logger.info(project)
-    tw = TaskWarrior()
-    tasks = tw.load_tasks()
-    df_pending = pd.DataFrame(tasks['pending'])
-    df_completed = pd.DataFrame(tasks['completed'])
-    #if (description in df_pending.to_numpy()) and (project in df_pending.to_numpy()):
+    with TaskWarrior() as tw:
+        tasks = tw.load_tasks()
+        df_pending = pd.DataFrame(tasks['pending'])
+        df_completed = pd.DataFrame(tasks['completed'])
+        #if (description in df_pending.to_numpy()) and (project in df_pending.to_numpy()):
     try:
         return df_pending[(df_pending['description'] == description) & (df_pending['project'].apply(str) == project)]['id'].item()
     except:
@@ -217,18 +217,18 @@ def Update_Task(ID, attribute, value):
     logger.info(ID)
     logger.info("attribute = " + attribute)
     logger.info(value)
-    tw = TaskWarrior()
-    id, task = tw.get_task(id=ID)
-    logger.info(task)
+    with TaskWarrior() as tw:
+        id, task = tw.get_task(id=ID)
+        logger.info(task)
 
-    try:
-        if task[attribute] != value:
+        try:
+            if task[attribute] != value:
+                task[attribute] = value
+                tw.task_update(task)
+        except KeyError:
+            logger.info("Attribute has not been set so we are adding it")
             task[attribute] = value
             tw.task_update(task)
-    except KeyError:
-        logger.info("Attribute has not been set so we are adding it")
-        task[attribute] = value
-        tw.task_update(task)
 
     logger.info(task)
 

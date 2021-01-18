@@ -7,6 +7,13 @@ import scr.create_task.Create_Task as ct
 
 @pytest.fixture()
 def setup_and_teardown():
+    """This generators will setup or mock dataframe by reading from the Test_Data folder.
+
+        Args:
+
+        Yields:
+            df: dataframe read from Test_Data folder
+        """
         if 'Test_Data' not in os.getcwd():
             os.chdir("./test/Test_Data")
         df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')

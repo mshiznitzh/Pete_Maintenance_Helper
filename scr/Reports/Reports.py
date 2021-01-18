@@ -1,4 +1,34 @@
+"""This module builds reports
 
+This module is used to
+
+Example:
+    Examples can be given using either the ``Example`` or ``Examples``
+    sections. Sections support any reStructuredText formatting, including
+    literal blocks::
+
+        $ python Pete_Maintenance_Helper.py
+
+Section breaks are created by resuming unindented text. Section breaks
+are also implicitly created anytime a new section starts.
+
+Attributes:
+    module_level_variable1 (int): Module level variables may be documented in
+        either the ``Attributes`` section of the module docstring, or in an
+        inline docstring immediately following the variable.
+
+        Either form is acceptable, but the two should not be mixed. Choose
+        one convention to document module level variables and be consistent
+        with it.
+
+Todo:
+    * For module TODOs
+    * You have to also use ``sphinx.ext.todo`` extension
+
+.. _Google Python Style Guide:
+   http://google.github.io/styleguide/pyguide.html
+
+"""
 import pandas as pd
 from typing import Optional
 from xlsxwriter.worksheet import (
@@ -14,6 +44,7 @@ from dateutil.tz import tzutc
 import numpy as np
 
 def get_column_width(worksheet: Worksheet, column: int) -> Optional[int]:
+    # TODO Create Docstring
     """Get the max column width in a `Worksheet` column."""
     strings = getattr(worksheet, '_ts_all_strings', None)
     if strings is None:
@@ -41,6 +72,7 @@ def get_column_width(worksheet: Worksheet, column: int) -> Optional[int]:
     return max(lengths)
 
 def set_column_autowidth(worksheet: Worksheet, column: int):
+    # TODO Create Docstring
     """
     Set the width automatically on a column in the `Worksheet`.
     !!! Make sure you run this function AFTER having all cells filled in
@@ -53,6 +85,7 @@ def set_column_autowidth(worksheet: Worksheet, column: int):
 
 
 def Genrate_Physical_Prints_Report(scheduledf):
+    # TODO Create Docstring
     writer = pd.ExcelWriter('Metro West Physical Prints Report.xlsx', engine='xlsxwriter')
 
     scheduledf = scheduledf[scheduledf['Region_Name'] == 'METRO WEST']
@@ -140,6 +173,7 @@ def Genrate_Physical_Prints_Report(scheduledf):
 
 
 def Genrate_Electrical_Prints_Report(scheduledf):
+    # TODO Create Docstring
     writer = pd.ExcelWriter('Metro West Electrical Prints Report.xlsx', engine='xlsxwriter')
 
     scheduledf = scheduledf[scheduledf['Region_Name'] == 'METRO WEST']
@@ -226,6 +260,7 @@ def Genrate_Electrical_Prints_Report(scheduledf):
     writer.close()
 
 def Genrate_Relay_Settings_Report(scheduledf, Relay_Setters_df):
+    # TODO Create Docstring
         writer = pd.ExcelWriter('Metro West Relay Settings Report.xlsx', engine='xlsxwriter')
 
         scheduledf = scheduledf[scheduledf['Region_Name'] == 'METRO WEST']
@@ -318,6 +353,7 @@ def Genrate_Relay_Settings_Report(scheduledf, Relay_Setters_df):
         writer.close()
 
 def Genrate_Matrial_Report(Material_df, scheduledf):
+    # TODO Create Docstring
     for district in np.sort(scheduledf.Work_Center_Name.dropna().unique()):
         writer = pd.ExcelWriter(' '.join([district,'Material Report.xlsx']), engine='xlsxwriter')
         workbook = writer.book
@@ -356,6 +392,7 @@ def Genrate_Matrial_Report(Material_df, scheduledf):
         writer.close()
 
 def Genrate_Resource_Plan(scheduledf, Budget_item_df):
+    # TODO Create Docstring
 
     #scheduledf = scheduledf[scheduledf['Region_Name'] == 'METRO WEST']
     scheduledf.drop_duplicates(subset='PETE_ID', keep='last', inplace=True)

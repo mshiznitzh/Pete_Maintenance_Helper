@@ -1,6 +1,34 @@
 #!/usr/bin/env python3
-"""
-Module Docstring
+"""The core module of the Pete Helper Project
+
+This module is used to
+
+Example:
+    Examples can be given using either the ``Example`` or ``Examples``
+    sections. Sections support any reStructuredText formatting, including
+    literal blocks::
+
+        $ python Pete_Maintenance_Helper.py
+
+Section breaks are created by resuming unindented text. Section breaks
+are also implicitly created anytime a new section starts.
+
+Attributes:
+    module_level_variable1 (int): Module level variables may be documented in
+        either the ``Attributes`` section of the module docstring, or in an
+        inline docstring immediately following the variable.
+
+        Either form is acceptable, but the two should not be mixed. Choose
+        one convention to document module level variables and be consistent
+        with it.
+
+Todo:
+    * For module TODOs
+    * You have to also use ``sphinx.ext.todo`` extension
+
+.. _Google Python Style Guide:
+   http://google.github.io/styleguide/pyguide.html
+
 """
 
 # TODO: update Docstring
@@ -30,6 +58,7 @@ import scr.Reports.Reports as Reports
 
 
 def filesearch(word=""):
+    # TODO Create Docstring
     """Returns a list with all files with the word/extension in it"""
     logger.info('Starting filesearch')
     file = []
@@ -46,6 +75,7 @@ def filesearch(word=""):
 
 
 def Change_Working_Path(path):
+    # TODO Create Docstring
     # Check if New path exists
     logger.info('Current path is ' + str(os.getcwd()))
     if os.path.exists(path):
@@ -59,6 +89,7 @@ def Change_Working_Path(path):
 
 #Pandas Functions
 def Excel_to_Pandas(filename,check_update=False):
+    # TODO Create Docstring
     logger.info('importing file ' + filename)
     df=[]
     if check_update == True:
@@ -79,6 +110,7 @@ def Excel_to_Pandas(filename,check_update=False):
     return df
 
 def Cleanup_Dataframe(df):
+    # TODO Create Docstring
     logger.info('Starting Cleanup_Dataframe')
     logger.debug(df.info(verbose=True))
     # Remove whitespace on both ends of column headers
@@ -92,6 +124,7 @@ def Cleanup_Dataframe(df):
 
 
 def create_tasks(df, description, duedate, tag='PMH'):
+    # TODO Create Docstring
     df = df.sort_values(by=['Estimated_In_Service_Date'])
     for index, row in df.iterrows():
 
@@ -132,6 +165,7 @@ def create_tasks(df, description, duedate, tag='PMH'):
 
 
 def Check_for_Task(description, project):
+    # TODO Create Docstring
     logger.info("Starting Function")
     description = str(description)
     project = str(project)
@@ -155,6 +189,7 @@ def Check_for_Task(description, project):
     return 0
 
 def Add_Task(description, project, duedate, priority=None, tag=None):
+    # TODO Create Docstring
     logger.info("Starting Function")
     tw = TaskWarrior()
     ID = 0
@@ -176,6 +211,7 @@ def Add_Task(description, project, duedate, priority=None, tag=None):
 
 
 def Update_Task(ID, attribute, value):
+    # TODO Create Docstring
     logger.info("Starting Function")
     logger.info(ID)
     logger.info("attribute = " + attribute)
@@ -202,6 +238,7 @@ def Update_Task(ID, attribute, value):
 
 
 def main():
+    # TODO Create Docstring
     Project_Data_Filename='All Project Data Report Metro West or Mike.xlsx'
     Schedules_Filename = 'Metro West PETE Schedules.xlsx'
     Budget_Item_Filename = 'Budget Item.xlsx'

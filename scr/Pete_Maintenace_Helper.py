@@ -191,13 +191,14 @@ def Check_for_Task(description, project):
 def Add_Task(description, project, duedate, priority=None, tag=None):
     # TODO Create Docstring
     logger.info("Starting Function")
-    tw = TaskWarrior()
+
     ID = 0
     ID = Check_for_Task(description, project)
     logger.info(ID)
     if ID == 0 :
-        task=tw.task_add(description=description, priority=priority, project=project, due=duedate)
-        ID = task['id']
+        with TaskWarrior() as tw:
+            task=tw.task_add(description=description, priority=priority, project=project, due=duedate)
+            ID = task['id']
 
     elif ID > 0:
         #Task exist update

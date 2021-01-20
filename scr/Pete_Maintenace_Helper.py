@@ -53,6 +53,12 @@ import scr.create_task.Create_Task as ct
 import scr.Reports.Reports as Reports
 
 
+import multiprocessing
+import concurrent.futures
+import functools
+from queue import Queue
+import time
+
 
 # OS Functions
 
@@ -126,29 +132,37 @@ def Cleanup_Dataframe(df):
 def create_tasks(df, description, duedate, tag='PMH'):
     # TODO Create Docstring
     df = df.sort_values(by=['Estimated_In_Service_Date'])
-    for index, row in df.iterrows():
+    with concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()-1) as executor:
 
-        logger.info("Starting Function")
-        logger.info(str(row['PETE_ID']))
+        for index, row in df.iterrows():
+            logger.info("Starting Function")
+            logger.info(str(row['PETE_ID']))
 
-        project = str(row['PETE_ID']) + ':' + str(row['Project_Name_y'])
-
-
-        if row['Project_Tier'] == 1.0:
-            priority = 'H'
-
-        elif row['Project_Tier'] == 2.0:
-            priority = 'M'
-
-        elif row['Project_Tier'] == 3.0:
-            priority = 'L'
-
-        else:
-            priority = None
-
-        Add_Task(description, project, duedate, priority, tag)
+            project = str(row['PETE_ID']) + ':' + str(row['Project_Name_y'])
 
 
+            if row['Project_Tier'] == 1.0:
+                priority = 'H'
+
+            elif row['Project_Tier'] == 2.0:
+                priority = 'M'
+
+            elif row['Project_Tier'] == 3.0:
+                priority = 'L'
+
+            else:
+                priority = None
+
+        #Add_Task(description, project, duedate, priority, tag)
+
+        # with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
+            patrial_Add_Task = functools.partial(Add_Task, description, project, duedate, priority)
+
+            executor.submit(patrial_Add_Task, [tag])
+        #     executor.map(patrial_Add_Task, [tag])
+        #t = threading.Thread(target=Add_Task, args=(description, project, duedate, priority, tag,))
+       # t.start()
+      #  t.join()
 
 #def Project_Start_60_Days_Out_No_Outages
 #def Check_Estimated_In_Service_Date():
@@ -175,7 +189,7 @@ def Check_for_Task(description, project):
     tasks = tw.load_tasks()
     df_pending = pd.DataFrame(tasks['pending'])
     df_completed = pd.DataFrame(tasks['completed'])
-    #if (description in df_pending.to_numpy()) and (project in df_pending.to_numpy()):
+        #if (description in df_pending.to_numpy()) and (project in df_pending.to_numpy()):
     try:
         return df_pending[(df_pending['description'] == description) & (df_pending['project'].apply(str) == project)]['id'].item()
     except:
@@ -191,11 +205,12 @@ def Check_for_Task(description, project):
 def Add_Task(description, project, duedate, priority=None, tag=None):
     # TODO Create Docstring
     logger.info("Starting Function")
-    tw = TaskWarrior()
+
     ID = 0
     ID = Check_for_Task(description, project)
     logger.info(ID)
     if ID == 0 :
+        tw = TaskWarrior()
         task=tw.task_add(description=description, priority=priority, project=project, due=duedate)
         ID = task['id']
 
@@ -207,7 +222,7 @@ def Add_Task(description, project, duedate, priority=None, tag=None):
         Update_Task(ID, 'priority', priority)
 
     if tag is not None:
-        Update_Task(ID, 'tags', tag)
+        Update_Task(ID, 'tags', [tag])
 
 
 def Update_Task(ID, attribute, value):
@@ -293,7 +308,7 @@ def main():
 
 
     # Return the day of the week as an integer, where Monday is 0 and Sunday is 6
-    if dt.date.today().weekday() == 3:
+    if dt.date.today().weekday() == 1:
         res = Popen('tasks=$(task tag=PMH_E _ids) && task delete $tasks', shell=True, stdin=PIPE)
         res.stdin.write(b'a\n')
         res.stdin.flush()
@@ -311,12 +326,12 @@ def main():
         ct.Create_tasks_for_Engineering_Activities_Finish_Dates(Project_Schedules_All_Data_df)
         ct.Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
 
-    ct.Create_task_for_ESID_before_Energiztion(Project_Schedules_All_Data_df)
-    ct.Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes)
-    ct.Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df)
-    ct.Create_task_for_missing_tiers(Project_Schedules_All_Data_df)
-    ct.Create_tasks_TOA_outside_Waterfalls(Project_Schedules_All_Data_df)
-    ct.Create_tasks_TOA_no_active(Project_Schedules_All_Data_df)
+    ct.Create_task_for_ESID_before_Energiztion(Project_Schedules_All_Data_df),
+    ct.Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes),
+    ct.Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df),
+    ct.Create_task_for_missing_tiers(Project_Schedules_All_Data_df),
+    ct.Create_tasks_TOA_outside_Waterfalls(Project_Schedules_All_Data_df),
+    ct.Create_tasks_TOA_no_active(Project_Schedules_All_Data_df),
     ct.Create_tasks_Construnction_Summary_before_Construnction_Ready(Project_Schedules_All_Data_df)
 
     res = Popen('task sync', shell=True, stdin=PIPE)

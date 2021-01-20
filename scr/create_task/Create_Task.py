@@ -51,27 +51,9 @@ def Create_tasks_for_Precon_meetings(myprojects, schedule):
     outputdf = precons_df[precons_df.Project_ID.isin(list(myprojects.PETE_ID))]
 
     outputdf.sort_values(by=['Estimated_In_Service_Date'])
-    for index, row in outputdf.iterrows():
-
-        description = 'Check if I have an invite to ' + row['Grandchild']
-        project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
-        duedate = row['Planned_Finish'] - DT.timedelta(days=7)
-
-        if row['Project_Tier'] == 1.0:
-            priority = 'H'
-
-        elif row['Project_Tier'] == 2.0:
-            priority = 'M'
-
-        elif row['Project_Tier'] == 3.0:
-            priority = 'L'
-
-        else:
-            priority = None
-
-        Pete_Maintenace_Helper.Add_Task(description, project, duedate, priority, 'PMH')
-        # p.start()
-    # p.join()
+    description = 'Check if I have an invite to ' + row['Grandchild']
+    duedate = row['Planned_Finish'] - DT.timedelta(days=7)
+    Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate)
 
 
 def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=True):
@@ -158,25 +140,10 @@ def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf):
     outputdf = Releaseddf[~Releaseddf['PETE_ID'].isin(Engscheduledf['PETE_ID'])]
     outputdf = outputdf.drop_duplicates(subset='PETE_ID', keep="first")
     outputdf.sort_values(by=['Estimated_In_Service_Date'])
-    for index, row in outputdf.iterrows():
+    description = 'Check with Engineering on when a schedule will be finalized'
+    duedate = DT.datetime.today() + DT.timedelta(hours=2)
 
-        description = 'Check with Engineering on when a schedule will be finalized'
-        project = str(row['PETE_ID']) + ':' + str(row['Project_Name_x'])
-        duedate = DT.datetime.today() + DT.timedelta(hours=2)
-
-        if row['Project_Tier'] == 1.0:
-            priority = 'H'
-
-        elif row['Project_Tier'] == 2.0:
-            priority = 'M'
-
-        elif row['Project_Tier'] == 3.0:
-            priority = 'L'
-
-        else:
-            priority = None
-
-        Pete_Maintenace_Helper.Add_Task(description, project, duedate, priority, 'PMH')
+    Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate)
 
 
 def Create_task_for_Released_projects_missing_Construnction_Ready_Date(scheduledf):
@@ -191,27 +158,12 @@ def Create_task_for_Released_projects_missing_Construnction_Ready_Date(scheduled
     filterdf = filterdf.drop_duplicates(subset=['PETE_ID'])
 
     filterdf.sort_values(by=['Estimated_In_Service_Date'])
-    for index, row in filterdf.iterrows():
 
-        description = 'Check with Engineering on populating the construction ready date'
-        project = str(row['PETE_ID']) + ':' + row['Project_Name_x']
-        duedate = DT.datetime.today() + DT.timedelta(hours=3)
 
-        if row['Project_Tier'] == 1.0:
-            priority = 'H'
+    description = 'Check with Engineering on populating the construction ready date'
 
-        elif row['Project_Tier'] == 2.0:
-            priority = 'M'
-
-        elif row['Project_Tier'] == 3.0:
-            priority = 'L'
-
-        else:
-            priority = None
-
-        Pete_Maintenace_Helper.Add_Task(description, project, duedate, priority, 'PMH')
-        # p.start()
-    # p.join()
+    duedate = DT.datetime.today() + DT.timedelta(hours=3)
+    Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate)
 
 
 def Create_task_for_ESID_before_Energiztion(scheduledf, Create_Tasks=True):
@@ -476,25 +428,10 @@ def Create_task_for_add_WA_to_schedule(scheduledf, myprojectbudgetitmes):
                           (scheduledf['BUDGETITEMNUMBER'].isin(myprojectbudgetitmes))]
     outputdf = filterdf
     outputdf = outputdf.sort_values(by=['Estimated_In_Service_Date'])
-    for index, row in outputdf.iterrows():
+    description = 'Add PETE ID to query for Schedules'
+    duedate = DT.datetime.today() + DT.timedelta(hours=6)
 
-        description = 'Add PETE ID to query for Schedules'
-        project = str(row['PETE_ID']) + ':' + row['Project_Name_y']
-        duedate = DT.datetime.today() + DT.timedelta(hours=6)
-
-        if row['Project_Tier'] == 1.0:
-            priority = 'H'
-
-        elif row['Project_Tier'] == 2.0:
-            priority = 'M'
-
-        elif row['Project_Tier'] == 3.0:
-            priority = 'L'
-
-        else:
-            priority = None
-
-        Pete_Maintenace_Helper.Add_Task(description, project, duedate, priority, 'PMH')
+    Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate)
 
 #def Complete_Task():
 
@@ -506,25 +443,9 @@ def Create_task_for_missing_tiers(df):
 
     outputdf = filterdf.drop_duplicates(subset=['PETE_ID'])
     outputdf = outputdf.sort_values(by=['Estimated_In_Service_Date'])
-    for index, row in outputdf.iterrows():
-
-        description = 'Project Tier Missing'
-        project = str(row['PETE_ID']) + ':' + row['Project_Name_y']
-        duedate = DT.datetime.today() + DT.timedelta(hours=6)
-
-        if row['Project_Tier'] == 1.0:
-            priority = 'H'
-
-        elif row['Project_Tier'] == 2.0:
-            priority = 'M'
-
-        elif row['Project_Tier'] == 3.0:
-            priority = 'L'
-
-        else:
-            priority = None
-
-        Pete_Maintenace_Helper.Add_Task(description, project, duedate, priority, 'PMH')
+    description = 'Project Tier Missing'
+    duedate = DT.datetime.today() + DT.timedelta(hours=6)
+    Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate)
 
 def Create_tasks_TOA_outside_Waterfalls(df, Create_Tasks=True):
     # TODO Create Docstring

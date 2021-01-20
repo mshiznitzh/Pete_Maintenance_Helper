@@ -51,7 +51,7 @@ from tkinter import filedialog
 from subprocess import Popen, PIPE
 import scr.create_task.Create_Task as ct
 import scr.Reports.Reports as Reports
-from tqdm import tqdm
+
 
 import multiprocessing
 import concurrent.futures
@@ -134,7 +134,7 @@ def create_tasks(df, description, duedate, tag='PMH'):
     df = df.sort_values(by=['Estimated_In_Service_Date'])
     with concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()-1) as executor:
 
-        for index, row in tqdm(df.iterrows()):
+        for index, row in df.iterrows():
             logger.info("Starting Function")
             logger.info(str(row['PETE_ID']))
 

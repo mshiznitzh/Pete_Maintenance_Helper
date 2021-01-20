@@ -15,16 +15,16 @@ def setup_and_teardown():
             df: dataframe read from Test_Data folder
         """
     if 'Test_Data' not in os.getcwd():
-        os.chdir("./test/Test_Data")
-        df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
-        df['Start_Date'] = pd.to_datetime(df['Start_Date'])
-        df['Finish_Date'] = pd.to_datetime(df['Finish_Date'])
-        df['COMMENTS'].fillna('', inplace=True)
-        df['COMMENTS'] = df.COMMENTS.astype(str)
-        df['Parent'].fillna('', inplace=True)
-        df['Parent'] = df. Parent.astype(str)
+        os.chdir('./Test_Data')
+    df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
+    df['Start_Date'] = pd.to_datetime(df['Start_Date'])
+    df['Finish_Date'] = pd.to_datetime(df['Finish_Date'])
+    df['COMMENTS'].fillna('', inplace=True)
+    df['COMMENTS'] = df.COMMENTS.astype(str)
+    df['Parent'].fillna('', inplace=True)
+    df['Parent'] = df. Parent.astype(str)
 
-        yield df
+    yield df
 
 def test_Create_task_for_Relay_Settings_Finish_date(setup_and_teardown):
     description = 'Check with Relay Setter on when settings are going to be issued'

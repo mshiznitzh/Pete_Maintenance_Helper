@@ -52,7 +52,7 @@ def Create_tasks_for_Precon_meetings(myprojects, schedule):
 
     outputdf.sort_values(by=['Estimated_In_Service_Date'])
     description = 'Check if I have an invite to ' + row['Grandchild']
-    duedate = row['Planned_Finish'] - DT.timedelta(days=7)
+    duedate = DT.datetime.today() + DT.timedelta(hours=8)
     Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate)
 
 

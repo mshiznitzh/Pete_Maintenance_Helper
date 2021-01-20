@@ -15,7 +15,7 @@ def setup_and_teardown():
             df: dataframe read from Test_Data folder
         """
     if 'Test_Data' not in os.getcwd():
-        os.chdir('./Test_Data')
+        os.chdir('./test/Test_Data')
     df = pd.read_csv('Create_task_for_Relay_Settings_Test_Data.csv')
     df['Start_Date'] = pd.to_datetime(df['Start_Date'])
     df['Finish_Date'] = pd.to_datetime(df['Finish_Date'])

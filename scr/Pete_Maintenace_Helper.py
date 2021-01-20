@@ -49,8 +49,8 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog
 from subprocess import Popen, PIPE
-import create_task.Create_Task as ct
-import Reports.Reports as Reports
+import scr.create_task.Create_Task as ct
+import scr.Reports.Reports as Reports
 from tqdm import tqdm
 
 import multiprocessing

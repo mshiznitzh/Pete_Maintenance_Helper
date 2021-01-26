@@ -1,0 +1,141 @@
+Create_tasks_for_Precon_meetings:
+  description: Check if I have an invite to Precon
+  due: 8
+  tag: Precon
+
+Create_tasks_for_Waterfalls:
+  baseline:
+    description: Waterfall needs to be baselined
+    due: 24
+    tag: Waterfall_Baseline
+  Finish_b4_Start:
+    description: Waterfall Finish is before Waterfall Start'
+    due: 24
+    tag: Waterfall_Finish
+  wrong_ESID:
+    description: Waterfall Finish not in same season as EISD
+    due: 24
+    tag: EISD
+
+Create_task_for_Final_Engineering_with_draft_schedules:
+  description: Check with Engineering on when a schedule will be finalized
+  due: 1
+  tag: TE_draft
+
+Create_task_for_Released_projects_missing_Construnction_Ready_Date:
+  description: Check with Engineering on populating the construction ready date
+  due: 2
+  tag: Ready_Date
+
+Create_task_for_ESID_before_Energiztion:
+  description: Project Energization is after Estimated In-Service Date
+  due: 4
+  tag: ESID
+
+Create_tasks_for_Engineering_Activities_Start_Dates:
+  description: Check with Engineering on if Electrical Designs were started
+  due: 8
+  tag:
+
+Create_tasks_for_Engineering_Activities_Start_Dates:
+  Electrical:
+    description: Check with Engineering on if Electrical Designs were started
+    due: 5
+    tag: EdesignStart
+
+  Physical:
+    description: Check with Engineering on if Physical Designs were started
+    due: 5
+    tag: PdesignStart
+
+  Foundation:
+    description: Check with Engineering on if Foundation Designs were started
+    due: 5
+    tag: FdesignStart
+  TE:
+     description: Ask Engineering to update the TE schedule
+     due: 5
+     tag: TEStart
+
+Create_tasks_for_Engineering_Activities_Finish_Dates:
+  Electrical:
+    description: Check with Engineering on if Electrical Designs were issued
+    due: 2
+    tag: EdesignFinish
+  Physical:
+    description: Check with Engineering on if Physical Designs were issued
+    due: 2
+    tag: PdesignFinish
+
+  Foundation:
+    description: Check with Engineering on if Foundation Designs were issued
+    due: 2
+    tag: FdesignFinish
+  TE:
+    description: Ask Engineering to update the TE schedule (Finish Date)
+    due: 2
+    tag: TEFinish
+
+Create_tasks_for_Construncction_Task_Request_Approval:
+  description: Ask Engineering for update on Construction Task Request Approval
+  due: 8
+  tag:
+
+Create_tasks_for_Design_Book_Issued:
+  description: Ask Engineering for update on Design Book Issued
+  due: .5
+  tag: Design_Book
+
+Create_tasks_for_WA:
+  description: Waterfall needs to be baselined
+  due: 5
+  tag: WA
+
+Create_task_for_Relay_Settings:
+  start:
+    description: Check with Relay Setter on when settings are going to be started
+    due: 8
+  finish:
+    description: Check with Relay Setter on when settings are going to be issued
+    due: 1
+  tag: RelaySettings
+
+Create_task_for_add_WA_to_schedule:
+  description: Add PETE ID to query for Schedules
+  due: 20
+  tag: WAtoADD
+
+Create_task_for_missing_tiers:
+  description: Project Tier Missing
+  due: 25
+  tag: tier
+
+Create_tasks_TOA_outside_Waterfalls:
+  description: TOA request outside Waterfall dates
+  due: 6
+  tag: TOA
+
+Create_tasks_TOA_no_active:
+  description: No Active TOA for project
+  due: 7
+  tag: TOA
+
+Create_tasks_Construnction_Summary_before_Construnction_Ready:
+  description: Waterfall needs to be baselined
+  due: 1.5
+  tag: Construnction_Ready
+
+Create_tasks_Station_Design_Finish_after_Construction_Ready_Date:
+  description: Construction Summary before Construction Ready
+  due: 1.5
+  tag: Construnction_Ready
+
+Create_tasks_Line_Design_Finish_after_Construction_Ready_Date:
+  description: Design Finish after Construction Ready Date
+  due: 1.5
+  tag: Construnction_Ready
+
+Create_tasks_Line_Design_Finish_after_Construction_Ready_Date:
+  description: Design Finish after Construction Ready Date (Line)
+  due: 1.5
+  tag: Construnction_Ready

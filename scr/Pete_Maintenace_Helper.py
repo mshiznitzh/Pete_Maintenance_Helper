@@ -56,9 +56,15 @@ import scr.Reports.Reports as Reports
 import multiprocessing
 import concurrent.futures
 import functools
-from queue import Queue
-import time
+import yaml
 
+
+def read_yaml(filename, path='./configs'):
+    old_path = Change_Working_Path(path)
+    with open(filename) as file:
+        yaml_content = yaml.safe_load(file)
+    Change_Working_Path(old_path)
+    return yaml_content
 
 # OS Functions
 
@@ -84,6 +90,7 @@ def Change_Working_Path(path):
     # TODO Create Docstring
     # Check if New path exists
     logger.info('Current path is ' + str(os.getcwd()))
+    old_path=os.getcwd()
     if os.path.exists(path):
         # Change the current working Directory
         try:
@@ -92,7 +99,7 @@ def Change_Working_Path(path):
             logger.error("Can't change the Current Working Directory", exc_info = True)
     else:
         print("Can't change the Current Working Directory because this path doesn't exits")
-
+    return old_path
 #Pandas Functions
 def Excel_to_Pandas(filename,check_update=False):
     # TODO Create Docstring
@@ -254,11 +261,14 @@ def Update_Task(ID, attribute, value):
 
 def main():
     # TODO Create Docstring
-    Project_Data_Filename='All Project Data Report Metro West or Mike.xlsx'
-    Schedules_Filename = 'Metro West PETE Schedules.xlsx'
-    Budget_Item_Filename = 'Budget Item.xlsx'
-    Relay_Setters_Filename = 'Relay Setter Report.xlsx'
-    Material_Data_Filename = 'Material Status Report All Metro West.xlsx'
+    file_yaml = read_yaml('files.yaml', './configs')
+    Project_Data_Filename = file_yaml['Project_Data_Spreadsheet']['filename']
+
+    #Project_Data_Filename='All Project Data Report Metro West or Mike.xlsx'
+    Schedules_Filename = file_yaml['Schedules_Spreadsheet']['filename']
+    Budget_Item_Filename = file_yaml['Budget_Item_Spreadsheet']['filename']
+    Relay_Setters_Filename = file_yaml['Relay_Setters_Spreadsheet']['filename']
+    Material_Data_Filename = file_yaml['Material_Data_Spreadsheet']['filename']
 
     myprojectbudgetitmes=['00003212', '00003201', '00003203', '00003206', '00003226']
 
@@ -308,23 +318,24 @@ def main():
 
 
     # Return the day of the week as an integer, where Monday is 0 and Sunday is 6
-    if dt.date.today().weekday() == 1:
-        res = Popen('tasks=$(task tag=PMH_E _ids) && task delete $tasks', shell=True, stdin=PIPE)
-        res.stdin.write(b'a\n')
-        res.stdin.flush()
-        res.stdin.close()
-        res = Popen('task sync', shell=True, stdin=PIPE)
-        res.stdin.flush()
-        res.wait()
-        res.stdin.close()
+    # if dt.date.today().weekday() == 3:
+    #     res = Popen('tasks=$(task tag=PMH_E _ids) && task delete $tasks', shell=True, stdin=PIPE)
+    #     res.stdin.write(b'a\n')
+    #     res.stdin.flush()
+    #     res.wait()
+    #     res.stdin.close()
+    #     res = Popen('task sync', shell=True, stdin=PIPE)
+    #     res.stdin.flush()
+    #     res.wait()
+    #     res.stdin.close()
 
         #Create_tasks_for_Precon_meetings(Project_Schedules_All_Data_df)
-        ct.Create_task_for_Final_Engineering_with_draft_schedules(Project_Schedules_All_Data_df)
-        ct.Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
-        ct.Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
-        ct.Create_tasks_for_Engineering_Activities_Start_Dates(Project_Schedules_All_Data_df)
-        ct.Create_tasks_for_Engineering_Activities_Finish_Dates(Project_Schedules_All_Data_df)
-        ct.Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
+    ct.Create_task_for_Final_Engineering_with_draft_schedules(Project_Schedules_All_Data_df)
+    ct.Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
+    ct.Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
+    ct.Create_tasks_for_Engineering_Activities_Start_Dates(Project_Schedules_All_Data_df)
+    ct.Create_tasks_for_Engineering_Activities_Finish_Dates(Project_Schedules_All_Data_df)
+    ct.Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
 
     ct.Create_task_for_ESID_before_Energiztion(Project_Schedules_All_Data_df),
     ct.Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes),

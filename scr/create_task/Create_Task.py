@@ -40,7 +40,7 @@ import scr.Pete_Maintenace_Helper
 list_my_BUDGETITEMS = ['3201','3202','3203','3206', '3212', '3226']
 
 
-def Create_tasks_for_Precon_meetings(myprojects, schedule):
+def Create_tasks_for_Precon_meetings(myprojects, schedule,Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     precons_df = schedule[(schedule['Grandchild'] == 'Pre-Construction Meeting') &
                           (schedule['Schedule_Status'] == 'Active') &
@@ -49,14 +49,15 @@ def Create_tasks_for_Precon_meetings(myprojects, schedule):
                           (schedule['Project_Status'] == 'Released')]
 
     outputdf = precons_df[precons_df.Project_ID.isin(list(myprojects.PETE_ID))]
+    if len(outputdf) >= 1:
+        outputdf.sort_values(by=['Estimated_In_Service_Date'])
+        description = task_yaml['Create_tasks_for_Precon_meetings']['description']
+        duedate = DT.datetime.today() + DT.timedelta(hours=task_yaml['Create_tasks_for_Precon_meetings']['due'])
+        if Create_Tasks:
+            scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate, task_yaml['Create_tasks_for_Precon_meetings']['tag'])
+    return description
 
-    outputdf.sort_values(by=['Estimated_In_Service_Date'])
-    description = 'Check if I have an invite to Precon'
-    duedate = DT.datetime.today() + DT.timedelta(hours=8)
-    scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate)
-
-
-def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=True):
+def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     # This filters Waterfall schedules that are in draft of Released projects
     description = None
@@ -75,10 +76,11 @@ def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=True):
     outputdf.sort_values(by=['Estimated_In_Service_Date'])
 
     if len(outputdf) >= 1:
-        description = 'Waterfall needs to be baselined'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Waterfalls']['baseline']['description']
+        duedate = DT.datetime.today() + DT.timedelta(hours=task_yaml['Create_tasks_for_Waterfalls']['baseline']['due'])
+        tag = task_yaml['Create_tasks_for_Waterfalls']['baseline']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate)
+            scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate, tag)
 
     Waterfall_Start_DF = scheduledf[(scheduledf['Schedule_Function'] == 'PMO') &
                                     (scheduledf['Program_Manager'] == 'Michael Howard') &
@@ -94,10 +96,11 @@ def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=True):
         Waterfall_Start_DF['Start_Date'].values > Waterfall_Finish_DF['Start_Date'].values]
 
     if len(outputdf) >= 1:
-        description = 'Waterfall Finish is before Waterfall Start'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Waterfalls']['Finish_b4_Start']['description']
+        duedate = DT.datetime.today() + DT.timedelta(hours=task_yaml['Create_tasks_for_Waterfalls']['Finish_b4_Start']['due'])
+        tag = task_yaml['Create_tasks_for_Waterfalls']['Finish_b4_Start']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate)
+            scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate, tag)
 
     outputdf = Waterfall_Finish_DF
     outputdf['ESID_SEASON'] = outputdf.loc[
@@ -118,14 +121,16 @@ def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=True):
             outputdf['WaterFall_SEASON'] != outputdf['ESID_SEASON'])]
 
     if len(outputdf) >= 1:
-        description = 'Waterfall Finish not in same season as EISD'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Waterfalls']['wrong_ESID']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_for_Waterfalls']['wrong_ESID']['due'])
+        tag = task_yaml['Create_tasks_for_Waterfalls']['wrong_ESID']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate)
+            scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate, tag)
     return description
 
 
-def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf):
+def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf, Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     # This filters Waterfall schedules that are in draft of Released projects
 
@@ -140,17 +145,22 @@ def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf):
     outputdf = Releaseddf[~Releaseddf['PETE_ID'].isin(Engscheduledf['PETE_ID'])]
     outputdf = outputdf.drop_duplicates(subset='PETE_ID', keep="first")
     outputdf.sort_values(by=['Estimated_In_Service_Date'])
-    description = 'Check with Engineering on when a schedule will be finalized'
-    duedate = DT.datetime.today() + DT.timedelta(hours=2)
+    if len(outputdf) >= 1:
+        description = task_yaml['Create_task_for_Final_Engineering_with_draft_schedules']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_task_for_Final_Engineering_with_draft_schedules']['due'])
+        tag = task_yaml['Create_task_for_Final_Engineering_with_draft_schedules']['tag']
+        if Create_Tasks:
+            scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate, tag)
+    return Create_Tasks
 
-    scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate)
 
-
-def Create_task_for_Released_projects_missing_Construnction_Ready_Date(scheduledf):
+def Create_task_for_Released_projects_missing_Construnction_Ready_Date(scheduledf, Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     # This filters Waterfall schedules that are in draft of Released projects
 
-    filterdf = scheduledf[(scheduledf['Schedule_Function'] == 'Transmission Engineering') &
+    filterdf = scheduledf[(scheduledf['Estimated_In_Service_Date'] <= DT.datetime.today() + relativedelta(months=+6)) &
+                        (scheduledf['Schedule_Function'] == 'Transmission Engineering') &
                           (pd.isnull(scheduledf['PLANNEDCONSTRUCTIONREADY'])) &
                           (scheduledf['Program_Manager'] == 'Michael Howard') |
                             (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
@@ -158,15 +168,17 @@ def Create_task_for_Released_projects_missing_Construnction_Ready_Date(scheduled
     filterdf = filterdf.drop_duplicates(subset=['PETE_ID'])
 
     filterdf.sort_values(by=['Estimated_In_Service_Date'])
+    if len(filterdf) >= 1:
+        description = task_yaml['Create_task_for_Released_projects_missing_Construnction_Ready_Date']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_task_for_Released_projects_missing_Construnction_Ready_Date']['due'])
+        tag = task_yaml['Create_task_for_Released_projects_missing_Construnction_Ready_Date']['tag']
+        if Create_Tasks:
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
+    return Create_Tasks
 
 
-    description = 'Check with Engineering on populating the construction ready date'
-
-    duedate = DT.datetime.today() + DT.timedelta(hours=3)
-    scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate)
-
-
-def Create_task_for_ESID_before_Energiztion(scheduledf, Create_Tasks=True):
+def Create_task_for_ESID_before_Energiztion(scheduledf, Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
 
     description = None
@@ -178,14 +190,16 @@ def Create_task_for_ESID_before_Energiztion(scheduledf, Create_Tasks=True):
     filterdf.sort_values(by=['Estimated_In_Service_Date'])
 
     if len(filterdf) >= 1:
-        description = 'Project Energization is after Estimated In-Service Date'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_task_for_ESID_before_Energiztion']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_task_for_ESID_before_Energiztion']['due'])
+        tag = task_yaml['Create_task_for_ESID_before_Energiztion']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate)
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
 
 
-def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks=True):
+def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks=True,  task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     description = None
     # This code filters out the start dates for TE activities and creates tasks
@@ -217,60 +231,72 @@ def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks
     filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
 
     if len(filterdf) >= 1:
-        description = 'Check with Engineering on if Electrical Designs were started'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['Electrical']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['Electrical']['due'])
+        tag = task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['Electrical']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     filterdf = PDdf[~PDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
 
     if len(filterdf) >= 1:
-        description = 'Check with Engineering on if Physical Designs were started'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['Physical']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['Physical']['due'])
+        tag = task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['Physical']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     filterdf = FDdf[~FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(PDdf['PETE_ID'])]
 
     if len(filterdf) >= 1:
-        description = 'Check with Engineering on if Foundation Designs were started'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['Foundation']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['Foundation']['due'])
+        tag = task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['Foundation']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     filterdf = FDdf[FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     #filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
 
     if len(filterdf) >= 1:
-        description = 'Ask Engineering to update the TE schedule'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['TE']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['TE']['due'])
+        tag = task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['TE']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     filterdf = EDdf[EDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
     #filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
 
     if len(filterdf) >= 1:
-        description = 'Ask Engineering to update the TE schedule'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['TE']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['TE']['due'])
+        tag = task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['TE']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     filterdf = FDdf[FDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
     #filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
 
     if len(filterdf) >= 1:
-        description = 'Ask Engineering to update the TE schedule'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['TE']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['TE']['due'])
+        tag = task_yaml['Create_tasks_for_Engineering_Activities_Start_Dates']['TE']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     return description
 
 
-def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Tasks=True):
+def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     # This code filters out the finish dates for TE activities and creates tasks
     description = None
@@ -288,64 +314,76 @@ def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Task
 
     filterdf = EDdf[~EDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
-
+    # Electrical
     if len(filterdf) >= 1:
-        description = 'Check with Engineering on if Electrical Designs were issued'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['Electrical']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['Electrical']['due'])
+        tag = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['Electrical']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     filterdf = PDdf[~PDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(FDdf['PETE_ID'])]
-
+    # Physical
     if len(filterdf) >= 1:
-        description = 'Check with Engineering on if Physical Designs were issued'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['Physical']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['Physical']['due'])
+        tag = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['Physical']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     filterdf = FDdf[~FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     filterdf = filterdf[~filterdf['PETE_ID'].isin(PDdf['PETE_ID'])]
-
+    # Foundation
     if len(filterdf) >= 1:
-        description = 'Check with Engineering on if Foundation Designs were issued'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['Foundation']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['Foundation']['due'])
+        tag = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['Foundation']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     filterdf = FDdf[FDdf['PETE_ID'].isin(EDdf['PETE_ID'])]
     #filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
 
     if len(filterdf) >= 1:
-        description = 'Ask Engineering to update the TE schedule (Finish Date)'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['TE']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['TE']['due'])
+        tag = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['TE']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     filterdf = FDdf[FDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
     #filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
 
 
     if len(filterdf) >= 1:
-        description = 'Ask Engineering to update the TE schedule (Finish Date)'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['TE']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['TE']['due'])
+        tag = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['TE']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     filterdf = EDdf[EDdf['PETE_ID'].isin(PDdf['PETE_ID'])]
     #filterdf = pd.merge(PDdf[PDdf['PETE_ID'].isin(EDdf['PETE_ID'])], filterdf, how='right')
 
 
     if len(filterdf) >= 1:
-        description = 'Ask Engineering to update the TE schedule (Finish Date)'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['TE']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['TE']['due'])
+        tag = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['TE']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     return description
 
 
-def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf, Create_Tasks=True):
+def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf, Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     description = None
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Construction Task Request Approval') &
@@ -354,25 +392,31 @@ def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf, Create_Tas
                           (scheduledf['Program_Manager'] == 'Michael Howard')]
 
     if len(filterdf) >= 1:
-        description = 'Ask Engineering for update on Construction Task Request Approval'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['due'])
+        tag = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
 
 
-def Create_tasks_for_Design_Book_Issued(scheduledf):
+def Create_tasks_for_Design_Book_Issued(scheduledf, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Complete Design Book Issued') &
                           (scheduledf['Finish_Date'] <= DT.datetime.today() - DT.timedelta(days=5)) &
                           (scheduledf[r'Finish_Date_Planned\Actual'] != 'A')]
+    if len(filterdf) >= 1:
+        description = task_yaml['Create_tasks_for_Design_Book_Issued']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+        hours=task_yaml['Create_tasks_for_Design_Book_Issued']['due'])
+        tag = task_yaml['Create_tasks_for_Design_Book_Issued']['tag']
+        if Create_Tasks:
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
+    return description
 
-    description = 'Ask Engineering for update on Design Book Issued'
-    duedate = DT.datetime.today() + DT.timedelta(hours=5)
-    scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
-
-
-def Create_tasks_for_WA(scheduledf):
+def Create_tasks_for_WA(scheduledf,Create_Tasks=True,
+                                   task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     filterdf = scheduledf[(pd.isnull(scheduledf['FIMSTATUS'])) &
                           (scheduledf['PLANNEDCONSTRUCTIONREADY'] <= DT.datetime.today() - DT.timedelta(days=5)) &
@@ -380,13 +424,17 @@ def Create_tasks_for_WA(scheduledf):
                           (scheduledf['Program_Manager'] == 'Michael Howard') |
                             (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
 
-    description = 'Ask Engineering about the WA'
-    duedate = DT.datetime.today() + DT.timedelta(hours=5)
-    scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+    description = task_yaml['Create_tasks_for_WA']['description']
+    duedate = DT.datetime.today() + DT.timedelta(
+        hours=task_yaml['Create_tasks_for_WA']['due'])
+    tag = task_yaml['Create_tasks_for_WA']['tag']
+    if Create_Tasks:
+        scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
 
 
-def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True):
+def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True,
+                                   task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     # This filters Prints with finished dates past 5 days past today without an actual finish
     # TODO Convert Filter to Query
@@ -399,10 +447,11 @@ def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True):
     filterdf=filterdf.sort_values(by=['Estimated_In_Service_Date'])
 
     if len(filterdf) >= 1:
-        description = 'Check with Relay Setter on when settings are going to be issued'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_task_for_Relay_Settings']['start']['description']
+        duedate = DT.datetime.today() + DT.timedelta(hours=task_yaml['Create_task_for_Relay_Settings']['start']['due'])
+        tag = task_yaml['Create_task_for_Relay_Settings']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Create Relay Settings') &
                               (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
@@ -412,14 +461,16 @@ def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True):
     filterdf = filterdf.sort_values(by=['Estimated_In_Service_Date'])
 
     if len(filterdf) >= 1:
-        description = 'Check with Relay Setter on when settings are going to be started'
-        duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_task_for_Relay_Settings']['finish']['description']
+        duedate = DT.datetime.today() + DT.timedelta(hours=task_yaml['Create_task_for_Relay_Settings']['finish']['due'])
+        tag = task_yaml['Create_task_for_Relay_Settings']['tag']
         if Create_Tasks:
-            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     return description
 
-def Create_task_for_add_WA_to_schedule(scheduledf, myprojectbudgetitmes):
+def Create_task_for_add_WA_to_schedule(scheduledf, myprojectbudgetitmes, Create_Tasks=True,
+                                   task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     # This filters Prints with finished dates past 5 days past today without an actual finish
     # TODO Convert Filter to Query
@@ -428,26 +479,36 @@ def Create_task_for_add_WA_to_schedule(scheduledf, myprojectbudgetitmes):
                           (scheduledf['BUDGETITEMNUMBER'].isin(myprojectbudgetitmes))]
     outputdf = filterdf
     outputdf = outputdf.sort_values(by=['Estimated_In_Service_Date'])
-    description = 'Add PETE ID to query for Schedules'
-    duedate = DT.datetime.today() + DT.timedelta(hours=6)
-
-    scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate)
+    if len(outputdf) >= 1:
+        description = task_yaml['Create_task_for_add_WA_to_schedule']['description']
+        duedate = DT.datetime.today() + DT.timedelta(hours=task_yaml['Create_task_for_add_WA_to_schedule']['due'])
+        tag = task_yaml['Create_task_for_add_WA_to_schedule']['tag']
+        if Create_Tasks == True:
+            scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate, tag)
+    return description
 
 #def Complete_Task():
 
-def Create_task_for_missing_tiers(df):
+def Create_task_for_missing_tiers(df, Create_Tasks=True,
+                                   task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     # TODO Convert Filter to Query
+    description = None
     filterdf = df[(pd.isnull(df['Project_Tier'])) &
                           (df['Program_Manager'] == 'Michael Howard')]
 
     outputdf = filterdf.drop_duplicates(subset=['PETE_ID'])
     outputdf = outputdf.sort_values(by=['Estimated_In_Service_Date'])
-    description = 'Project Tier Missing'
-    duedate = DT.datetime.today() + DT.timedelta(hours=6)
-    scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate)
+    if len(outputdf) >= 1:
+        description = task_yaml['Create_task_for_missing_tiers']['description']
+        duedate = DT.datetime.today() + DT.timedelta(hours=task_yaml['Create_task_for_missing_tiers']['due'])
+        tag = task_yaml['Create_task_for_missing_tiers']['tag']
+        if Create_Tasks == True:
+            scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate, tag)
+    return description
 
-def Create_tasks_TOA_outside_Waterfalls(df, Create_Tasks=True):
+def Create_tasks_TOA_outside_Waterfalls(df, Create_Tasks=True,
+                                   task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     description = None
 #TODO Convert Filter to Query
@@ -482,13 +543,15 @@ def Create_tasks_TOA_outside_Waterfalls(df, Create_Tasks=True):
     filterdf = filterdf.drop_duplicates(subset=['PETE_ID'], keep='first')
 
     if len(filterdf) >= 1:
-        description = 'TOA request outside Waterfall dates'
-    duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_TOA_outside_Waterfalls']['description']
+        duedate = DT.datetime.today() + DT.timedelta(hours=task_yaml['Create_tasks_TOA_outside_Waterfalls']['due'])
+        tag = task_yaml['Create_tasks_TOA_outside_Waterfalls']['tag']
     if Create_Tasks:
-        scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+        scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
 
-def Create_tasks_TOA_no_active(df, Create_Tasks=True):
+def Create_tasks_TOA_no_active(df, Create_Tasks=True,
+                                   task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     description = None
     # TODO Convert Filter to Query
@@ -508,13 +571,15 @@ def Create_tasks_TOA_no_active(df, Create_Tasks=True):
     filterdf = my_projects_df[~my_projects_df['PETE_ID'].isin(active_outage_df['PETE_ID'])]
 
     if len(filterdf) >= 1:
-        description = 'No Active TOA for project'
-    duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_TOA_no_active']['description']
+        duedate = DT.datetime.today() + DT.timedelta(hours=task_yaml['Create_tasks_TOA_no_active']['due'])
+        tag = task_yaml['Create_tasks_TOA_no_active']['tag']
     if Create_Tasks:
-        scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+        scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
 
-def Create_tasks_Construnction_Summary_before_Construnction_Ready(df, Create_Tasks=True):
+def Create_tasks_Construnction_Summary_before_Construnction_Ready(df, Create_Tasks=True,
+                                   task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     description = None
 #TODO Convert Filter to Query
@@ -527,13 +592,15 @@ def Create_tasks_Construnction_Summary_before_Construnction_Ready(df, Create_Tas
     filterdf = CS_df.drop_duplicates(subset=['PETE_ID'], keep='first')
 
     if len(filterdf) >= 1:
-        description = 'Construction Summary before Construction Ready'
-    duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_Construnction_Summary_before_Construnction_Ready']['description']
+        duedate = DT.datetime.today() + DT.timedelta(hours=task_yaml['Create_tasks_Construnction_Summary_before_Construnction_Ready']['due'])
+        tag = task_yaml['Create_tasks_Construnction_Summary_before_Construnction_Ready']['tag']
     if Create_Tasks:
-        scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+        scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
 
-def Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(df, Create_Tasks=True):
+def Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(df, Create_Tasks=True,
+                                   task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     description = None
     # TODO Convert Filter to Query
@@ -554,10 +621,12 @@ def Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(df, Create_
     filterdf = CS_df.drop_duplicates(subset=['PETE_ID'], keep='first')
 
     if len(filterdf) >= 1:
-        description = 'Design Finish after Construction Ready Date'
-    duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_Station_Design_Finish_after_Construction_Ready_Date']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_Station_Design_Finish_after_Construction_Ready_Date']['due'])
+        tag = task_yaml['Create_tasks_Station_Design_Finish_after_Construction_Ready_Date']['tag']
     if Create_Tasks:
-        scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+        scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
 
 def Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(df, Create_Tasks=True):
@@ -583,8 +652,10 @@ def Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(df, Create_Tas
     filterdf = CS_df.drop_duplicates(subset=['PETE_ID'], keep='first')
 
     if len(filterdf) >= 1:
-        description = 'Design Finish after Construction Ready Date (Line)'
-    duedate = DT.datetime.today() + DT.timedelta(hours=8)
+        description = task_yaml['Create_tasks_Line_Design_Finish_after_Construction_Ready_Date']['description']
+        duedate = DT.datetime.today() + DT.timedelta(
+            hours=task_yaml['Create_tasks_Line_Design_Finish_after_Construction_Ready_Date']['due'])
+        tag = task_yaml['Create_tasks_Line_Design_Finish_after_Construction_Ready_Date']['tag']
     if Create_Tasks:
-        scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, 'PMH_E')
+        scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description

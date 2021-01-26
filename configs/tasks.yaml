@@ -121,12 +121,12 @@ Create_tasks_TOA_no_active:
   tag: TOA
 
 Create_tasks_Construnction_Summary_before_Construnction_Ready:
-  description: Waterfall needs to be baselined
+  description: Construction Summary before Construction Ready
   due: 1.5
   tag: Construnction_Ready
 
 Create_tasks_Station_Design_Finish_after_Construction_Ready_Date:
-  description: Construction Summary before Construction Ready
+  description: Design Finish after Construction Ready Date
   due: 1.5
   tag: Construnction_Ready
 

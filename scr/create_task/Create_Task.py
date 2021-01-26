@@ -447,8 +447,8 @@ def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True,
     filterdf=filterdf.sort_values(by=['Estimated_In_Service_Date'])
 
     if len(filterdf) >= 1:
-        description = task_yaml['Create_task_for_Relay_Settings']['start']['description']
-        duedate = DT.datetime.today() + DT.timedelta(hours=task_yaml['Create_task_for_Relay_Settings']['start']['due'])
+        description = task_yaml['Create_task_for_Relay_Settings']['finish']['description']
+        duedate = DT.datetime.today() + DT.timedelta(hours=task_yaml['Create_task_for_Relay_Settings']['finish']['due'])
         tag = task_yaml['Create_task_for_Relay_Settings']['tag']
         if Create_Tasks:
             scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
@@ -461,8 +461,8 @@ def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True,
     filterdf = filterdf.sort_values(by=['Estimated_In_Service_Date'])
 
     if len(filterdf) >= 1:
-        description = task_yaml['Create_task_for_Relay_Settings']['finish']['description']
-        duedate = DT.datetime.today() + DT.timedelta(hours=task_yaml['Create_task_for_Relay_Settings']['finish']['due'])
+        description = task_yaml['Create_task_for_Relay_Settings']['start']['description']
+        duedate = DT.datetime.today() + DT.timedelta(hours=task_yaml['Create_task_for_Relay_Settings']['start']['due'])
         tag = task_yaml['Create_task_for_Relay_Settings']['tag']
         if Create_Tasks:
             scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)

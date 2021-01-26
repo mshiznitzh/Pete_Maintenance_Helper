@@ -1,0 +1,19 @@
+Project_Data_Spreadsheet:
+  path: ./Data
+  filename: All Project Data Report Metro West or Mike.xlsx
+
+Schedules_Spreadsheet:
+  path: ./Data
+  filename: Metro West PETE Schedules.xlsx
+
+Budget_Item_Spreadsheet:
+  path: ./Data
+  filename: Budget Item.xlsx
+
+Relay_Setters_Spreadsheet:
+  path: ./Data
+  filename: Relay Setter Report.xlsx
+
+Material_Data_Spreadsheet:
+  path: ./Data
+  filename: Material Status Report All Metro West.xlsx

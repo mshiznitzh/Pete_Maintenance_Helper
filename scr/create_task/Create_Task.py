@@ -629,7 +629,8 @@ def Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(df, Create_
         scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
 
-def Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(df, Create_Tasks=True):
+def Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(df, Create_Tasks=True,
+                                            task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     description = None
     # TODO Convert Filter to Query

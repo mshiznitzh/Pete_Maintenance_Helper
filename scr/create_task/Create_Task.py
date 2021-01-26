@@ -392,10 +392,10 @@ def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf, Create_Tas
                           (scheduledf['Program_Manager'] == 'Michael Howard')]
 
     if len(filterdf) >= 1:
-        description = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['description']
+        description = task_yaml['Create_tasks_for_Construncction_Task_Request_Approval']['description']
         duedate = DT.datetime.today() + DT.timedelta(
-            hours=task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['due'])
-        tag = task_yaml['Create_tasks_for_Engineering_Activities_Finish_Dates']['tag']
+            hours=task_yaml['Create_tasks_for_Construncction_Task_Request_Approval']['due'])
+        tag = task_yaml['Create_tasks_for_Construncction_Task_Request_Approval']['tag']
         if Create_Tasks:
             scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description

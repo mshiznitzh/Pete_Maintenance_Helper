@@ -29,8 +29,10 @@ def get_logger(log_file_name, log_sub_dir=""):
 
     # Create Log file directory if not exists
     if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-
+        try:
+            os.makedirs(log_dir)
+        except:
+            pass
     # Build Log File Full Path
     logPath = log_file_name if os.path.exists(log_file_name) else os.path.join(log_dir, (str(log_file_name) + '.log'))
 

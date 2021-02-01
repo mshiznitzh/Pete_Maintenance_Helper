@@ -31,7 +31,8 @@ Todo:
 """
 
 
-
+import scr.log_decorator as log_decorator
+import scr.log as log
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 import datetime as DT
@@ -39,7 +40,7 @@ import scr.Pete_Maintenace_Helper
 
 list_my_BUDGETITEMS = ['3201','3202','3203','3206', '3212', '3226']
 
-
+@log_decorator.log_decorator()
 def Create_tasks_for_Precon_meetings(myprojects, schedule,Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     precons_df = schedule[(schedule['Grandchild'] == 'Pre-Construction Meeting') &
@@ -56,7 +57,7 @@ def Create_tasks_for_Precon_meetings(myprojects, schedule,Create_Tasks=True, tas
         if Create_Tasks:
             scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate, task_yaml['Create_tasks_for_Precon_meetings']['tag'])
     return description
-
+@log_decorator.log_decorator()
 def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     # This filters Waterfall schedules that are in draft of Released projects
@@ -129,7 +130,7 @@ def Create_tasks_for_Waterfalls(scheduledf, Create_Tasks=True, task_yaml = scr.P
             scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate, tag)
     return description
 
-
+@log_decorator.log_decorator()
 def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf, Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     # This filters Waterfall schedules that are in draft of Released projects
@@ -154,7 +155,7 @@ def Create_task_for_Final_Engineering_with_draft_schedules(scheduledf, Create_Ta
             scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate, tag)
     return Create_Tasks
 
-
+@log_decorator.log_decorator()
 def Create_task_for_Released_projects_missing_Construnction_Ready_Date(scheduledf, Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     # This filters Waterfall schedules that are in draft of Released projects
@@ -177,7 +178,7 @@ def Create_task_for_Released_projects_missing_Construnction_Ready_Date(scheduled
             scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return Create_Tasks
 
-
+@log_decorator.log_decorator()
 def Create_task_for_ESID_before_Energiztion(scheduledf, Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
 
@@ -198,7 +199,7 @@ def Create_task_for_ESID_before_Energiztion(scheduledf, Create_Tasks=True, task_
             scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
 
-
+@log_decorator.log_decorator()
 def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks=True,  task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     description = None
@@ -295,7 +296,7 @@ def Create_tasks_for_Engineering_Activities_Start_Dates(scheduledf, Create_Tasks
 
     return description
 
-
+@log_decorator.log_decorator()
 def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     # This code filters out the finish dates for TE activities and creates tasks
@@ -382,7 +383,7 @@ def Create_tasks_for_Engineering_Activities_Finish_Dates(scheduledf, Create_Task
 
     return description
 
-
+@log_decorator.log_decorator()
 def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf, Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     description = None
@@ -400,7 +401,7 @@ def Create_tasks_for_Construncction_Task_Request_Approval(scheduledf, Create_Tas
             scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
 
-
+@log_decorator.log_decorator()
 def Create_tasks_for_Design_Book_Issued(scheduledf, Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
     filterdf = scheduledf[(scheduledf['Grandchild'] == 'Complete Design Book Issued') &
@@ -414,7 +415,7 @@ def Create_tasks_for_Design_Book_Issued(scheduledf, Create_Tasks=True, task_yaml
         if Create_Tasks:
             scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
-
+@log_decorator.log_decorator()
 def Create_tasks_for_WA(scheduledf,Create_Tasks=True,
                                    task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
@@ -432,7 +433,7 @@ def Create_tasks_for_WA(scheduledf,Create_Tasks=True,
         scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
 
-
+@log_decorator.log_decorator()
 def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True,
                                    task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
@@ -468,7 +469,7 @@ def Create_task_for_Relay_Settings(scheduledf, Create_Tasks=True,
             scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     return description
-
+@log_decorator.log_decorator()
 def Create_task_for_add_WA_to_schedule(scheduledf, myprojectbudgetitmes, Create_Tasks=True,
                                    task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
@@ -488,7 +489,7 @@ def Create_task_for_add_WA_to_schedule(scheduledf, myprojectbudgetitmes, Create_
     return description
 
 #def Complete_Task():
-
+@log_decorator.log_decorator()
 def Create_task_for_missing_tiers(df, Create_Tasks=True,
                                    task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
@@ -506,7 +507,7 @@ def Create_task_for_missing_tiers(df, Create_Tasks=True,
         if Create_Tasks == True:
             scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate, tag)
     return description
-
+@log_decorator.log_decorator()
 def Create_tasks_TOA_outside_Waterfalls(df, Create_Tasks=True,
                                    task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
@@ -535,8 +536,8 @@ def Create_tasks_TOA_outside_Waterfalls(df, Create_Tasks=True,
     filterdf = pd.merge(active_outage_df, Water_Start_DF[['PETE_ID', 'WaterFall_Start']], on='PETE_ID', how='left')
     filterdf = pd.merge(filterdf, Water_Finish_DF[['PETE_ID', 'WaterFall_Finish']], on='PETE_ID', how='left')
 
-    filterdfs = filterdf[filterdf['Start_Date'].lt(filterdf['WaterFall_Start'])]
-    filterdff = filterdf[filterdf['Finish_Date'].gt(filterdf['WaterFall_Finish'])]
+    filterdfs = filterdf[filterdf['Start_Date'].le(filterdf['WaterFall_Start'])]
+    filterdff = filterdf[filterdf['Finish_Date'].ge(filterdf['WaterFall_Finish'])]
 
 
     filterdf = pd.concat([filterdfs, filterdff], ignore_index=True)
@@ -549,7 +550,7 @@ def Create_tasks_TOA_outside_Waterfalls(df, Create_Tasks=True,
     if Create_Tasks:
         scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
-
+@log_decorator.log_decorator()
 def Create_tasks_TOA_no_active(df, Create_Tasks=True,
                                    task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
@@ -568,7 +569,12 @@ def Create_tasks_TOA_no_active(df, Create_Tasks=True,
                         (df['Program_Manager'] == 'Michael Howard') |
                         (df['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))
                         ]
+
+    no_TOA_neededdf= df[(df['Grandchild'] == 'No TOA Request Needed')]
+
+
     filterdf = my_projects_df[~my_projects_df['PETE_ID'].isin(active_outage_df['PETE_ID'])]
+    filterdf = filterdf[~filterdf['PETE_ID'].isin(no_TOA_neededdf['PETE_ID'])]
 
     if len(filterdf) >= 1:
         description = task_yaml['Create_tasks_TOA_no_active']['description']
@@ -577,7 +583,7 @@ def Create_tasks_TOA_no_active(df, Create_Tasks=True,
     if Create_Tasks:
         scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
-
+@log_decorator.log_decorator()
 def Create_tasks_Construnction_Summary_before_Construnction_Ready(df, Create_Tasks=True,
                                    task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
@@ -598,7 +604,7 @@ def Create_tasks_Construnction_Summary_before_Construnction_Ready(df, Create_Tas
     if Create_Tasks:
         scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
-
+@log_decorator.log_decorator()
 def Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(df, Create_Tasks=True,
                                    task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring
@@ -628,7 +634,7 @@ def Create_tasks_Station_Design_Finish_after_Construction_Ready_Date(df, Create_
     if Create_Tasks:
         scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
-
+@log_decorator.log_decorator()
 def Create_tasks_Line_Design_Finish_after_Construction_Ready_Date(df, Create_Tasks=True,
                                             task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring

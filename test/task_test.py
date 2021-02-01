@@ -184,6 +184,19 @@ def test_Create_tasks_no_active_TOA_inside_Waterfall(setup_and_teardown):
 
     assert ct.Create_tasks_TOA_no_active(setup_and_teardown, False) == description
 
+def test_Create_tasks_no_active_TOA_inside_Waterfall_neg(setup_and_teardown):
+
+    setup_and_teardown.at[0, 'PETE_ID'] = 1
+    setup_and_teardown.at[0, 'Grandchild'] = 'Waterfall Start'
+    setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+    setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+    setup_and_teardown.at[1, 'PETE_ID'] = 1
+    setup_and_teardown.at[1, 'Grandchild'] = 'No TOA Request Needed'
+    setup_and_teardown.at[1, 'Program_Manager'] = 'Michael Howard'
+    setup_and_teardown.at[1, 'Finish_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+    assert ct.Create_tasks_TOA_no_active(setup_and_teardown, False) == None
+
 def test_Create_tasks_Construnction_Summary_before_Construnction_Ready(setup_and_teardown):
     description = 'Construction Summary before Construction Ready'
     # setup_and_teardown['COMMENTS'] = setup_and_teardown['COMMENTS'].astype(str)

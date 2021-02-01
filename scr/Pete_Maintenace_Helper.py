@@ -38,6 +38,8 @@ __version__ = "0.1.0"
 __license__ = "MIT"
 
 
+import scr.log_decorator as log_decorator
+import scr.log as log
 import logging
 from logzero import logger
 from taskw import TaskWarrior
@@ -58,7 +60,7 @@ import concurrent.futures
 import functools
 import yaml
 
-
+@log_decorator.log_decorator()
 def read_yaml(filename, path='./configs'):
     old_path = Change_Working_Path(path)
     with open(filename) as file:
@@ -68,11 +70,11 @@ def read_yaml(filename, path='./configs'):
 
 # OS Functions
 
-
+@log_decorator.log_decorator()
 def filesearch(word=""):
     # TODO Create Docstring
     """Returns a list with all files with the word/extension in it"""
-    logger.info('Starting filesearch')
+
     file = []
     for f in glob.glob("*"):
         if word[0] == ".":
@@ -85,7 +87,7 @@ def filesearch(word=""):
     logger.debug(file)
     return file
 
-
+@log_decorator.log_decorator()
 def Change_Working_Path(path):
     # TODO Create Docstring
     # Check if New path exists
@@ -100,10 +102,12 @@ def Change_Working_Path(path):
     else:
         print("Can't change the Current Working Directory because this path doesn't exits")
     return old_path
+
 #Pandas Functions
+@log_decorator.log_decorator()
 def Excel_to_Pandas(filename,check_update=False):
     # TODO Create Docstring
-    logger.info('importing file ' + filename)
+
     df=[]
     if check_update == True:
         timestamp = dt.datetime.fromtimestamp(Path(filename).stat().st_mtime)
@@ -122,9 +126,10 @@ def Excel_to_Pandas(filename,check_update=False):
     logger.debug(df.info(verbose=True))
     return df
 
+@log_decorator.log_decorator()
 def Cleanup_Dataframe(df):
     # TODO Create Docstring
-    logger.info('Starting Cleanup_Dataframe')
+
     logger.debug(df.info(verbose=True))
     # Remove whitespace on both ends of column headers
     df.columns = df.columns.str.strip()
@@ -134,15 +139,14 @@ def Cleanup_Dataframe(df):
 
     return df
 
-
-
+@log_decorator.log_decorator()
 def create_tasks(df, description, duedate, tag='PMH'):
     # TODO Create Docstring
     df = df.sort_values(by=['Estimated_In_Service_Date'])
     with concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()-1) as executor:
 
         for index, row in df.iterrows():
-            logger.info("Starting Function")
+
             logger.info(str(row['PETE_ID']))
 
             project = str(row['PETE_ID']) + ':' + str(row['Project_Name_y'])
@@ -179,15 +183,10 @@ def create_tasks(df, description, duedate, tag='PMH'):
 #def Check_WaterFall_Draft_State():
 #def Check_Start_Date_Relay_Settings():
 
-
-
-
-
-
-
+@log_decorator.log_decorator()
 def Check_for_Task(description, project):
     # TODO Create Docstring
-    logger.info("Starting Function")
+
     description = str(description)
     project = str(project)
     logger.info(description)
@@ -209,9 +208,10 @@ def Check_for_Task(description, project):
 
     return 0
 
+@log_decorator.log_decorator()
 def Add_Task(description, project, duedate, priority=None, tag=None):
     # TODO Create Docstring
-    logger.info("Starting Function")
+
 
     ID = 0
     ID = Check_for_Task(description, project)
@@ -229,12 +229,12 @@ def Add_Task(description, project, duedate, priority=None, tag=None):
         Update_Task(ID, 'priority', priority)
 
     if tag is not None:
-        Update_Task(ID, 'tags', [tag])
+        Update_Task(ID, 'tags', tag)
 
-
+@log_decorator.log_decorator
 def Update_Task(ID, attribute, value):
     # TODO Create Docstring
-    logger.info("Starting Function")
+
     logger.info(ID)
     logger.info("attribute = " + attribute)
     logger.info(value)
@@ -258,7 +258,7 @@ def Update_Task(ID, attribute, value):
 
 
 
-
+@log_decorator.log_decorator()
 def main():
     # TODO Create Docstring
     file_yaml = read_yaml('files.yaml', './configs')
@@ -273,7 +273,6 @@ def main():
     myprojectbudgetitmes=['00003212', '00003201', '00003203', '00003206', '00003226']
 
     """ Main entry point of the app """
-    logger.info("Starting Pete Maintenance Helper")
     Change_Working_Path('./Data')
     try:
         Project_Data_df=Excel_to_Pandas(Project_Data_Filename, True)
@@ -368,9 +367,11 @@ def main():
 if __name__ == "__main__":
     """ This is executed when run from the command line """
     # Setup Logging
-    logger = logging.getLogger('root')
-    FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
-    logging.basicConfig(format=FORMAT)
-    logger.setLevel(logging.DEBUG)
+  #  logger = logging.getLogger('root')
+   # FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+  #  logging.basicConfig(format=FORMAT)
+
+
+ #   logger.setLevel(logging.DEBUG)
 
     main()

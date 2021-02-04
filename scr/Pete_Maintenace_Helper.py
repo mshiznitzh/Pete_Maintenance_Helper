@@ -60,7 +60,7 @@ import concurrent.futures
 import functools
 import yaml
 
-@log_decorator.log_decorator()
+##@log_decorator.log_decorator()()
 def read_yaml(filename, path='./configs'):
     old_path = Change_Working_Path(path)
     with open(filename) as file:
@@ -70,7 +70,7 @@ def read_yaml(filename, path='./configs'):
 
 # OS Functions
 
-@log_decorator.log_decorator()
+##@log_decorator.log_decorator()()
 def filesearch(word=""):
     # TODO Create Docstring
     """Returns a list with all files with the word/extension in it"""
@@ -87,7 +87,7 @@ def filesearch(word=""):
     logger.debug(file)
     return file
 
-@log_decorator.log_decorator()
+##@log_decorator.log_decorator()()
 def Change_Working_Path(path):
     # TODO Create Docstring
     # Check if New path exists
@@ -104,7 +104,7 @@ def Change_Working_Path(path):
     return old_path
 
 #Pandas Functions
-@log_decorator.log_decorator()
+##@log_decorator.log_decorator()()
 def Excel_to_Pandas(filename,check_update=False):
     # TODO Create Docstring
 
@@ -126,7 +126,7 @@ def Excel_to_Pandas(filename,check_update=False):
     logger.debug(df.info(verbose=True))
     return df
 
-@log_decorator.log_decorator()
+##@log_decorator.log_decorator()()
 def Cleanup_Dataframe(df):
     # TODO Create Docstring
 
@@ -139,7 +139,7 @@ def Cleanup_Dataframe(df):
 
     return df
 
-@log_decorator.log_decorator()
+##@log_decorator.log_decorator()()
 def create_tasks(df, description, duedate, tag='PMH'):
     # TODO Create Docstring
     df = df.sort_values(by=['Estimated_In_Service_Date'])
@@ -183,7 +183,7 @@ def create_tasks(df, description, duedate, tag='PMH'):
 #def Check_WaterFall_Draft_State():
 #def Check_Start_Date_Relay_Settings():
 
-@log_decorator.log_decorator()
+##@log_decorator.log_decorator()()
 def Check_for_Task(description, project):
     # TODO Create Docstring
 
@@ -208,7 +208,7 @@ def Check_for_Task(description, project):
 
     return 0
 
-@log_decorator.log_decorator()
+##@log_decorator.log_decorator()()
 def Add_Task(description, project, duedate, priority=None, tag=None):
     # TODO Create Docstring
 
@@ -231,7 +231,7 @@ def Add_Task(description, project, duedate, priority=None, tag=None):
     if tag is not None:
         Update_Task(ID, 'tags', tag)
 
-@log_decorator.log_decorator
+#@log_decorator.log_decorator()
 def Update_Task(ID, attribute, value):
     # TODO Create Docstring
 
@@ -252,10 +252,6 @@ def Update_Task(ID, attribute, value):
         tw.task_update(task)
 
     logger.info(task)
-
-
-
-
 
 
 @log_decorator.log_decorator()
@@ -373,5 +369,4 @@ if __name__ == "__main__":
 
 
  #   logger.setLevel(logging.DEBUG)
-
     main()

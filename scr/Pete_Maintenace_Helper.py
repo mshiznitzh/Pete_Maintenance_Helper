@@ -60,7 +60,9 @@ import concurrent.futures
 import functools
 import yaml
 
-##@log_decorator.log_decorator()()
+logger_obj = log.get_logger(log_file_name='log', log_sub_dir='logs_dir')
+
+@log_decorator.log_decorator()
 def read_yaml(filename, path='./configs'):
     old_path = Change_Working_Path(path)
     with open(filename) as file:
@@ -70,7 +72,7 @@ def read_yaml(filename, path='./configs'):
 
 # OS Functions
 
-##@log_decorator.log_decorator()()
+@log_decorator.log_decorator()
 def filesearch(word=""):
     # TODO Create Docstring
     """Returns a list with all files with the word/extension in it"""
@@ -84,27 +86,27 @@ def filesearch(word=""):
         elif word in f:
             file.append(f)
             #return file
-    logger.debug(file)
+    logger_obj.debug(file)
     return file
 
-##@log_decorator.log_decorator()()
+@log_decorator.log_decorator()
 def Change_Working_Path(path):
     # TODO Create Docstring
     # Check if New path exists
-    logger.info('Current path is ' + str(os.getcwd()))
+    logger_obj.debug('Current path is ' + str(os.getcwd()))
     old_path=os.getcwd()
     if os.path.exists(path):
         # Change the current working Directory
         try:
             os.chdir(path)  # Change the working directory
         except OSError:
-            logger.error("Can't change the Current Working Directory", exc_info = True)
+            logger_objerror("Can't change the Current Working Directory", exc_info = True)
     else:
         print("Can't change the Current Working Directory because this path doesn't exits")
     return old_path
 
 #Pandas Functions
-##@log_decorator.log_decorator()()
+@log_decorator.log_decorator()
 def Excel_to_Pandas(filename,check_update=False):
     # TODO Create Docstring
 
@@ -120,17 +122,17 @@ def Excel_to_Pandas(filename,check_update=False):
         df = pd.read_excel(filename, sheet_name=None)
         df = pd.concat(df, axis=0, ignore_index=True)
     except:
-        logger.error("Error importing file " + filename, exc_info=True)
+        logger_obj.error("Error importing file " + filename, exc_info=True)
 
     df=Cleanup_Dataframe(df)
-    logger.debug(df.info(verbose=True))
+    logger_obj.debug(df.info(verbose=True))
     return df
 
-##@log_decorator.log_decorator()()
+@log_decorator.log_decorator()
 def Cleanup_Dataframe(df):
     # TODO Create Docstring
 
-    logger.debug(df.info(verbose=True))
+    logger_obj.debug(df.info(verbose=True))
     # Remove whitespace on both ends of column headers
     df.columns = df.columns.str.strip()
 
@@ -139,7 +141,7 @@ def Cleanup_Dataframe(df):
 
     return df
 
-##@log_decorator.log_decorator()()
+@log_decorator.log_decorator()
 def create_tasks(df, description, duedate, tag='PMH'):
     # TODO Create Docstring
     df = df.sort_values(by=['Estimated_In_Service_Date'])
@@ -147,7 +149,7 @@ def create_tasks(df, description, duedate, tag='PMH'):
 
         for index, row in df.iterrows():
 
-            logger.info(str(row['PETE_ID']))
+            logger_obj.info(str(row['PETE_ID']))
 
             project = str(row['PETE_ID']) + ':' + str(row['Project_Name_y'])
 
@@ -183,14 +185,14 @@ def create_tasks(df, description, duedate, tag='PMH'):
 #def Check_WaterFall_Draft_State():
 #def Check_Start_Date_Relay_Settings():
 
-##@log_decorator.log_decorator()()
+@log_decorator.log_decorator()
 def Check_for_Task(description, project):
     # TODO Create Docstring
 
     description = str(description)
     project = str(project)
-    logger.info(description)
-    logger.info(project)
+    logger_obj.info(description)
+    logger_obj.info(project)
     tw = TaskWarrior()
     tasks = tw.load_tasks()
     df_pending = pd.DataFrame(tasks['pending'])
@@ -199,23 +201,23 @@ def Check_for_Task(description, project):
     try:
         return df_pending[(df_pending['description'] == description) & (df_pending['project'].apply(str) == project)]['id'].item()
     except:
-        logger.info('Not found in pending')
+        logger_obj.info('Not found in pending')
     #elif (description in df_completed.values) and project in df_completed.values:
     try:
         return df_completed[(df_completed['description'] == description) & (df_completed['project'].apply(str) == str(project))]['id'].item()
     except:
-        logger.info('Not found in completed')
+        logger_obj.info('Not found in completed')
 
     return 0
 
-##@log_decorator.log_decorator()()
+@log_decorator.log_decorator()
 def Add_Task(description, project, duedate, priority=None, tag=None):
     # TODO Create Docstring
 
 
     ID = 0
     ID = Check_for_Task(description, project)
-    logger.info(ID)
+    logger_obj.info(ID)
     if ID == 0 :
         tw = TaskWarrior()
         task=tw.task_add(description=description, priority=priority, project=project, due=duedate)
@@ -231,28 +233,27 @@ def Add_Task(description, project, duedate, priority=None, tag=None):
     if tag is not None:
         Update_Task(ID, 'tags', tag)
 
-#@log_decorator.log_decorator()
+@log_decorator.log_decorator()
 def Update_Task(ID, attribute, value):
     # TODO Create Docstring
 
-    logger.info(ID)
-    logger.info("attribute = " + attribute)
-    logger.info(value)
+    logger_obj.info(ID)
+    logger_obj.info("attribute = " + attribute)
+    logger_obj.info(value)
     tw = TaskWarrior()
     id, task = tw.get_task(id=ID)
-    logger.info(task)
+    logger_obj.info(task)
 
     try:
         if task[attribute] != value:
             task[attribute] = value
             tw.task_update(task)
     except KeyError:
-        logger.info("Attribute has not been set so we are adding it")
+        logger_obj.info("Attribute has not been set so we are adding it")
         task[attribute] = value
         tw.task_update(task)
 
-    logger.info(task)
-
+    logger_obj.info(task)
 
 @log_decorator.log_decorator()
 def main():
@@ -273,7 +274,7 @@ def main():
     try:
         Project_Data_df=Excel_to_Pandas(Project_Data_Filename, True)
     except:
-        logger.error('Can not find Project Data file')
+        logger_obj.error('Can not find Project Data file')
         raise
 
 
@@ -281,18 +282,18 @@ def main():
     try:
         Project_Schedules_df=Excel_to_Pandas(Schedules_Filename, True)
     except:
-        logger.error('Can not find Schedule Data file')
+        logger_obj.error('Can not find Schedule Data file')
         raise
 
     try:
         budget_item_df=Excel_to_Pandas(Budget_Item_Filename)
     except:
-        logger.error('Can not find Budget Item Data file')
+        logger_obj.error('Can not find Budget Item Data file')
 
     try:
         Relay_Setters_df=Excel_to_Pandas(Relay_Setters_Filename)
     except:
-        logger.error('Can not find Relay Setters Data file')
+        logger_obj.error('Can not find Relay Setters Data file')
 
 
     Project_Schedules_All_Data_df = pd.merge(Project_Schedules_df, Project_Data_df, on='PETE_ID', sort= False, how='outer')
@@ -353,7 +354,7 @@ def main():
         try:
             Material_Data_df = Excel_to_Pandas(Material_Data_Filename)
         except:
-            logger.error('Can not find Project Data file')
+            logger_obj.error('Can not find Project Data file')
             raise
         Reports.Genrate_Matrial_Report(Material_Data_df, Project_Schedules_All_Data_df)
     #Reports.Genrate_Resource_Plan(Project_Schedules_All_Data_df, budget_item_df)
@@ -361,12 +362,5 @@ def main():
 
 
 if __name__ == "__main__":
-    """ This is executed when run from the command line """
-    # Setup Logging
-  #  logger = logging.getLogger('root')
-   # FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
-  #  logging.basicConfig(format=FORMAT)
 
-
- #   logger.setLevel(logging.DEBUG)
     main()

@@ -464,3 +464,12 @@ def test_create_tasks_for_waterfalls_Baseline(setup_and_teardown):
 
     assert ct.create_tasks_for_waterfalls(setup_and_teardown, False) == description
 
+def test_create_task_for_final_engineering_with_draft_schedules(setup_and_teardown):
+    description = 'Check with Engineering on when a schedule will be finalized'
+    setup_and_teardown.at[0, 'PROJECTSTATUS'] = 'Released'
+    setup_and_teardown.at[0, 'Region_Name'] = 'METRO WEST'
+    setup_and_teardown.at[0, 'Parent'] = 'Construction Summary'
+    setup_and_teardown.at[0, 'Start_Date'] = pd.to_datetime("today").date()
+    setup_and_teardown.at[0, 'Region_Name'] == 'METRO WEST'
+
+    assert ct.create_task_for_final_engineering_with_draft_schedules(setup_and_teardown, False) == description

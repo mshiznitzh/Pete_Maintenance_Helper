@@ -1,9 +1,9 @@
-Create_tasks_for_Precon_meetings:
+create_tasks_for_precon_meetings:
   description: Check if I have an invite to Precon
   due: 8
   tag: Precon
 
-Create_tasks_for_Waterfalls:
+create_tasks_for_waterfalls:
   baseline:
     description: Waterfall needs to be baselined
     due: 24
@@ -17,27 +17,27 @@ Create_tasks_for_Waterfalls:
     due: 24
     tag: EISD
 
-Create_task_for_Final_Engineering_with_draft_schedules:
+create_task_for_final_engineering_with_draft_schedules:
   description: Check with Engineering on when a schedule will be finalized
   due: 1
   tag: TE_draft
 
-Create_task_for_Released_projects_missing_Construnction_Ready_Date:
+create_task_for_released_projects_missing_construnction_ready_date:
   description: Check with Engineering on populating the construction ready date
   due: 2
   tag: Ready_Date
 
-Create_task_for_ESID_before_Energiztion:
+create_task_for_eisd_before_energiztion:
   description: Project Energization is after Estimated In-Service Date
   due: 4
   tag: ESID
 
-Create_tasks_for_Engineering_Activities_Start_Dates:
+create_tasks_for_engineering_activities_start_dates:
   description: Check with Engineering on if Electrical Designs were started
   due: 8
   tag:
 
-Create_tasks_for_Engineering_Activities_Start_Dates:
+create_tasks_for_engineering_activities_start_dates:
   Electrical:
     description: Check with Engineering on if Electrical Designs were started
     due: 5
@@ -57,7 +57,7 @@ Create_tasks_for_Engineering_Activities_Start_Dates:
      due: 5
      tag: TEStart
 
-Create_tasks_for_Engineering_Activities_Finish_Dates:
+create_tasks_for_engineering_activities_finish_dates:
   Electrical:
     description: Check with Engineering on if Electrical Designs were issued
     due: 2
@@ -76,22 +76,22 @@ Create_tasks_for_Engineering_Activities_Finish_Dates:
     due: 2
     tag: TEFinish
 
-Create_tasks_for_Construncction_Task_Request_Approval:
+create_tasks_for_construncction_task_request_approval:
   description: Ask Engineering for update on Construction Task Request Approval
   due: 8
   tag:
 
-Create_tasks_for_Design_Book_Issued:
+create_tasks_for_design_book_issued:
   description: Ask Engineering for update on Design Book Issued
   due: .5
   tag: Design_Book
 
-Create_tasks_for_WA:
+create_tasks_for_wa:
   description: Waterfall needs to be baselined
   due: 5
   tag: WA
 
-Create_task_for_Relay_Settings:
+create_task_for_relay_settings:
   start:
     description: Check with Relay Setter on when settings are going to be started
     due: 8
@@ -100,42 +100,42 @@ Create_task_for_Relay_Settings:
     due: 1
   tag: RelaySettings
 
-Create_task_for_add_WA_to_schedule:
+create_task_for_add_wa_to_schedule:
   description: Add PETE ID to query for Schedules
   due: 20
   tag: WAtoADD
 
-Create_task_for_missing_tiers:
+create_task_for_missing_tiers:
   description: Project Tier Missing
   due: 25
   tag: tier
 
-Create_tasks_TOA_outside_Waterfalls:
+create_tasks_toa_outside_waterfalls:
   description: TOA request outside Waterfall dates
   due: 6
   tag: TOA
 
-Create_tasks_TOA_no_active:
+create_tasks_toa_no_active:
   description: No Active TOA for project
   due: 7
   tag: TOA
 
-Create_tasks_Construnction_Summary_before_Construnction_Ready:
+create_tasks_construnction_summary_before_construnction_ready:
   description: Construction Summary before Construction Ready
   due: 1.5
   tag: Construnction_Ready
 
-Create_tasks_Station_Design_Finish_after_Construction_Ready_Date:
+create_tasks_station_design_finish_after_construction_ready_date:
   description: Design Finish after Construction Ready Date
   due: 1.5
   tag: Construnction_Ready
 
-Create_tasks_Line_Design_Finish_after_Construction_Ready_Date:
+create_tasks_line_design_finish_after_construction_ready_date:
   description: Design Finish after Construction Ready Date
   due: 1.5
   tag: Construnction_Ready
 
-Create_tasks_Line_Design_Finish_after_Construction_Ready_Date:
+create_tasks_line_design_finish_after_construction_ready_date:
   description: Design Finish after Construction Ready Date (Line)
   due: 1.5
   tag: Construnction_Ready

@@ -606,7 +606,7 @@ def create_tasks_toa_no_active(df, create_tasks=True,
 
     my_projects_df = df[(df['Grandchild'] == 'Waterfall Start') &
                         (df['Finish_Date'].le(
-                            pd.to_datetime(pd.to_datetime("today").date() + pd.DateOffset(days=120)))) &
+                            pd.to_datetime(pd.to_datetime("today").date() + pd.DateOffset(days=30)))) &
                         (df['Program_Manager'] == 'Michael Howard') |
                         (df['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))
                         ]

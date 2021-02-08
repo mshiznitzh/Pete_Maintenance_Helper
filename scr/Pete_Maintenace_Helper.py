@@ -37,11 +37,8 @@ __author__ = "MiKe Howard"
 __version__ = "0.1.0"
 __license__ = "MIT"
 
-
 import scr.log_decorator as log_decorator
 import scr.log as log
-import logging
-from logzero import logger
 from taskw import TaskWarrior
 import pandas as pd
 import glob
@@ -54,7 +51,6 @@ from subprocess import Popen, PIPE
 import scr.create_task.Create_Task as ct
 import scr.Reports.Reports as Reports
 
-
 import multiprocessing
 import concurrent.futures
 import functools
@@ -62,15 +58,18 @@ import yaml
 
 logger_obj = log.get_logger(log_file_name='log', log_sub_dir='logs_dir')
 
+
 @log_decorator.log_decorator()
 def read_yaml(filename, path='./configs'):
-    old_path = Change_Working_Path(path)
+    old_path = change_working_path(path)
     with open(filename) as file:
         yaml_content = yaml.safe_load(file)
-    Change_Working_Path(old_path)
+    change_working_path(old_path)
     return yaml_content
 
+
 # OS Functions
+
 
 @log_decorator.log_decorator()
 def filesearch(word=""):
@@ -85,38 +84,41 @@ def filesearch(word=""):
 
         elif word in f:
             file.append(f)
-            #return file
     logger_obj.debug(file)
     return file
 
+
 @log_decorator.log_decorator()
-def Change_Working_Path(path):
+def change_working_path(path):
     # TODO Create Docstring
     # Check if New path exists
     logger_obj.debug('Current path is ' + str(os.getcwd()))
-    old_path=os.getcwd()
+    old_path = os.getcwd()
     if os.path.exists(path):
         # Change the current working Directory
         try:
             os.chdir(path)  # Change the working directory
         except OSError:
-            logger_obj.error("Can't change the Current Working Directory", exc_info = True)
+            logger_obj.error("Can't change the Current Working Directory", exc_info=True)
     else:
         logger_obj.error("Can't change the Current Working Directory because this path doesn't exits")
     return old_path
 
-#Pandas Functions
+
+# Pandas Functions
+
+
 @log_decorator.log_decorator()
-def Excel_to_Pandas(filename,check_update=False):
+def excel_to_pandas(filename, check_update=False):
     # TODO Create Docstring
 
-    df=[]
-    if check_update == True:
+    df = []
+    if check_update:
         timestamp = dt.datetime.fromtimestamp(Path(filename).stat().st_mtime)
         if dt.datetime.today().date() != timestamp.date():
             root = tk.Tk()
             root.withdraw()
-            filename = filedialog.askopenfilename(title =' '.join(['Select file for', filename]))
+            filename = filedialog.askopenfilename(title=' '.join(['Select file for', filename]))
 
     try:
         df = pd.read_excel(filename, sheet_name=None)
@@ -124,12 +126,13 @@ def Excel_to_Pandas(filename,check_update=False):
     except:
         logger_obj.error("Error importing file " + filename, exc_info=True)
 
-    df=Cleanup_Dataframe(df)
+    df = cleanup_dataframe(df)
     logger_obj.debug(df.info(verbose=True))
     return df
 
+
 @log_decorator.log_decorator()
-def Cleanup_Dataframe(df):
+def cleanup_dataframe(df):
     # TODO Create Docstring
 
     logger_obj.debug(df.info(verbose=True))
@@ -141,18 +144,18 @@ def Cleanup_Dataframe(df):
 
     return df
 
+
 @log_decorator.log_decorator()
 def create_tasks(df, description, duedate, tag='PMH'):
     # TODO Create Docstring
     df = df.sort_values(by=['Estimated_In_Service_Date'])
-    with concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()-1) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count() - 1) as executor:
 
         for index, row in df.iterrows():
 
             logger_obj.info(str(row['PETE_ID']))
 
             project = str(row['PETE_ID']) + ':' + str(row['Project_Name_y'])
-
 
             if row['Project_Tier'] == 1.0:
                 priority = 'H'
@@ -166,27 +169,20 @@ def create_tasks(df, description, duedate, tag='PMH'):
             else:
                 priority = None
 
-        #Add_Task(description, project, duedate, priority, tag)
+            # add_task(description, project, duedate, priority, tag)
 
-        # with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
-            patrial_Add_Task = functools.partial(Add_Task, description, project, duedate, priority)
+            # with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
+            patrial_add_task = functools.partial(add_task, description, project, duedate, priority)
 
-            executor.submit(patrial_Add_Task, [tag])
+            executor.submit(patrial_add_task, [tag])
         #     executor.map(patrial_Add_Task, [tag])
-        #t = threading.Thread(target=Add_Task, args=(description, project, duedate, priority, tag,))
-       # t.start()
-      #  t.join()
+        # t = threading.Thread(target=add_task, args=(description, project, duedate, priority, tag,))
+        # t.start()
+        #  t.join()
 
-#def Project_Start_60_Days_Out_No_Outages
-#def Check_Estimated_In_Service_Date():
-#def Construction_Ready_Date():
-#def Check_Program_Manager_Resource():
-#def Check_Construction_Manager_Resource():
-#def Check_WaterFall_Draft_State():
-#def Check_Start_Date_Relay_Settings():
 
 @log_decorator.log_decorator()
-def Check_for_Task(description, project):
+def check_for_task(description, project):
     # TODO Create Docstring
 
     description = str(description)
@@ -197,51 +193,53 @@ def Check_for_Task(description, project):
     tasks = tw.load_tasks()
     df_pending = pd.DataFrame(tasks['pending'])
     df_completed = pd.DataFrame(tasks['completed'])
-        #if (description in df_pending.to_numpy()) and (project in df_pending.to_numpy()):
+    # if (description in df_pending.to_numpy()) and (project in df_pending.to_numpy()):
     try:
-        return df_pending[(df_pending['description'] == description) & (df_pending['project'].apply(str) == project)]['id'].item()
+        return df_pending[(df_pending['description'] == description) & (df_pending['project'].apply(str) == project)][
+            'id'].item()
     except:
         logger_obj.info('Not found in pending')
-    #elif (description in df_completed.values) and project in df_completed.values:
+    # elif (description in df_completed.values) and project in df_completed.values:
     try:
-        return df_completed[(df_completed['description'] == description) & (df_completed['project'].apply(str) == str(project))]['id'].item()
+        return df_completed[
+            (df_completed['description'] == description) & (df_completed['project'].apply(str) == str(project))][
+            'id'].item()
     except:
         logger_obj.info('Not found in completed')
 
     return 0
 
+
 @log_decorator.log_decorator()
-def Add_Task(description, project, duedate, priority=None, tag=None):
+def add_task(description, project, duedate, priority=None, tag=None):
     # TODO Create Docstring
-
-
-    ID = 0
-    ID = Check_for_Task(description, project)
-    logger_obj.info(ID)
-    if ID == 0 :
+    task_id = check_for_task(description, project)
+    logger_obj.info(task_id)
+    if task_id == 0:
         tw = TaskWarrior()
-        task=tw.task_add(description=description, priority=priority, project=project, due=duedate)
-        ID = task['id']
+        task = tw.task_add(description=description, priority=priority, project=project, due=duedate)
+        task_id = task['task_id']
 
-    elif ID > 0:
-        #Task exist update
-        Update_Task(ID, 'due', duedate)
+    elif task_id > 0:
+        # Task exist update
+        update_task(task_id, 'due', duedate)
 
     if priority is not None:
-        Update_Task(ID, 'priority', priority)
+        update_task(task_id, 'priority', priority)
 
     if tag is not None:
-        Update_Task(ID, 'tags', tag)
+        update_task(task_id, 'tags', tag)
+
 
 @log_decorator.log_decorator()
-def Update_Task(ID, attribute, value):
+def update_task(task_id, attribute, value):
     # TODO Create Docstring
 
-    logger_obj.info(ID)
+    logger_obj.info(task_id)
     logger_obj.info("attribute = " + attribute)
     logger_obj.info(value)
     tw = TaskWarrior()
-    id, task = tw.get_task(id=ID)
+    task_id, task = tw.get_task(id=task_id)
     logger_obj.info(task)
 
     try:
@@ -255,54 +253,50 @@ def Update_Task(ID, attribute, value):
 
     logger_obj.info(task)
 
+
 @log_decorator.log_decorator()
 def main():
     # TODO Create Docstring
     file_yaml = read_yaml('files.yaml', './configs')
-    Project_Data_Filename = file_yaml['Project_Data_Spreadsheet']['filename']
+    project_data_filename = file_yaml['Project_Data_Spreadsheet']['filename']
 
-    #Project_Data_Filename='All Project Data Report Metro West or Mike.xlsx'
-    Schedules_Filename = file_yaml['Schedules_Spreadsheet']['filename']
-    Budget_Item_Filename = file_yaml['Budget_Item_Spreadsheet']['filename']
-    Relay_Setters_Filename = file_yaml['Relay_Setters_Spreadsheet']['filename']
-    Material_Data_Filename = file_yaml['Material_Data_Spreadsheet']['filename']
+    # project_data_filename='All Project Data Report Metro West or Mike.xlsx'
+    schedules_filename = file_yaml['Schedules_Spreadsheet']['filename']
+    budget_item_filename = file_yaml['Budget_Item_Spreadsheet']['filename']
+    relay_setters_filename = file_yaml['Relay_Setters_Spreadsheet']['filename']
+    material_data_filename = file_yaml['Material_Data_Spreadsheet']['filename']
 
-    myprojectbudgetitmes=['00003212', '00003201', '00003203', '00003206', '00003226']
+    myprojectbudgetitmes = ['00003212', '00003201', '00003203', '00003206', '00003226']
 
     """ Main entry point of the app """
-    Change_Working_Path('./Data')
+    change_working_path('./Data')
     try:
-        Project_Data_df=Excel_to_Pandas(Project_Data_Filename, True)
+        project_data_df = excel_to_pandas(project_data_filename, True)
     except:
         logger_obj.error('Can not find Project Data file')
         raise
 
-
-
     try:
-        Project_Schedules_df=Excel_to_Pandas(Schedules_Filename, True)
+        project_schedules_df = excel_to_pandas(schedules_filename, True)
     except:
         logger_obj.error('Can not find Schedule Data file')
         raise
 
-    try:
-        budget_item_df=Excel_to_Pandas(Budget_Item_Filename)
-    except:
-        logger_obj.error('Can not find Budget Item Data file')
+    # try:
+    #    budget_item_df = excel_to_pandas(budget_item_filename)
+    # except:
+#   logger_obj.error('Can not find Budget Item Data file')
 
     try:
-        Relay_Setters_df=Excel_to_Pandas(Relay_Setters_Filename)
+        relay_setters_df = excel_to_pandas(relay_setters_filename)
     except:
         logger_obj.error('Can not find Relay Setters Data file')
 
+    project_schedules_all_data_df = pd.merge(project_schedules_df, project_data_df, on='PETE_ID', sort=False,
+                                             how='outer')
 
-    Project_Schedules_All_Data_df = pd.merge(Project_Schedules_df, Project_Data_df, on='PETE_ID', sort= False, how='outer')
-
-    #myprojectsdf.to_csv('myprojects.csv')
-    Project_Schedules_All_Data_df.to_csv('scheduledf.csv')
-
-
-
+    # myprojectsdf.to_csv('myprojects.csv')
+    project_schedules_all_data_df.to_csv('scheduledf.csv')
 
     # res = Popen('tasks=$(task tag=PMH _ids) && task delete $tasks', shell=True, stdin=PIPE)
     # res.stdin.write(b'a\n')
@@ -311,7 +305,6 @@ def main():
     # res = Popen('task sync', shell=True, stdin=PIPE)
     # res.wait()
     # res.stdin.close()
-
 
     # Return the day of the week as an integer, where Monday is 0 and Sunday is 6
     # if dt.date.today().weekday() == 3:
@@ -325,42 +318,40 @@ def main():
     #     res.wait()
     #     res.stdin.close()
 
-        #Create_tasks_for_Precon_meetings(Project_Schedules_All_Data_df)
-    ct.create_task_for_final_engineering_with_draft_schedules(Project_Schedules_All_Data_df)
-    ct.create_task_for_released_projects_missing_construnction_ready_date(Project_Schedules_All_Data_df)
-    ct.create_task_for_relay_settings(Project_Schedules_All_Data_df)
-    ct.create_tasks_for_engineering_activities_start_dates(Project_Schedules_All_Data_df)
-    ct.create_tasks_for_engineering_activities_finish_dates(Project_Schedules_All_Data_df)
-    ct.create_task_for_relay_settings(Project_Schedules_All_Data_df)
+    # Create_tasks_for_Precon_meetings(project_schedules_all_data_df)
+    ct.create_task_for_final_engineering_with_draft_schedules(project_schedules_all_data_df)
+    ct.create_task_for_released_projects_missing_construnction_ready_date(project_schedules_all_data_df)
+    ct.create_task_for_relay_settings(project_schedules_all_data_df)
+    ct.create_tasks_for_engineering_activities_start_dates(project_schedules_all_data_df)
+    ct.create_tasks_for_engineering_activities_finish_dates(project_schedules_all_data_df)
+    ct.create_task_for_relay_settings(project_schedules_all_data_df)
 
-    ct.create_task_for_eisd_before_energiztion(Project_Schedules_All_Data_df),
-    ct.create_task_for_add_wa_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes),
-    ct.create_tasks_for_waterfalls(Project_Schedules_All_Data_df),
-    ct.create_task_for_missing_tiers(Project_Schedules_All_Data_df),
-    ct.create_tasks_toa_outside_waterfalls(Project_Schedules_All_Data_df),
-    ct.create_tasks_toa_no_active(Project_Schedules_All_Data_df),
-    ct.create_tasks_construnction_summary_before_construnction_ready(Project_Schedules_All_Data_df)
+    ct.create_task_for_eisd_before_energiztion(project_schedules_all_data_df),
+    ct.create_task_for_add_wa_to_schedule(project_schedules_all_data_df, myprojectbudgetitmes),
+    ct.create_tasks_for_waterfalls(project_schedules_all_data_df),
+    ct.create_task_for_missing_tiers(project_schedules_all_data_df),
+    ct.create_tasks_toa_outside_waterfalls(project_schedules_all_data_df),
+    ct.create_tasks_toa_no_active(project_schedules_all_data_df),
+    ct.create_tasks_construnction_summary_before_construnction_ready(project_schedules_all_data_df)
 
     res = Popen('task sync', shell=True, stdin=PIPE)
     res.wait()
     res.stdin.close()
 
     if dt.date.today().weekday() == 4:
-        Reports.Genrate_Relay_Settings_Report(Project_Schedules_All_Data_df, Relay_Setters_df)
-        Reports.Genrate_Electrical_Prints_Report(Project_Schedules_All_Data_df)
-        Reports.Genrate_Physical_Prints_Report(Project_Schedules_All_Data_df)
+        Reports.Genrate_Relay_Settings_Report(project_schedules_all_data_df, relay_setters_df)
+        Reports.Genrate_Electrical_Prints_Report(project_schedules_all_data_df)
+        Reports.Genrate_Physical_Prints_Report(project_schedules_all_data_df)
 
     if dt.date.today().weekday() == 4:
         try:
-            Material_Data_df = Excel_to_Pandas(Material_Data_Filename)
+            material_data_df = excel_to_pandas(material_data_filename)
         except:
             logger_obj.error('Can not find Project Data file')
             raise
-        Reports.Genrate_Matrial_Report(Material_Data_df, Project_Schedules_All_Data_df)
-    #Reports.Genrate_Resource_Plan(Project_Schedules_All_Data_df, budget_item_df)
-
+        Reports.Genrate_Matrial_Report(material_data_df, project_schedules_all_data_df)
+    # Reports.Genrate_Resource_Plan(project_schedules_all_data_df, budget_item_df)
 
 
 if __name__ == "__main__":
-
     main()

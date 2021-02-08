@@ -1,15 +1,18 @@
-import sys, os, functools
-from inspect import getframeinfo, stack
+import sys
+import os
+import functools
+from inspect import getframeinfo
+from inspect import stack
 import scr.log as log
 
 logger_obj = log.get_logger(log_file_name='log', log_sub_dir='logs_dir')
 
+
 def log_decorator(_func=None):
     def log_decorator_info(func):
         @functools.wraps(func)
-        def log_decorator_wrapper( *args, **kwargs):
+        def log_decorator_wrapper(*args, **kwargs):
             # Build logger object
-
 
             """ Create a list of the positional arguments passed to function.
             - Using repr() for string representation for each argument. repr() is similar to str() only difference being
@@ -27,8 +30,8 @@ def log_decorator(_func=None):
             - In order to get actual function and file name we will use 'extra' parameter.
             - To get the file name we are using in-built module inspect.getframeinfo which returns calling file name """
             py_file_caller = getframeinfo(stack()[1][0])
-            extra_args = { 'func_name_override': func.__name__,
-                           'file_name_override': os.path.basename(py_file_caller.filename) }
+            extra_args = {'func_name_override': func.__name__,
+                          'file_name_override': os.path.basename(py_file_caller.filename)}
 
             """ Before to the function execution, log function details."""
             logger_obj.info(f"Arguments: {formatted_arguments} - Begin function", extra=extra_args)

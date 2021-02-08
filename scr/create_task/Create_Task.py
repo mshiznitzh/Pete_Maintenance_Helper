@@ -146,10 +146,13 @@ def create_task_for_final_engineering_with_draft_schedules(scheduledf, create_ta
                                                                'tasks.yaml')):
     # TODO Create Docstring
     # This filters Waterfall schedules that are in draft of Released projects
+    description = None
+
 
     released_df = scheduledf[(scheduledf['PROJECTSTATUS'] == 'Released') &
-                             (scheduledf['Estimated_In_Service_Date'] <= dt.datetime.today() + relativedelta(
-                                months=+6)) &
+                             (scheduledf['Child'] == 'Construction Summary') &
+                             (scheduledf['Start_Date'] <= pd.to_datetime(dt.datetime.today().date() + relativedelta(
+                                months=+6))) &
                              ~(scheduledf['Project_Category'].isin(['ROW', 'RELO'])) &
                              (scheduledf['Region_Name'] == 'METRO WEST') |
                              (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
@@ -166,7 +169,7 @@ def create_task_for_final_engineering_with_draft_schedules(scheduledf, create_ta
         tag = task_yaml['create_task_for_final_engineering_with_draft_schedules']['tag']
         if create_tasks:
             scr.Pete_Maintenace_Helper.create_tasks(outputdf, description, duedate, tag)
-    return create_tasks
+    return description
 
 
 @log_decorator.log_decorator()
@@ -603,7 +606,7 @@ def create_tasks_toa_no_active(df, create_tasks=True,
 
     my_projects_df = df[(df['Grandchild'] == 'Waterfall Start') &
                         (df['Finish_Date'].le(
-                            pd.to_datetime(pd.to_datetime("today").date() + pd.DateOffset(days=120)))) &
+                            pd.to_datetime(pd.to_datetime("today").date() + pd.DateOffset(days=30)))) &
                         (df['Program_Manager'] == 'Michael Howard') |
                         (df['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))
                         ]

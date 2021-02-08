@@ -1,7 +1,7 @@
 import logging
 import os
-#from rich.logging import RichHandler
 import sys
+
 
 class CustomFormatter2(logging.Formatter):
     """ Custom Formatter does these 2 things:
@@ -37,7 +37,7 @@ class CustomFormatter2(logging.Formatter):
     reset = "\x1b[0m"
 
     def format(self, record):
-        FORMATS = {
+        formats = {
             logging.DEBUG: self.LightGray + self._fmt + self.reset,
             logging.INFO: self.Normal + self._fmt + self.reset,
             logging.WARNING: self.Yellow + self._fmt + self.reset,
@@ -45,23 +45,20 @@ class CustomFormatter2(logging.Formatter):
             logging.CRITICAL: self.Cyan + self._fmt + self.reset
         }
 
-
         if hasattr(record, 'func_name_override'):
             record.funcName = record.func_name_override
         if hasattr(record, 'file_name_override'):
             record.filename = record.file_name_override
-        log_fmt = FORMATS.get(record.levelno)
+        log_fmt = formats.get(record.levelno)
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
-        #return formatter.format(record)
-        #return super(CustomFormatter2, self).format(record)
+
 
 class CustomFormatter(logging.Formatter):
     """ Custom Formatter does these 2 things:
     1. Overrides 'funcName' with the value of 'func_name_override', if it exists.
     2. Overrides 'filename' with the value of 'file_name_override', if it exists.
     """
-
 
     def format(self, record):
         if hasattr(record, 'func_name_override'):
@@ -85,15 +82,16 @@ def get_logger(log_file_name, log_sub_dir=""):
         os.makedirs(log_dir)
 
     # Build Log File Full Path
-    logPath = log_file_name if os.path.exists(log_file_name) else os.path.join(log_dir, (str(log_file_name) + '.log'))
+    logpath = log_file_name if os.path.exists(log_file_name) else os.path.join(log_dir, (str(log_file_name) + '.log'))
 
     # Create logger object and set the format for logging and other attributes
     logger = logging.Logger(log_file_name)
     logger.setLevel(logging.DEBUG)
-#    handler = RichHandler(rich_tracebacks=True) #logging.FileHandler(logPath, 'w+')
+    #    handler = RichHandler(rich_tracebacks=True) #logging.FileHandler(logPath, 'w+')
     handler = logging.StreamHandler(sys.__stdout__)
     """ Set the formatter of 'CustomFormatter' type as we need to log base function name and base file name """
-    handler.setFormatter(CustomFormatter2('%(asctime)5s - %(levelname)-5s - %(filename)s - %(funcName)s - %(message)s (%(filename)s:%(lineno)d)'))
+    handler.setFormatter(CustomFormatter2(
+        '%(asctime)5s - %(levelname)-5s - %(filename)s - %(funcName)s - %(message)s (%(filename)s:%(lineno)d)'))
     logger.addHandler(handler)
 
     # Return logger object

@@ -1,6 +1,6 @@
 import sys, os, functools
 from inspect import getframeinfo, stack
-import log
+import scr.log as log
 
 logger_obj = log.get_logger(log_file_name='log', log_sub_dir='logs_dir')
 

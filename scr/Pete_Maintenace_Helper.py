@@ -100,9 +100,9 @@ def Change_Working_Path(path):
         try:
             os.chdir(path)  # Change the working directory
         except OSError:
-            logger_objerror("Can't change the Current Working Directory", exc_info = True)
+            logger_obj.error("Can't change the Current Working Directory", exc_info = True)
     else:
-        print("Can't change the Current Working Directory because this path doesn't exits")
+        logger_obj.error("Can't change the Current Working Directory because this path doesn't exits")
     return old_path
 
 #Pandas Functions
@@ -326,20 +326,20 @@ def main():
     #     res.stdin.close()
 
         #Create_tasks_for_Precon_meetings(Project_Schedules_All_Data_df)
-    ct.Create_task_for_Final_Engineering_with_draft_schedules(Project_Schedules_All_Data_df)
-    ct.Create_task_for_Released_projects_missing_Construnction_Ready_Date(Project_Schedules_All_Data_df)
-    ct.Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
-    ct.Create_tasks_for_Engineering_Activities_Start_Dates(Project_Schedules_All_Data_df)
-    ct.Create_tasks_for_Engineering_Activities_Finish_Dates(Project_Schedules_All_Data_df)
-    ct.Create_task_for_Relay_Settings(Project_Schedules_All_Data_df)
+    ct.create_task_for_final_engineering_with_draft_schedules(Project_Schedules_All_Data_df)
+    ct.create_task_for_released_projects_missing_construnction_ready_date(Project_Schedules_All_Data_df)
+    ct.create_task_for_relay_settings(Project_Schedules_All_Data_df)
+    ct.create_tasks_for_engineering_activities_start_dates(Project_Schedules_All_Data_df)
+    ct.create_tasks_for_engineering_activities_finish_dates(Project_Schedules_All_Data_df)
+    ct.create_task_for_relay_settings(Project_Schedules_All_Data_df)
 
-    ct.Create_task_for_ESID_before_Energiztion(Project_Schedules_All_Data_df),
-    ct.Create_task_for_add_WA_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes),
-    ct.Create_tasks_for_Waterfalls(Project_Schedules_All_Data_df),
-    ct.Create_task_for_missing_tiers(Project_Schedules_All_Data_df),
-    ct.Create_tasks_TOA_outside_Waterfalls(Project_Schedules_All_Data_df),
-    ct.Create_tasks_TOA_no_active(Project_Schedules_All_Data_df),
-    ct.Create_tasks_Construnction_Summary_before_Construnction_Ready(Project_Schedules_All_Data_df)
+    ct.create_task_for_eisd_before_energiztion(Project_Schedules_All_Data_df),
+    ct.create_task_for_add_wa_to_schedule(Project_Schedules_All_Data_df, myprojectbudgetitmes),
+    ct.create_tasks_for_waterfalls(Project_Schedules_All_Data_df),
+    ct.create_task_for_missing_tiers(Project_Schedules_All_Data_df),
+    ct.create_tasks_toa_outside_waterfalls(Project_Schedules_All_Data_df),
+    ct.create_tasks_toa_no_active(Project_Schedules_All_Data_df),
+    ct.create_tasks_construnction_summary_before_construnction_ready(Project_Schedules_All_Data_df)
 
     res = Popen('task sync', shell=True, stdin=PIPE)
     res.wait()

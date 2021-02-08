@@ -40,6 +40,8 @@ import scr.Pete_Maintenace_Helper
 
 list_my_BUDGETITEMS = ['3201','3202','3203','3206', '3212', '3226']
 
+logger_obj = log.get_logger(log_file_name='log', log_sub_dir='logs_dir')
+
 @log_decorator.log_decorator()
 def Create_tasks_for_Precon_meetings(myprojects, schedule,Create_Tasks=True, task_yaml = scr.Pete_Maintenace_Helper.read_yaml('tasks.yaml')):
     # TODO Create Docstring

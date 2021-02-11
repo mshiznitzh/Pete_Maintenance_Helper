@@ -326,13 +326,15 @@ def main():
     ct.create_tasks_for_engineering_activities_finish_dates(project_schedules_all_data_df)
     ct.create_task_for_relay_settings(project_schedules_all_data_df)
 
-    ct.create_task_for_eisd_before_energiztion(project_schedules_all_data_df),
-    ct.create_task_for_add_wa_to_schedule(project_schedules_all_data_df, myprojectbudgetitmes),
-    ct.create_tasks_for_waterfalls(project_schedules_all_data_df),
-    ct.create_task_for_missing_tiers(project_schedules_all_data_df),
-    ct.create_tasks_toa_outside_waterfalls(project_schedules_all_data_df),
-    ct.create_tasks_toa_no_active(project_schedules_all_data_df),
+    ct.create_task_for_eisd_before_energiztion(project_schedules_all_data_df)
+    ct.create_task_for_add_wa_to_schedule(project_schedules_all_data_df, myprojectbudgetitmes)
+    ct.create_tasks_for_waterfalls(project_schedules_all_data_df)
+    ct.create_task_for_missing_tiers(project_schedules_all_data_df)
+    ct.create_tasks_toa_outside_waterfalls(project_schedules_all_data_df)
+    ct.create_tasks_toa_no_active(project_schedules_all_data_df)
     ct.create_tasks_construnction_summary_before_construnction_ready(project_schedules_all_data_df)
+    ct.create_tasks_line_design_finish_after_construction_ready_date(project_schedules_all_data_df)
+    ct.create_tasks_station_activities_conflict(project_schedules_all_data_df)
 
     res = Popen('task sync', shell=True, stdin=PIPE)
     res.wait()

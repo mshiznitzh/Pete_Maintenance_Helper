@@ -139,3 +139,13 @@ create_tasks_line_design_finish_after_construction_ready_date:
   description: Design Finish after Construction Ready Date (Line)
   due: 1.5
   tag: Construnction_Ready
+
+create_tasks_line_activities_conflict:
+  description: TE date conflicts with construction/distict summary
+  due: .25
+  tag: Conflict
+
+create_tasks_station_activities_conflict:
+  description: TE date conflicts with construction/distict summary
+  due: .25
+  tag: Conflict

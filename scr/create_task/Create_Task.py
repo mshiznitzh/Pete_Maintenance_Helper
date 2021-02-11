@@ -148,11 +148,10 @@ def create_task_for_final_engineering_with_draft_schedules(scheduledf, create_ta
     # This filters Waterfall schedules that are in draft of Released projects
     description = None
 
-
     released_df = scheduledf[(scheduledf['PROJECTSTATUS'] == 'Released') &
                              (scheduledf['Child'] == 'Construction Summary') &
                              (scheduledf['Start_Date'] <= pd.to_datetime(dt.datetime.today().date() + relativedelta(
-                                months=+6))) &
+                                 months=+6))) &
                              ~(scheduledf['Project_Category'].isin(['ROW', 'RELO'])) &
                              (scheduledf['Region_Name'] == 'METRO WEST') |
                              (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
@@ -229,7 +228,7 @@ def create_tasks_for_engineering_activities_start_dates(scheduledf, create_tasks
     # This code filters out the start dates for TE activities and creates tasks
     ed_df = scheduledf[(scheduledf['Grandchild'] == 'Electrical Design') &
                        (scheduledf['Start_Date'] + (
-                              scheduledf['Finish_Date'] - scheduledf['Start_Date']) / 2 <= dt.datetime.today()) &
+                               scheduledf['Finish_Date'] - scheduledf['Start_Date']) / 2 <= dt.datetime.today()) &
                        (scheduledf[r'Start_Date_Planned\Actual'] != 'A') &
                        (scheduledf['Finish_Date'] >= dt.datetime.today()) &
                        (scheduledf['Program_Manager'] == 'Michael Howard') |
@@ -237,7 +236,7 @@ def create_tasks_for_engineering_activities_start_dates(scheduledf, create_tasks
 
     pd_df = scheduledf[(scheduledf['Grandchild'] == 'Physical Design') &
                        (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
-                          'Start_Date']) / 2 <= dt.datetime.today()) &
+                           'Start_Date']) / 2 <= dt.datetime.today()) &
                        (scheduledf[r'Start_Date_Planned\Actual'] != 'A') &
                        (scheduledf['Finish_Date'] >= dt.datetime.today()) &
                        (scheduledf['Program_Manager'] == 'Michael Howard') |
@@ -245,7 +244,7 @@ def create_tasks_for_engineering_activities_start_dates(scheduledf, create_tasks
 
     fd_df = scheduledf[(scheduledf['Grandchild'] == 'Foundation Design') &
                        (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
-                          'Start_Date']) / 2 <= dt.datetime.today()) &
+                           'Start_Date']) / 2 <= dt.datetime.today()) &
                        (scheduledf[r'Start_Date_Planned\Actual'] != 'A') &
                        (scheduledf['Finish_Date'] >= dt.datetime.today()) &
                        (scheduledf['Program_Manager'] == 'Michael Howard') |
@@ -682,6 +681,111 @@ def create_tasks_station_design_finish_after_construction_ready_date(df, create_
             scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
     return description
 
+@log_decorator.log_decorator()
+def create_tasks_line_activities_conflict(df, create_tasks=True,
+                                                                  task_yaml=scr.Pete_Maintenace_Helper.read_yaml(
+                                                                      'tasks.yaml')):
+    # TODO Create Docstring
+    description = None
+    df_list = []
+    # TODO Convert Filter to Query
+    activities = ['Complete Design Books Issued']
+    for activity in activities:
+        df_list.append(df[(df['Grandchild'] == activity) &
+                          (df['Program_Manager'] == 'Michael Howard') |
+                          (df['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))
+                          ])
+    cs_df = pd.concat(df_list)
+
+    df_list = []
+    activities = ['Construction Summary']
+    for activity in activities:
+        df_list.append(df[df['PARENT'] == activity])
+
+    activities_df = pd.concat(df_list)
+    activities_df = activities_df.sort_values(by=['Start_Date'])
+    activities_df.drop_duplicates(subset=['PETE_ID'], keep='first')
+
+    cs_df = cs_df[~cs_df['PETE_ID'].isin(activities_df['PETE_ID'])]
+    cs_df = cs_df.sort_values(by=['Start_Date'], ascending=True)
+    filterdf = cs_df.drop_duplicates(subset=['PETE_ID'], keep='first')
+
+    if len(filterdf) >= 1:
+        description = task_yaml['create_tasks_line_activities_conflict']['description']
+        duedate = dt.datetime.today() + dt.timedelta(
+            hours=task_yaml['create_tasks_line_activities_conflict']['due'])
+        tag = task_yaml['create_tasks_line_activities_conflict']['tag']
+        if create_tasks:
+            scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
+    return description
+
+@log_decorator.log_decorator()
+def create_tasks_station_activities_conflict(df, create_tasks=True,
+                                                                  task_yaml=scr.Pete_Maintenace_Helper.read_yaml(
+                                                                      'tasks.yaml')):
+    # TODO Create Docstring
+    description = None
+    df_list = []
+    # TODO Convert Filter to Query
+    activities = ['Electrical Design', 'Foundation Design', 'Physical Design', 'Grading Design']
+    for activity in activities:
+
+        act_df = df[(df['Grandchild'] == activity) &
+                    (df['Program_Manager'] == 'Michael Howard') |
+                    (df['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))
+                          ]
+
+        if activity == 'Electrical Design':
+            hold_df = df[(df['Grandchild'] == 'Electrical Job Planning') |
+               (df['Grandchild'] == 'Electrical Construction')]
+
+            exculdedf = df[(df['Grandchild'] == 'Electrical Construction') &
+               (df[r'Finish_Date_Planned\Actual'] == 'A')]
+
+        elif activity == 'Foundation Design':
+            hold_df = df[(df['Grandchild'] == 'Foundation Job Planning') |
+                         (df['Grandchild'] == 'Foundations')]
+
+            exculdedf = df[(df['Grandchild'] == 'Foundations') &
+                           (df[r'Finish_Date_Planned\Actual'] == 'A')]
+
+        elif activity == 'Physical Design':
+            hold_df = df[(df['Grandchild'] == 'Physical Job Planning') |
+                         (df['Grandchild'] == 'Physical')]
+
+            exculdedf = df[(df['Grandchild'] == 'Physical') &
+                           (df[r'Finish_Date_Planned\Actual'] == 'A')]
+
+        elif activity == 'Grading Design':
+            hold_df = df[(df['Grandchild'] == 'Grading Job Planning') |
+                         (df['Grandchild'] == 'Grading')]
+
+            exculdedf = df[(df['Grandchild'] == 'Grading') &
+                           (df[r'Finish_Date_Planned\Actual'] == 'A')]
+
+        hold_df = hold_df[~hold_df['PETE_ID'].isin(exculdedf['PETE_ID'])]
+
+        hold_df = hold_df.sort_values(by=['Start_Date'])
+        hold_df.drop_duplicates(subset=['PETE_ID'], keep='first')
+        act_df = act_df.rename(columns={'Start_Date': 'Design_Start_Date'})
+
+        act_df = pd.merge(hold_df, act_df[['PETE_ID', 'Design_Start_Date' ]], on= 'PETE_ID', how='left')
+        act_df = act_df.sort_values(by=['Start_Date'], ascending=True)
+
+        act_df = act_df.query('Design_Start_Date <= Start_Date')
+
+        filterdf = act_df.drop_duplicates(subset=['PETE_ID'], keep='first')
+
+        if len(filterdf) >= 1:
+            description = task_yaml['create_tasks_station_activities_conflict']['description']
+            duedate = dt.datetime.today() + dt.timedelta(
+                hours=task_yaml['create_tasks_station_activities_conflict']['due'])
+            tag = task_yaml['create_tasks_station_activities_conflict']['tag']
+            if create_tasks:
+                scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
+
+    return description
+
 
 @log_decorator.log_decorator()
 def create_tasks_line_design_finish_after_construction_ready_date(df, create_tasks=True,
@@ -689,22 +793,26 @@ def create_tasks_line_design_finish_after_construction_ready_date(df, create_tas
                                                                       'tasks.yaml')):
     # TODO Create Docstring
     description = None
+    df_list = []
     # TODO Convert Filter to Query
-    cs_df = df[(df['Grandchild'] == 'Complete Design Books Issued') &
-               # (df['Grandchild'] == 'Project WA Approved') &
-               (df['Region_Name'] == 'METRO WEST') &
-               (df['Finish_Date'].lt(pd.to_datetime(df['PLANNEDCONSTRUCTIONREADY']))) &
-               (df[r'Finish_Date_Planned\Actual'] == 'P')
-               ]
+    activities = ['Complete Design Books Issued', 'Project WA Approved', 'Material Request', '' ]
+    for activity in activities:
+        df_list.append(df[(df['Grandchild'] == activity) &
+                               (df['Region_Name'] == 'METRO WEST') &
+                               (df['Finish_Date'].lt(pd.to_datetime(df['PLANNEDCONSTRUCTIONREADY']))) &
+                               (df[r'Finish_Date_Planned\Actual'] == 'P')
+                               ])
+    cs_df = pd.concat(df_list)
 
-    cs1_df = df[(df['Grandchild'] == 'Project WA Approved') &
-                (df['Region_Name'] == 'METRO WEST') &
-                (df['Finish_Date'].lt(pd.to_datetime(df['PLANNEDCONSTRUCTIONREADY']))) &
-                (df[r'Finish_Date_Planned\Actual'] == 'P')
-                ]
+    df_list = []
+    schedules = ['Construction', 'District']
+    for schedule in schedules:
+        df_list.append(df[df['Schedule_Function'] == schedule])
 
-    cs_df = pd.concat([cs_df, cs1_df])
+    schedules_df = pd.concat(df_list)
+    schedules_df.drop_duplicates(subset=['PETE_ID'], keep='first')
 
+    cs_df = cs_df[~cs_df['PETE_ID'].isin(schedules_df['PETE_ID'])]
     cs_df = cs_df.sort_values(by=['Start_Date'], ascending=True)
     filterdf = cs_df.drop_duplicates(subset=['PETE_ID'], keep='first')
 

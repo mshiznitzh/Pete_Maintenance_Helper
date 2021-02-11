@@ -481,5 +481,224 @@ class TestTE:
 
             assert ct.create_tasks_for_engineering_activities_start_dates(setup_and_teardown, False) == description
 
+        def test_create_tasks_line_activities_conflict(self, setup_and_teardown):
+            description = 'TE date conflicts with construction/distict summary'
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Grandchild'] = 'Complete Design Books Issued'
+            setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=-1))
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Parent'] = 'Construction Summary'
+            setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            assert ct.create_tasks_line_activities_conflict(setup_and_teardown, False) == description
+
+        def test_create_tasks_station_activities_conflict_1(self, setup_and_teardown):
+            description = 'TE date conflicts with construction/distict summary'
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Grandchild'] = 'Electrical Design'
+            setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=-1))
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Grandchild'] = 'Electrical Job Planning'
+            setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            assert ct.create_tasks_station_activities_conflict(setup_and_teardown, False) == description
+
+        def test_create_tasks_station_activities_conflict_2(self, setup_and_teardown):
+            description = 'TE date conflicts with construction/distict summary'
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Grandchild'] = 'Electrical Design'
+            setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=-1))
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Grandchild'] = 'Electrical Construction'
+            setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            assert ct.create_tasks_station_activities_conflict(setup_and_teardown, False) == description
+
+        def test_create_tasks_station_activities_conflict_3(self, setup_and_teardown):
+            description = 'TE date conflicts with construction/distict summary'
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Grandchild'] = 'Foundation Design'
+            setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=-1))
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Grandchild'] = 'Foundation Job Planning'
+            setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            assert ct.create_tasks_station_activities_conflict(setup_and_teardown, False) == description
+
+        def test_create_tasks_station_activities_conflict_4(self, setup_and_teardown):
+            description = 'TE date conflicts with construction/distict summary'
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Grandchild'] = 'Foundation Design'
+            setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=-1))
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Grandchild'] = 'Foundations'
+            setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            assert ct.create_tasks_station_activities_conflict(setup_and_teardown, False) == description
+
+        def test_create_tasks_station_activities_conflict_5(self, setup_and_teardown):
+            description = 'TE date conflicts with construction/distict summary'
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Grandchild'] = 'Physical Design'
+            setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=-1))
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Grandchild'] = 'Physical Job Planning'
+            setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            assert ct.create_tasks_station_activities_conflict(setup_and_teardown, False) == description
+
+        def test_create_tasks_station_activities_conflict_6(self, setup_and_teardown):
+            description = 'TE date conflicts with construction/distict summary'
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Grandchild'] = 'Physical Design'
+            setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=-1))
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Grandchild'] = 'Physical'
+            setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            assert ct.create_tasks_station_activities_conflict(setup_and_teardown, False) == description
+
+        def test_create_tasks_station_activities_conflict_7(self, setup_and_teardown):
+            description = 'TE date conflicts with construction/distict summary'
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Grandchild'] = 'Grading Design'
+            setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=-1))
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Grandchild'] = 'Grading Job Planning'
+            setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            assert ct.create_tasks_station_activities_conflict(setup_and_teardown, False) == description
+
+        def test_create_tasks_station_activities_conflict_8(self, setup_and_teardown):
+            description = 'TE date conflicts with construction/distict summary'
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Grandchild'] = 'Grading Design'
+            setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=-1))
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Grandchild'] = 'Grading'
+            setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            assert ct.create_tasks_station_activities_conflict(setup_and_teardown, False) == description
+
+
+
     class TestNegtive:
-            pass
+        def test_create_tasks_line_design_finish_after_construction_ready_date(self, setup_and_teardown):
+            description = None
+            # setup_and_teardown['COMMENTS'] = setup_and_teardown['COMMENTS'].astype(str)
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Grandchild'] = 'Complete Design Books Issued'
+            setup_and_teardown.at[0, 'Region_Name'] = 'METRO WEST'
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=1))
+            setup_and_teardown.at[0, r'Finish_Date_Planned\Actual'] = 'A'
+            setup_and_teardown.at[0, 'PLANNEDCONSTRUCTIONREADY'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Schedule_Function'] = 'Construction'
+
+            assert ct.create_tasks_line_design_finish_after_construction_ready_date(setup_and_teardown,
+                                                                                    False) == description
+
+        def test_create_tasks_station_activities_conflict_1(self, setup_and_teardown):
+            description = None
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Grandchild'] = 'Electrical Design'
+            setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=-1))
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Grandchild'] = 'Electrical Job Planning'
+            setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            setup_and_teardown.at[2, 'PETE_ID'] = 1
+            setup_and_teardown.at[2, 'Grandchild'] = 'Electrical Construction'
+            setup_and_teardown.at[2, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+            setup_and_teardown.at[2, r'Finish_Date_Planned\Actual'] = 'A'
+
+            assert ct.create_tasks_station_activities_conflict(setup_and_teardown, False) == description
+
+        def test_create_tasks_station_activities_conflict_2(self, setup_and_teardown):
+            description = None
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Grandchild'] = 'Foundation Design'
+            setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=-1))
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Grandchild'] = 'Foundation Job Planning'
+            setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            setup_and_teardown.at[2, 'PETE_ID'] = 1
+            setup_and_teardown.at[2, 'Grandchild'] = 'Foundations'
+            setup_and_teardown.at[2, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+            setup_and_teardown.at[2, r'Finish_Date_Planned\Actual'] = 'A'
+
+            assert ct.create_tasks_station_activities_conflict(setup_and_teardown, False) == description
+
+        def test_create_tasks_station_activities_conflict_3(self, setup_and_teardown):
+            description = None
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Grandchild'] = 'Physical Design'
+            setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=-1))
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Grandchild'] = 'Physical Job Planning'
+            setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            setup_and_teardown.at[2, 'PETE_ID'] = 1
+            setup_and_teardown.at[2, 'Grandchild'] = 'Physical'
+            setup_and_teardown.at[2, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+            setup_and_teardown.at[2, r'Finish_Date_Planned\Actual'] = 'A'
+
+            assert ct.create_tasks_station_activities_conflict(setup_and_teardown, False) == description
+
+        def test_create_tasks_station_activities_conflict_4(self, setup_and_teardown):
+            description = None
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Grandchild'] = 'Grading Design'
+            setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=-1))
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Grandchild'] = 'Grading Job Planning'
+            setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            setup_and_teardown.at[2, 'PETE_ID'] = 1
+            setup_and_teardown.at[2, 'Grandchild'] = 'Grading'
+            setup_and_teardown.at[2, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+            setup_and_teardown.at[2, r'Finish_Date_Planned\Actual'] = 'A'
+
+            assert ct.create_tasks_station_activities_conflict(setup_and_teardown, False) == description

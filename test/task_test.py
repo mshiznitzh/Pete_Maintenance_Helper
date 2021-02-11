@@ -507,7 +507,7 @@ class TestTE:
             setup_and_teardown.at[1, 'Grandchild'] = 'Electrical Job Planning'
             setup_and_teardown.at[1, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
 
-            assert ct.create_tasks_station_activities_conflict(setup_and_teardown, False) == description
+            assert ct.create_tasks_station_activities_conflict(setup_and_teardown, False) == description + " " + 'Electrical Design'
 
         def test_create_tasks_station_activities_conflict_2(self, setup_and_teardown):
             description = 'TE date conflicts with construction/distict summary'

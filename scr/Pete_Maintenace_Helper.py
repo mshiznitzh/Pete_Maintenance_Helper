@@ -50,6 +50,7 @@ from tkinter import filedialog
 from subprocess import Popen, PIPE
 import scr.create_task.Create_Task as ct
 import scr.Reports.Reports as Reports
+import inspect
 
 import multiprocessing
 import concurrent.futures
@@ -214,11 +215,11 @@ def check_for_task(description, project):
 def add_task(description, project, duedate, priority=None, tag=None):
     # TODO Create Docstring
     task_id = check_for_task(description, project)
-    logger_obj.info(task_id)
     if task_id == 0:
         tw = TaskWarrior()
         task = tw.task_add(description=description, priority=priority, project=project, due=duedate)
-        task_id = task['task_id']
+        logger_obj.debug(task)
+        task_id = task['id']
 
     elif task_id > 0:
         # Task exist update
@@ -229,7 +230,6 @@ def add_task(description, project, duedate, priority=None, tag=None):
 
     if tag is not None:
         update_task(task_id, 'tags', tag)
-
 
 @log_decorator.log_decorator()
 def update_task(task_id, attribute, value):

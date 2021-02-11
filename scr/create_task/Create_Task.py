@@ -740,44 +740,44 @@ def create_tasks_station_activities_conflict(df, create_tasks=True,
                (df['Grandchild'] == 'Electrical Construction')]
 
             exculdedf = df[(df['Grandchild'] == 'Electrical Construction') &
-               (df[r'Finish_Date_Planned\Actual'] == 'A')]
+               (df[r'Start_Date_Planned\Actual'] == 'A')]
 
         elif activity == 'Foundation Design':
             hold_df = df[(df['Grandchild'] == 'Foundation Job Planning') |
                          (df['Grandchild'] == 'Foundations')]
 
             exculdedf = df[(df['Grandchild'] == 'Foundations') &
-                           (df[r'Finish_Date_Planned\Actual'] == 'A')]
+                           (df[r'Start_Date_Planned\Actual'] == 'A')]
 
         elif activity == 'Physical Design':
             hold_df = df[(df['Grandchild'] == 'Physical Job Planning') |
                          (df['Grandchild'] == 'Physical')]
 
             exculdedf = df[(df['Grandchild'] == 'Physical') &
-                           (df[r'Finish_Date_Planned\Actual'] == 'A')]
+                           (df[r'Start_Date_Planned\Actual'] == 'A')]
 
         elif activity == 'Grading Design':
             hold_df = df[(df['Grandchild'] == 'Grading Job Planning') |
                          (df['Grandchild'] == 'Grading')]
 
             exculdedf = df[(df['Grandchild'] == 'Grading') &
-                           (df[r'Finish_Date_Planned\Actual'] == 'A')]
+                           (df[r'Start_Date_Planned\Actual'] == 'A')]
 
         hold_df = hold_df[~hold_df['PETE_ID'].isin(exculdedf['PETE_ID'])]
 
         hold_df = hold_df.sort_values(by=['Start_Date'])
         hold_df.drop_duplicates(subset=['PETE_ID'], keep='first')
-        act_df = act_df.rename(columns={'Start_Date': 'Design_Start_Date'})
+        act_df = act_df.rename(columns={'Finish_Date': 'Design_Finish_Date'})
 
-        act_df = pd.merge(hold_df, act_df[['PETE_ID', 'Design_Start_Date' ]], on= 'PETE_ID', how='left')
+        act_df = pd.merge(hold_df, act_df[['PETE_ID', 'Design_Finish_Date' ]], on= 'PETE_ID', how='left')
         act_df = act_df.sort_values(by=['Start_Date'], ascending=True)
 
-        act_df = act_df.query('Design_Start_Date <= Start_Date')
+        act_df = act_df.query('Design_Finish_Date >= Start_Date')
 
         filterdf = act_df.drop_duplicates(subset=['PETE_ID'], keep='first')
 
         if len(filterdf) >= 1:
-            description = task_yaml['create_tasks_station_activities_conflict']['description']
+            description = task_yaml['create_tasks_station_activities_conflict']['description'] + " " + activity
             duedate = dt.datetime.today() + dt.timedelta(
                 hours=task_yaml['create_tasks_station_activities_conflict']['due'])
             tag = task_yaml['create_tasks_station_activities_conflict']['tag']

@@ -148,11 +148,10 @@ def create_task_for_final_engineering_with_draft_schedules(scheduledf, create_ta
     # This filters Waterfall schedules that are in draft of Released projects
     description = None
 
-
     released_df = scheduledf[(scheduledf['PROJECTSTATUS'] == 'Released') &
                              (scheduledf['Child'] == 'Construction Summary') &
                              (scheduledf['Start_Date'] <= pd.to_datetime(dt.datetime.today().date() + relativedelta(
-                                months=+6))) &
+                                 months=+6))) &
                              ~(scheduledf['Project_Category'].isin(['ROW', 'RELO'])) &
                              (scheduledf['Region_Name'] == 'METRO WEST') |
                              (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
@@ -229,7 +228,7 @@ def create_tasks_for_engineering_activities_start_dates(scheduledf, create_tasks
     # This code filters out the start dates for TE activities and creates tasks
     ed_df = scheduledf[(scheduledf['Grandchild'] == 'Electrical Design') &
                        (scheduledf['Start_Date'] + (
-                              scheduledf['Finish_Date'] - scheduledf['Start_Date']) / 2 <= dt.datetime.today()) &
+                               scheduledf['Finish_Date'] - scheduledf['Start_Date']) / 2 <= dt.datetime.today()) &
                        (scheduledf[r'Start_Date_Planned\Actual'] != 'A') &
                        (scheduledf['Finish_Date'] >= dt.datetime.today()) &
                        (scheduledf['Program_Manager'] == 'Michael Howard') |
@@ -237,7 +236,7 @@ def create_tasks_for_engineering_activities_start_dates(scheduledf, create_tasks
 
     pd_df = scheduledf[(scheduledf['Grandchild'] == 'Physical Design') &
                        (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
-                          'Start_Date']) / 2 <= dt.datetime.today()) &
+                           'Start_Date']) / 2 <= dt.datetime.today()) &
                        (scheduledf[r'Start_Date_Planned\Actual'] != 'A') &
                        (scheduledf['Finish_Date'] >= dt.datetime.today()) &
                        (scheduledf['Program_Manager'] == 'Michael Howard') |
@@ -245,7 +244,7 @@ def create_tasks_for_engineering_activities_start_dates(scheduledf, create_tasks
 
     fd_df = scheduledf[(scheduledf['Grandchild'] == 'Foundation Design') &
                        (scheduledf['Start_Date'] + (scheduledf['Finish_Date'] - scheduledf[
-                          'Start_Date']) / 2 <= dt.datetime.today()) &
+                           'Start_Date']) / 2 <= dt.datetime.today()) &
                        (scheduledf[r'Start_Date_Planned\Actual'] != 'A') &
                        (scheduledf['Finish_Date'] >= dt.datetime.today()) &
                        (scheduledf['Program_Manager'] == 'Michael Howard') |
@@ -689,21 +688,16 @@ def create_tasks_line_design_finish_after_construction_ready_date(df, create_tas
                                                                       'tasks.yaml')):
     # TODO Create Docstring
     description = None
+    df_list = []
     # TODO Convert Filter to Query
-    cs_df = df[(df['Grandchild'] == 'Complete Design Books Issued') &
-               # (df['Grandchild'] == 'Project WA Approved') &
-               (df['Region_Name'] == 'METRO WEST') &
-               (df['Finish_Date'].lt(pd.to_datetime(df['PLANNEDCONSTRUCTIONREADY']))) &
-               (df[r'Finish_Date_Planned\Actual'] == 'P')
-               ]
-
-    cs1_df = df[(df['Grandchild'] == 'Project WA Approved') &
-                (df['Region_Name'] == 'METRO WEST') &
-                (df['Finish_Date'].lt(pd.to_datetime(df['PLANNEDCONSTRUCTIONREADY']))) &
-                (df[r'Finish_Date_Planned\Actual'] == 'P')
-                ]
-
-    cs_df = pd.concat([cs_df, cs1_df])
+    activities = ['Complete Design Books Issued', 'Project WA Approved', 'Material Request', '' ]
+    for activity in activities:
+        df_list.append(df[(df['Grandchild'] == activity) &
+                               (df['Region_Name'] == 'METRO WEST') &
+                               (df['Finish_Date'].lt(pd.to_datetime(df['PLANNEDCONSTRUCTIONREADY']))) &
+                               (df[r'Finish_Date_Planned\Actual'] == 'P')
+                               ])
+    cs_df = pd.concat(df_list)
 
     cs_df = cs_df.sort_values(by=['Start_Date'], ascending=True)
     filterdf = cs_df.drop_duplicates(subset=['PETE_ID'], keep='first')

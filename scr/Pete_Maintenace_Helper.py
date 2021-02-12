@@ -37,6 +37,7 @@ __author__ = "MiKe Howard"
 __version__ = "0.1.0"
 __license__ = "MIT"
 
+import time
 import scr.log_decorator as log_decorator
 import scr.log as log
 from taskw import TaskWarrior
@@ -150,8 +151,8 @@ def cleanup_dataframe(df):
 def create_tasks(df, description, duedate, tag='PMH'):
     # TODO Create Docstring
     df = df.sort_values(by=['Estimated_In_Service_Date'])
-    with concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count() - 1) as executor:
-
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+    #with concurrent.futures.ProcessPoolExecutor(max_workers=1) as executor:
         for index, row in df.iterrows():
 
             logger_obj.info(str(row['PETE_ID']))
@@ -174,7 +175,6 @@ def create_tasks(df, description, duedate, tag='PMH'):
 
             # with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
             patrial_add_task = functools.partial(add_task, description, project, duedate, priority)
-
             executor.submit(patrial_add_task, [tag])
         #     executor.map(patrial_Add_Task, [tag])
         # t = threading.Thread(target=add_task, args=(description, project, duedate, priority, tag,))
@@ -188,8 +188,8 @@ def check_for_task(description, project):
 
     description = str(description)
     project = str(project)
-    logger_obj.info(description)
-    logger_obj.info(project)
+    logger_obj.debug(description)
+    logger_obj.debug(project)
     tw = TaskWarrior()
     tasks = tw.load_tasks()
     df_pending = pd.DataFrame(tasks['pending'])
@@ -214,11 +214,12 @@ def check_for_task(description, project):
 @log_decorator.log_decorator()
 def add_task(description, project, duedate, priority=None, tag=None):
     # TODO Create Docstring
+    logger_obj.debug(tag)
     task_id = check_for_task(description, project)
     if task_id == 0:
         tw = TaskWarrior()
-        task = tw.task_add(description=description, priority=priority, project=project, due=duedate)
-        logger_obj.debug(task)
+        task = tw.task_add(description=description, tags=tag, priority=priority, project=project, due=duedate)
+        logger_obj.debug('I have created task ' + str(task))
         task_id = task['id']
 
     elif task_id > 0:
@@ -231,6 +232,7 @@ def add_task(description, project, duedate, priority=None, tag=None):
     if tag is not None:
         update_task(task_id, 'tags', tag)
 
+
 @log_decorator.log_decorator()
 def update_task(task_id, attribute, value):
     # TODO Create Docstring
@@ -242,14 +244,30 @@ def update_task(task_id, attribute, value):
     task_id, task = tw.get_task(id=task_id)
     logger_obj.info(task)
 
-    try:
-        if task[attribute] != value:
-            task[attribute] = value
-            tw.task_update(task)
-    except KeyError:
-        logger_obj.info("Attribute has not been set so we are adding it")
-        task[attribute] = value
-        tw.task_update(task)
+
+
+    for attempt in range(9):
+        try:
+            if attribute not in task or task[attribute] != value:
+                task[attribute] = value
+                logger_obj.debug("Setting " + attribute + " to " + str(value))
+                tw.task_update(task)
+        except:
+            logger_obj.exception('Retry update - ' + str(attempt))
+        else:
+            break
+    else:
+        logger_obj.debug('Failed to Update task')
+
+    # try:
+    #     if task[attribute] != value:
+    #         task[attribute] = value
+    #         logger_obj.debug("Setting " + attribute + " to " + value)
+    #         tw.task_update(task)
+    # except KeyError:
+    #     logger_obj.info("Attribute has not been set so we are adding it")
+    #     task[attribute] = value
+    #     tw.task_update(task)
 
     logger_obj.info(task)
 

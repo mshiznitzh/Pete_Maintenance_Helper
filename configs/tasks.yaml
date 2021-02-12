@@ -95,10 +95,11 @@ create_task_for_relay_settings:
   start:
     description: Check with Relay Setter on when settings are going to be started
     due: 8
+  tag: RelaySettings
   finish:
     description: Check with Relay Setter on when settings are going to be issued
     due: 1
-  tag: RelaySettings
+
 
 create_task_for_add_wa_to_schedule:
   description: Add PETE ID to query for Schedules

@@ -184,6 +184,8 @@ def create_task_for_released_projects_missing_construnction_ready_date(scheduled
                           (scheduledf['Program_Manager'] == 'Michael Howard') |
                           (scheduledf['BUDGETITEMNUMBER'].isin(list_my_BUDGETITEMS))]
 
+    filterdf =  exclude_once_district_construction_publish(scheduledf, filterdf)
+
     filterdf = filterdf.drop_duplicates(subset=['PETE_ID'])
 
     filterdf.sort_values(by=['Estimated_In_Service_Date'])
@@ -740,44 +742,44 @@ def create_tasks_station_activities_conflict(df, create_tasks=True,
                (df['Grandchild'] == 'Electrical Construction')]
 
             exculdedf = df[(df['Grandchild'] == 'Electrical Construction') &
-               (df[r'Finish_Date_Planned\Actual'] == 'A')]
+               (df[r'Start_Date_Planned\Actual'] == 'A')]
 
         elif activity == 'Foundation Design':
             hold_df = df[(df['Grandchild'] == 'Foundation Job Planning') |
                          (df['Grandchild'] == 'Foundations')]
 
             exculdedf = df[(df['Grandchild'] == 'Foundations') &
-                           (df[r'Finish_Date_Planned\Actual'] == 'A')]
+                           (df[r'Start_Date_Planned\Actual'] == 'A')]
 
         elif activity == 'Physical Design':
             hold_df = df[(df['Grandchild'] == 'Physical Job Planning') |
                          (df['Grandchild'] == 'Physical')]
 
             exculdedf = df[(df['Grandchild'] == 'Physical') &
-                           (df[r'Finish_Date_Planned\Actual'] == 'A')]
+                           (df[r'Start_Date_Planned\Actual'] == 'A')]
 
         elif activity == 'Grading Design':
             hold_df = df[(df['Grandchild'] == 'Grading Job Planning') |
                          (df['Grandchild'] == 'Grading')]
 
             exculdedf = df[(df['Grandchild'] == 'Grading') &
-                           (df[r'Finish_Date_Planned\Actual'] == 'A')]
+                           (df[r'Start_Date_Planned\Actual'] == 'A')]
 
         hold_df = hold_df[~hold_df['PETE_ID'].isin(exculdedf['PETE_ID'])]
 
         hold_df = hold_df.sort_values(by=['Start_Date'])
         hold_df.drop_duplicates(subset=['PETE_ID'], keep='first')
-        act_df = act_df.rename(columns={'Start_Date': 'Design_Start_Date'})
+        act_df = act_df.rename(columns={'Finish_Date': 'Design_Finish_Date'})
 
-        act_df = pd.merge(hold_df, act_df[['PETE_ID', 'Design_Start_Date' ]], on= 'PETE_ID', how='left')
+        act_df = pd.merge(hold_df, act_df[['PETE_ID', 'Design_Finish_Date' ]], on= 'PETE_ID', how='left')
         act_df = act_df.sort_values(by=['Start_Date'], ascending=True)
 
-        act_df = act_df.query('Design_Start_Date <= Start_Date')
+        act_df = act_df.query('Design_Finish_Date >= Start_Date')
 
         filterdf = act_df.drop_duplicates(subset=['PETE_ID'], keep='first')
 
         if len(filterdf) >= 1:
-            description = task_yaml['create_tasks_station_activities_conflict']['description']
+            description = task_yaml['create_tasks_station_activities_conflict']['description'] + " " + activity
             duedate = dt.datetime.today() + dt.timedelta(
                 hours=task_yaml['create_tasks_station_activities_conflict']['due'])
             tag = task_yaml['create_tasks_station_activities_conflict']['tag']
@@ -785,6 +787,20 @@ def create_tasks_station_activities_conflict(df, create_tasks=True,
                 scr.Pete_Maintenace_Helper.create_tasks(filterdf, description, duedate, tag)
 
     return description
+
+@log_decorator.log_decorator()
+def exclude_once_district_construction_publish(df, activities_df):
+    df_list = []
+    schedules = ['Construction', 'District']
+    for schedule in schedules:
+        df_list.append(df[df['Schedule_Function'] == schedule])
+
+    schedules_df = pd.concat(df_list)
+    schedules_df.drop_duplicates(subset=['PETE_ID'], keep='first')
+
+    activities_df = activities_df[~activities_df['PETE_ID'].isin(schedules_df['PETE_ID'])]
+
+    return activities_df
 
 
 @log_decorator.log_decorator()
@@ -804,15 +820,17 @@ def create_tasks_line_design_finish_after_construction_ready_date(df, create_tas
                                ])
     cs_df = pd.concat(df_list)
 
-    df_list = []
-    schedules = ['Construction', 'District']
-    for schedule in schedules:
-        df_list.append(df[df['Schedule_Function'] == schedule])
+    cs_df = exclude_once_district_construction_publish(df, cs_df)
 
-    schedules_df = pd.concat(df_list)
-    schedules_df.drop_duplicates(subset=['PETE_ID'], keep='first')
-
-    cs_df = cs_df[~cs_df['PETE_ID'].isin(schedules_df['PETE_ID'])]
+    # df_list = []
+    # schedules = ['Construction', 'District']
+    # for schedule in schedules:
+    #     df_list.append(df[df['Schedule_Function'] == schedule])
+    #
+    # schedules_df = pd.concat(df_list)
+    # schedules_df.drop_duplicates(subset=['PETE_ID'], keep='first')
+    #
+    # cs_df = cs_df[~cs_df['PETE_ID'].isin(schedules_df['PETE_ID'])]
     cs_df = cs_df.sort_values(by=['Start_Date'], ascending=True)
     filterdf = cs_df.drop_duplicates(subset=['PETE_ID'], keep='first')
 

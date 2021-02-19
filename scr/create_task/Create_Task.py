@@ -576,8 +576,8 @@ def create_tasks_toa_outside_waterfalls(df, create_tasks=True,
     filterdf = pd.merge(active_outage_df, water_start_df[['PETE_ID', 'WaterFall_Start']], on='PETE_ID', how='left')
     filterdf = pd.merge(filterdf, water_finish_df[['PETE_ID', 'WaterFall_Finish']], on='PETE_ID', how='left')
 
-    filterdfs = filterdf[filterdf['Start_Date'].le(filterdf['WaterFall_Start'])]
-    filterdff = filterdf[filterdf['Finish_Date'].ge(filterdf['WaterFall_Finish'])]
+    filterdfs = filterdf[filterdf['Start_Date'].lt(filterdf['WaterFall_Start'])]
+    filterdff = filterdf[filterdf['Finish_Date'].gt(filterdf['WaterFall_Finish'])]
 
     filterdf = pd.concat([filterdfs, filterdff], ignore_index=True)
     filterdf = filterdf.drop_duplicates(subset=['PETE_ID'], keep='first')

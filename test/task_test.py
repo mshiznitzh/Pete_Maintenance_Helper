@@ -72,6 +72,53 @@ class TestTOA:
             setup_and_teardown.at[1, 'Finish_Date'] = pd.to_datetime(pd.to_datetime("today").date())
             assert ct.create_tasks_toa_no_active(setup_and_teardown, False) == None
 
+        def test_Create_tasks_TOA_equal_Waterfall_Start(self, setup_and_teardown):
+            description = None
+            # setup_and_teardown['COMMENTS'] = setup_and_teardown['COMMENTS'].astype(str)
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Schedule_Function'] = 'TOA'
+            setup_and_teardown.at[0, 'COMMENTS'] = str('Oncor Status: SUBMITTED ERCOT Status:')
+            setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[0, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(pd.to_datetime("today").date() + pd.DateOffset(days=1))
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Grandchild'] = 'Waterfall Start'
+            setup_and_teardown.at[1, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[1, 'Finish_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            setup_and_teardown.at[2, 'PETE_ID'] = 1
+            setup_and_teardown.at[2, 'Grandchild'] = 'Waterfall Finish'
+            setup_and_teardown.at[2, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[2, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=6))
+
+            assert ct.create_tasks_toa_outside_waterfalls(setup_and_teardown, False) == description
+
+        def test_Create_tasks_TOA_equal_Waterfall_Finish(self, setup_and_teardown):
+            description = None
+            # setup_and_teardown['COMMENTS'] = setup_and_teardown['COMMENTS'].astype(str)
+            setup_and_teardown.at[0, 'PETE_ID'] = 1
+            setup_and_teardown.at[0, 'Schedule_Function'] = 'TOA'
+            setup_and_teardown.at[0, 'COMMENTS'] = str('Oncor Status: SUBMITTED ERCOT Status:')
+            setup_and_teardown.at[0, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[0, 'Start_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+            setup_and_teardown.at[0, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=6))
+
+            setup_and_teardown.at[1, 'PETE_ID'] = 1
+            setup_and_teardown.at[1, 'Grandchild'] = 'Waterfall Start'
+            setup_and_teardown.at[1, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[1, 'Finish_Date'] = pd.to_datetime(pd.to_datetime("today").date())
+
+            setup_and_teardown.at[2, 'PETE_ID'] = 1
+            setup_and_teardown.at[2, 'Grandchild'] = 'Waterfall Finish'
+            setup_and_teardown.at[2, 'Program_Manager'] = 'Michael Howard'
+            setup_and_teardown.at[2, 'Finish_Date'] = pd.to_datetime(
+                pd.to_datetime("today").date() + pd.DateOffset(days=6))
+
+            assert ct.create_tasks_toa_outside_waterfalls(setup_and_teardown, False) == description
+
     class TestPositive:
         def test_Create_tasks_TOA_before_Waterfall(self, setup_and_teardown):
             description = 'TOA request outside Waterfall dates'

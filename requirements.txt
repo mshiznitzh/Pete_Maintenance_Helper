@@ -9,7 +9,7 @@ docutils==0.16
 idna==2.10
 imagesize==1.2.0
 iniconfig==1.1.1
-Jinja2==2.11.2
+Jinja2==2.11.3
 kitchen==1.2.6
 logzero==1.6.2
 MarkupSafe==1.1.1

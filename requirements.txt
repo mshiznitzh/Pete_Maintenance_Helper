@@ -13,7 +13,7 @@ Jinja2==2.11.2
 kitchen==1.2.6
 logzero==1.6.2
 MarkupSafe==1.1.1
-numpy==1.19.3
+numpy==1.22.0
 packaging==20.8
 pandas==1.1.4
 pluggy==0.13.1
